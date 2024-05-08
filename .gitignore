@@ -1,0 +1,5 @@
+build/
+/.vscode
+/opencv
+.DS_Store
+/helloworld_build
