@@ -59,6 +59,15 @@ target_include_directories(shader PUBLIC
 target_link_libraries(shader PUBLIC glad)
 target_link_libraries(shader PUBLIC ${PROJECT_SOURCE_DIR}/build/_deps/glfw3-build/src/libglfw3.a)
 
+add_library(triangle
+  ${PROJECT_SOURCE_DIR}/src/triangle/triangle.cpp
+  ${PROJECT_SOURCE_DIR}/src/triangle/triangle.h
+)
+target_include_directories(triangle PUBLIC
+  src
+  ${glfw3_SOURCE_DIR}/include
+)
+
 add_library(user_input
   ${PROJECT_SOURCE_DIR}/src/user_input/user_input.cpp
   ${PROJECT_SOURCE_DIR}/src/user_input/user_input.h 
@@ -80,6 +89,7 @@ target_include_directories(physics_simulation PUBLIC src)
 # Necessary libraries for project to compile at compile-time
 # target_link_libraries(physics_simulation PRIVATE glad)
 target_link_libraries(physics_simulation PRIVATE shader)
+target_link_libraries(physics_simulation PRIVATE triangle)
 target_link_libraries(physics_simulation PRIVATE user_input)
 target_link_libraries(physics_simulation PRIVATE stb_image)
 

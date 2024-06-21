@@ -1,11 +1,13 @@
 #include "exercises/exercises.h"
 #include <math.h>
 #include <iostream>
+#include <array>
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "user_input/user_input.h"
 #include "shader_class/shader_class.h"
 #include "stb_image/stb_image.h"
+#include "triangle/triangle.h"
 
 
 // settings
@@ -39,8 +41,8 @@ int exercises() {
 
 	Shader our_shader_01
 	(
-		"../src/shader_source/vertex_shader_practice.vs", 
-		"../src/shader_source/fragment_shader_01_practice.fs"
+		"./src/shader_source/vertex_shader_practice.vs", 
+		"./src/shader_source/fragment_shader_01_practice.fs"
 	);
 	const auto ready_01 = our_shader_01.ready();
 	if (!ready_01) {
@@ -48,8 +50,8 @@ int exercises() {
 		return -1;
 	}
 	Shader our_shader_02(
-		"../src/shader_source/vertex_shader_practice.vs", 
-		"../src/shader_source/fragment_shader_02_practice.fs"
+		"./src/shader_source/vertex_shader_practice.vs", 
+		"./src/shader_source/fragment_shader_02_practice.fs"
 	);
 	const auto ready_02 = our_shader_02.ready();
 	if (!ready_01) {
@@ -58,28 +60,40 @@ int exercises() {
 	}
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	float vertices1[] = {
+	float* obj = sphere(1.0f);
+	std::array<float, 9> equilateral_triangle = create_triangle_mesh(Triangle::Equilateral);
+
+	std::array<float, 32> vertices1 = {
 		// positions          // colors           // texture coords
 		 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
 		 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
 		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
 		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
 	};
-	float vertices2[] = {
-		 -0.75f, -0.75f, 0.0f,
-		 -0.75f, -0.25f, 0.0f,
-		 -0.5f, -0.25f, 0.0f,
+	std::array<float, 18> vertices2 = {
+		 1.0f, 0.0f, 0.0f,
+		 0.0f, 1.0f, 0.0f,
+		 0.0f, 0.0f, 1.0f,
+		 -1.0f, 0.0f, 0.0f,
+		 0.0f, -1.0f, 0.0f,
+		 0.0f, 0.0f, -1.0f,
 	};
-	unsigned int indices[] = {
-	    0, 1, 3,
-	    1, 2, 3
+	std::array<unsigned int, 30> indices = {
+	    0, 1, 2,
+		0, 1, 5,
+		0, 4, 2,
+		0, 4, 5,
+		3, 1, 2,
+		3, 1, 5,
+		3, 4, 2,
+		3, 4, 5,
 	};
 
 	unsigned int VBO[] = {0, 0}, VAO[] = {0, 0};
 	gen_gl_objs(VAO, VBO);
 
 	// first triangle setup
-	bind_gl_objs(VAO, VBO, vertices1);	
+	bind_gl_objs(VAO, VBO, equilateral_triangle);	
 	vert_attrib_pointer_config();
 
 	unsigned int EBO[1] = {0};
@@ -105,7 +119,7 @@ int exercises() {
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, texture02);
 	set_texture_params();
-	unsigned char* data2 = stbi_load("../src/awesomeface.png", &width, &height, &nrChannels, 0);
+	unsigned char* data2 = stbi_load("./src/awesomeface.png", &width, &height, &nrChannels, 0);
 	if (data2) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
 		glGenerateMipmap(GL_TEXTURE_2D);
@@ -139,6 +153,9 @@ int exercises() {
 		glBindTexture(GL_TEXTURE_2D, texture02);
 
 		our_shader_01.use();
+		float time = glfwGetTime();
+		our_shader_01.setFloat("time", time);
+
 		glBindVertexArray(VAO[0]);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -171,12 +188,6 @@ void gen_gl_objs(unsigned int *VAO, unsigned int *VBO) {
 	}
 }
 
-void bind_gl_objs(unsigned int *VAO, unsigned int *VBO, float (&vertices)[32]) {
-	glBindVertexArray(VAO[0]);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-}
-
 void vert_attrib_pointer_config() {
 	// position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
@@ -189,10 +200,10 @@ void vert_attrib_pointer_config() {
 	glEnableVertexAttribArray(2);
 }
 
-void write_to_element_buffer(unsigned int *EBO, unsigned int (&indices)[6]) {
+void write_to_element_buffer(unsigned int *EBO, std::array<unsigned int, 30> indices) {
 	glGenBuffers(1, EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
 }
 
 void set_texture_params() {
@@ -200,4 +211,21 @@ void set_texture_params() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
+
+// Fcts to create assorted geometries.
+float* sphere(float radius) {
+	static float out[18];
+	int k = 0;
+	for (int i=0; i<3; i++) {
+		for (int j=0; j<3; j++) {
+			if (i==j) {
+				out[k] = radius; // Diagonal matrix construction
+				out[k+9] = -radius;
+				k++;
+			}
+			else {out[k] = 0; k++;}
+		}
+	}
+	return out;
 }
