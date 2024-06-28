@@ -48,50 +48,32 @@ target_include_directories(glad PUBLIC src/external_libs)
 target_link_libraries(glad PUBLIC KHR)
 
 # src libs
-add_library(shader
-  ${PROJECT_SOURCE_DIR}/src/shader_class/shader_class.cpp 
-  ${PROJECT_SOURCE_DIR}/src/shader_class/shader_class.h
+add_library(gl_core
+  ${PROJECT_SOURCE_DIR}/src/gl_core/renderer.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/renderer.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/index_buffer.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/index_buffer.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/shader.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/shader.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/triangle.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/triangle.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_array.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_array.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_buffer_layout.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_buffer_layout.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_buffer.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_buffer.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/window.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/window.h
 )
-target_include_directories(shader PUBLIC
+target_include_directories(gl_core PUBLIC
   src
   ${glfw3_SOURCE_DIR}/include
 )
-target_link_libraries(shader PUBLIC glad)
-target_link_libraries(shader PUBLIC ${PROJECT_SOURCE_DIR}/build/_deps/glfw3-build/src/libglfw3.a)
+target_link_libraries(gl_core PUBLIC glad)
+target_link_libraries(gl_core PUBLIC ${PROJECT_SOURCE_DIR}/build/_deps/glfw3-build/src/libglfw3.a)
 
-add_library(triangle
-  ${PROJECT_SOURCE_DIR}/src/triangle/triangle.cpp
-  ${PROJECT_SOURCE_DIR}/src/triangle/triangle.h
-)
-target_include_directories(triangle PUBLIC
-  src
-  ${glfw3_SOURCE_DIR}/include
-)
-
-add_library(user_input
-  ${PROJECT_SOURCE_DIR}/src/user_input/user_input.cpp
-  ${PROJECT_SOURCE_DIR}/src/user_input/user_input.h 
-)
-target_include_directories(user_input PUBLIC
-  src
-  ${glfw3_SOURCE_DIR}/include
-)
-target_link_libraries(user_input PUBLIC glad)
-target_link_libraries(user_input PUBLIC ${PROJECT_SOURCE_DIR}/build/_deps/glfw3-build/src/libglfw3.a)
-
-add_executable(physics_simulation 
-  ${PROJECT_SOURCE_DIR}/src/apps/main/main.cpp
-  ${PROJECT_SOURCE_DIR}/src/tutorial/tutorial.cpp 
-  ${PROJECT_SOURCE_DIR}/src/exercises/exercises.cpp
-)
+add_executable(physics_simulation ${PROJECT_SOURCE_DIR}/src/apps/main/main.cpp)
 target_include_directories(physics_simulation PUBLIC src)
-
-# Necessary libraries for project to compile at compile-time
-# target_link_libraries(physics_simulation PRIVATE glad)
-target_link_libraries(physics_simulation PRIVATE shader)
-target_link_libraries(physics_simulation PRIVATE triangle)
-target_link_libraries(physics_simulation PRIVATE user_input)
 target_link_libraries(physics_simulation PRIVATE stb_image)
-
-# neccessary compile features to compile(basically like the version of the compiler)
-# target_compile_features(physics_simulation PRIVATE cxx_std_17)
+target_link_libraries(physics_simulation PRIVATE gl_core)

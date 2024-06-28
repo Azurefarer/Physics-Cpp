@@ -8,37 +8,13 @@
 #include "shader_class/shader_class.h"
 #include "stb_image/stb_image.h"
 #include "triangle/triangle.h"
-
-
-// settings
-static unsigned int SCR_WIDTH = 1920;
-static unsigned int SCR_HEIGHT = 1080;
-
-// GLSL source code
-// Moved into their own files, accessed by Shader_Class now
+#include "gl_core/renderer.h"
+#include "gl_core/window.h"
+#include "gl_core/index_buffer.h"
+#include "gl_core/vertex_buffer.h"
 
 int exercises() {
-	// glEnable(GL_DEBUG_OUTPUT);
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
-	if (window == NULL)	{
-		std::cout << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
-
-	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		std::cout << "Failed to initialize GLAD" << std::endl;
-		return -1;
-	}
-
+	Window window(1900, 1080, "compartmentalizing OpenGL code");
 	Shader our_shader_01
 	(
 		"./src/shader_source/vertex_shader_practice.vs", 
@@ -60,41 +36,18 @@ int exercises() {
 	}
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	float* obj = sphere(1.0f);
-	std::array<float, 9> equilateral_triangle = create_triangle_mesh(Triangle::Equilateral);
+	VertexBufferLayout layout;
+	layout.push<float>(3);
+	va.add_layout(layout);
 
-	std::array<float, 32> vertices1 = {
-		// positions          // colors           // texture coords
-		 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-		 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
-	};
-	std::array<float, 18> vertices2 = {
-		 1.0f, 0.0f, 0.0f,
-		 0.0f, 1.0f, 0.0f,
-		 0.0f, 0.0f, 1.0f,
-		 -1.0f, 0.0f, 0.0f,
-		 0.0f, -1.0f, 0.0f,
-		 0.0f, 0.0f, -1.0f,
-	};
-	std::array<unsigned int, 30> indices = {
-	    0, 1, 2,
-		0, 1, 5,
-		0, 4, 2,
-		0, 4, 5,
-		3, 1, 2,
-		3, 1, 5,
-		3, 4, 2,
-		3, 4, 5,
-	};
+	IndexBuffer ib(&indices, 3);
 
 	unsigned int VBO[] = {0, 0}, VAO[] = {0, 0};
 	gen_gl_objs(VAO, VBO);
 
 	// first triangle setup
 	bind_gl_objs(VAO, VBO, equilateral_triangle);	
-	vert_attrib_pointer_config();
+	vert_attrib_pointer_config(false, false);
 
 	unsigned int EBO[1] = {0};
 	write_to_element_buffer(EBO, indices);
@@ -106,7 +59,7 @@ int exercises() {
 	glBindTexture(GL_TEXTURE_2D, texture01);
 	set_texture_params();
 	int width = 0, height = 0, nrChannels = 0;
-	unsigned char *data1 = stbi_load("../src/container.jpg", &width, &height, &nrChannels, 0);
+	unsigned char *data1 = stbi_load("./src/container.jpg", &width, &height, &nrChannels, 0);
 	if (data1) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data1);
 		glGenerateMipmap(GL_TEXTURE_2D);
@@ -157,7 +110,7 @@ int exercises() {
 		our_shader_01.setFloat("time", time);
 
 		glBindVertexArray(VAO[0]);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -178,6 +131,8 @@ int exercises() {
 // Auxilliary fcts for readability
 void gen_gl_objs(unsigned int *VAO, unsigned int *VBO) {
 	// Safe, only throws error if the number of objs to gen is negative.
+	// Return integer vaule is always odd for both VAO and VBO
+	// The return value is not freed unless there is a call to delete vertex array.
 	glGenVertexArrays(sizeof(VAO)/sizeof(VAO[0]), VAO);
 	if (sizeof(VAO)/sizeof(VAO[0]) < 0) {
 		std::cout << "ERROR: VAO length is negative" << std::endl;
@@ -188,22 +143,29 @@ void gen_gl_objs(unsigned int *VAO, unsigned int *VBO) {
 	}
 }
 
-void vert_attrib_pointer_config() {
+void vert_attrib_pointer_config(bool color, bool UV) {
 	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	// color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	if (color && UV) {
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+		glEnableVertexAttribArray(2);	
+	}
 	// texture attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-}
-
-void write_to_element_buffer(unsigned int *EBO, std::array<unsigned int, 30> indices) {
-	glGenBuffers(1, EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
+	else if (color && !UV) {
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);	
+	}
+	else if (!color && UV) {
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);	
+	}
+	else if (!color && !UV) {
+		
+	}
 }
 
 void set_texture_params() {

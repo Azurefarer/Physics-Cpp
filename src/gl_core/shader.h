@@ -5,8 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-
-#include "glad/glad.h"
+#include "gl_core/renderer.h"
 
 class Shader
 {
@@ -26,42 +25,45 @@ public:
         }
         else {
             std::stringstream vShaderStream, fShaderStream;
-            // read file's buffer contents into streams
             vShaderStream << vShaderFile.rdbuf();
             fShaderStream << fShaderFile.rdbuf();
-            // close file handlers
-            vShaderFile.close();
-            fShaderFile.close();
-            // convert stream into string
-            std::string vertex_code = vShaderStream.str();
-            std::string fragment_code = fShaderStream.str();
-
-            // 2. compile shaders
-            // vertex shader
-            unsigned int vertex = compile_shader("VERTEX", vertex_code);
-            // fragment shader
-            unsigned int fragment = compile_shader("FRAGMENT", fragment_code);
-            if (!vertex || !fragment) {
-                std::cout << "bad vert or frag" << std::endl;
-            } else {
-                // shader Program
-                m_ID = glCreateProgram();
-                if (!m_ID) {
-                    std::cout << "failed to create program" << std::endl;
+            if (!vShaderStream || !fShaderStream) {
+                std::cout << "ERROR: vshaderstream or fshaderstream is empty" << std::endl;
+            }
+            else {
+                vShaderFile.close();
+                fShaderFile.close();
+                std::string vertex_code = vShaderStream.str();
+                std::string fragment_code = fShaderStream.str();
+                // 2. compile shaders
+                unsigned int vertex = compile_shader("VERTEX", vertex_code);
+                unsigned int fragment = compile_shader("FRAGMENT", fragment_code);
+                if (!vertex || !fragment) {
+                    std::cout << "bad vert or frag" << std::endl;
                 } else {
-                    glAttachShader(m_ID, vertex);
-                    glAttachShader(m_ID, fragment);
-                    glLinkProgram(m_ID);
-                    if (!checkCompileErrors(m_ID, "PROGRAM")) {
-                        std::cout << "program failed to link" << std::endl;
+                    // shader Program
+                    m_ID = glCreateProgram();
+                    if (!m_ID) {
+                        std::cout << "failed to create program" << std::endl;
                     } else {
-                        // delete the shaders as they're linked into our program now and no longer necessary
-                        glDeleteShader(vertex);
-                        glDeleteShader(fragment);
-                        std::cout << "Shader instance success." << std::endl;
-                        m_ready = true;
+                        glAttachShader(m_ID, vertex);
+                        glAttachShader(m_ID, fragment);
+                        glLinkProgram(m_ID);
+                        if (!checkCompileErrors(m_ID, "PROGRAM")) {
+                            std::cout << "program failed to link" << std::endl;
+                        } else {
+                            // delete the shaders as they're linked into our program now and no longer necessary
+                            glDeleteShader(vertex);
+                            glDeleteShader(fragment);
+                            std::cout << "Shader instance success." << std::endl;
+                            m_ready = true;
+                        }
                     }
                 }
+            }
+            const auto ready_01 = ready();
+            if (!ready_01) {
+                std::cout << "ready : " << ready_01 << std::endl;
             }
         }
     }
@@ -120,6 +122,7 @@ private:
         int success = 0;
         const char* csrc = src.c_str();
         if (shader_type == "VERTEX") {
+            std::cout << "inside Shader Class" << std::endl;
             shader = glCreateShader(GL_VERTEX_SHADER);
             glShaderSource(shader, 1, &csrc, NULL);
             glCompileShader(shader);
