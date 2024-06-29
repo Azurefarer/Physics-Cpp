@@ -1,11 +1,10 @@
 #pragma once
+#include <stdint.h>
 #include "gl_core/vertex_buffer.h"
 #include "gl_core/vertex_buffer_layout.h"
 
 class VertexArray {
-    private:
     public:
-        unsigned int m_renderer_ID;
         VertexArray();
         ~VertexArray();
 
@@ -13,4 +12,7 @@ class VertexArray {
         void bind();
         void unbind();
         void add_layout();
+
+    private:
+        unsigned int m_renderer_ID = 0;
 };

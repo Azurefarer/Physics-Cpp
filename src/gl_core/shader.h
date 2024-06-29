@@ -55,7 +55,6 @@ public:
                             // delete the shaders as they're linked into our program now and no longer necessary
                             glDeleteShader(vertex);
                             glDeleteShader(fragment);
-                            std::cout << "Shader instance success." << std::endl;
                             m_ready = true;
                         }
                     }
@@ -122,7 +121,6 @@ private:
         int success = 0;
         const char* csrc = src.c_str();
         if (shader_type == "VERTEX") {
-            std::cout << "inside Shader Class" << std::endl;
             shader = glCreateShader(GL_VERTEX_SHADER);
             glShaderSource(shader, 1, &csrc, NULL);
             glCompileShader(shader);

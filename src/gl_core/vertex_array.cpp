@@ -1,5 +1,5 @@
-#include "gl_core/renderer.h"
 #include "gl_core/vertex_array.h"
+#include "gl_core/renderer.h"
 #include "gl_core/vertex_buffer.h"
 #include "gl_core/vertex_buffer_layout.h"
 
@@ -14,12 +14,12 @@ VertexArray::~VertexArray() {
 void VertexArray::add_buffer(const VertexBuffer& vb, const VertexBufferLayout& layout) {
     bind();
     vb.bind();
-    const auto& elements = layout.GetElements();
+    const auto& elements = layout.get_elements();
+    uintptr_t offset = 0;
     for (unsigned int i=0; i<elements.size(); i++) {
         const auto& element = elements[i];
-        int offset = 0;
+        glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.get_stride(), (const void*)offset);
         glEnableVertexAttribArray(i);
-        glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.get_stride(), (const void*)0);
         offset += element.count * VertexBufferElement::get_size_of_type(element.type);
     }
 }

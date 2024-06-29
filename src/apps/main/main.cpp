@@ -16,6 +16,7 @@ int main() {
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     Shader shader(
         "./src/shader_source/vertex_shader_practice.vs",
         "./src/shader_source/fragment_shader_01_practice.fs");
@@ -32,7 +33,6 @@ int main() {
     std::array<float, 9> position = triangle.get_mesh_vertex_data();
 
     VertexArray va;
-    std::cout << "inside main fct" << std::endl;
     VertexBuffer vb(&position, sizeof(&position));
 	VertexBufferLayout layout;
     layout.push_float(3);
@@ -43,17 +43,17 @@ int main() {
     while (!glfwWindowShouldClose(window.get_window())) {
         window.process_input(window.get_window());
 
-		(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.0f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-        std::cout << "in while loop" << std::endl;
         shader.use();
 
         va.bind();
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
-        va.unbind();
+		GL_call(glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0));
+        // va.unbind();
 
         glfwSwapBuffers(window.get_window());
+        // std::cout << "in while loop : " << std::endl;
 		glfwPollEvents();
     }
     glfwTerminate();

@@ -1,7 +1,8 @@
 #include "gl_core/renderer.h"
 #include "gl_core/index_buffer.h"
 
-IndexBuffer::IndexBuffer(const void* data, unsigned int count) : m_count(count) {
+IndexBuffer::IndexBuffer(const void* data, unsigned int count) {
+    m_count = count;
     glGenBuffers(1, &m_renderer_ID);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_renderer_ID);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(unsigned int), data, GL_STATIC_DRAW);

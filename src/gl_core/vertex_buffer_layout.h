@@ -18,28 +18,29 @@ struct VertexBufferElement {
 };
 
 class VertexBufferLayout {
-    private:
-        std::vector<VertexBufferElement> m_elements;
-        unsigned int m_stride;
     public:
         VertexBufferLayout();
         ~VertexBufferLayout();
 
         void push_float(unsigned int count) {
             m_elements.push_back({GL_FLOAT, count, GL_FALSE});
-            m_stride += VertexBufferElement::get_size_of_type(GL_FLOAT);
+            m_stride += count * VertexBufferElement::get_size_of_type(GL_FLOAT);
         }
 
         void push_unsigned_int(unsigned int count) {
             m_elements.push_back({GL_UNSIGNED_INT, count, GL_FALSE});
-            m_stride += VertexBufferElement::get_size_of_type(GL_UNSIGNED_INT);
+            m_stride += count * VertexBufferElement::get_size_of_type(GL_UNSIGNED_INT);
         }
 
         void push_unsigned_char(unsigned int count) {
             m_elements.push_back({GL_UNSIGNED_BYTE, count, GL_TRUE});
-            m_stride += VertexBufferElement::get_size_of_type(GL_UNSIGNED_BYTE);
+            m_stride += count * VertexBufferElement::get_size_of_type(GL_UNSIGNED_BYTE);
         }
 
-        inline const std::vector<VertexBufferElement> GetElements() const { return m_elements; }
-        inline unsigned int get_stride() const { return m_stride; }
+        const std::vector<VertexBufferElement> get_elements() const { return m_elements; }
+        unsigned int get_stride() const { return m_stride; }
+
+    private:
+        std::vector<VertexBufferElement> m_elements;
+        unsigned int m_stride = 0;
 };

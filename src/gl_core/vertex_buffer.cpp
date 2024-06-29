@@ -1,5 +1,5 @@
-#include "gl_core/renderer.h"
 #include "gl_core/vertex_buffer.h"
+#include "gl_core/renderer.h"
 
 VertexBuffer::VertexBuffer(const void* data, unsigned int size) {
     glGenBuffers(1, &m_renderer_ID);
