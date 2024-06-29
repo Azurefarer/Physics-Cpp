@@ -12,6 +12,10 @@
 int main() {
     Window window(900, 500, "OpenGL Application");
     glfwSetFramebufferSizeCallback(window.get_window(), viewport_size_callback);
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+		std::cout << "Failed to initialize GLAD" << std::endl;
+		return -1;
+	}
     Shader shader(
         "./src/shader_source/vertex_shader_practice.vs",
         "./src/shader_source/fragment_shader_01_practice.fs");
