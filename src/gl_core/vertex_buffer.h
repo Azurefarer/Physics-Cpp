@@ -1,10 +1,11 @@
 #pragma once
+#include "gl_core/renderer.h"
 
 class VertexBuffer {
     private:
         unsigned int m_renderer_ID = 0;
     public:
-        VertexBuffer(const void* data, unsigned int size);
+        VertexBuffer(std::vector<Vertex>* data);
         ~VertexBuffer();
 
         void bind() const;

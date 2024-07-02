@@ -1,17 +1,17 @@
 #pragma once
-#include <array>
+#include "gl_core/renderer.h"
 
 class Triangle {
     private:
         unsigned int m_ID = 0;
-        std::array<float, 9> m_position;
+        std::vector<Vertex> m_vertices;
 
     public:
-        Triangle(std::array<float, 9> position);
+        Triangle(std::vector<Vertex> vertex);
         ~Triangle();
 
         void generate_triangle_mesh();
-        void set_mesh_vertex_data(std::array<float, 9> position);
+        void set_mesh_vertex_data(std::vector<Vertex> vertex);
 
-        std::array<float, 9> get_mesh_vertex_data() { return m_position; }
+        std::vector<Vertex> get_mesh_vertex_data() { return m_vertices; }
 };

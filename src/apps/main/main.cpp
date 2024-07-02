@@ -1,5 +1,4 @@
 #include <iostream>
-#include <array>
 #include "gl_core/renderer.h"
 #include "gl_core/window.h"
 #include "gl_core/shader.h"
@@ -10,50 +9,59 @@
 #include "gl_core/index_buffer.h"
 
 int main() {
+    // Set up Open GL Context
     Window window(900, 500, "OpenGL Application");
-    glfwSetFramebufferSizeCallback(window.get_window(), viewport_size_callback);
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		std::cout << "Failed to initialize GLAD" << std::endl;
-		return -1;
-	}
+    // glfwSetFramebufferSizeCallback(window.get_window(), viewport_size_callback);
+	// if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+	// 	std::cout << "Failed to initialize GLAD" << std::endl;
+	// 	return -1;
+	// }
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    // set up Shader(s)
     Shader shader(
         "./src/shader_source/vertex_shader_practice.vs",
         "./src/shader_source/fragment_shader_01_practice.fs");
-    std::array<float, 9> positions = {
+
+    // Set up Vertex Data
+    std::vector<Vertex> vertices = {
+        {-0.5, -0.5, 0.0},
+        {0.5, -0.5, 0.0},
+        {0.5, 0.5, 0.0}
+    };
+
+    std::vector<float> positions = {
         -0.5, -0.5, 0.0,
         0.5, -0.5, 0.0,
         0.5, 0.5, 0.0
     };
-    std::array<unsigned int, 3> indices = {
+    std::vector<unsigned int> indices = {
         0, 1, 2
     };
-    Triangle triangle(positions);
+    Triangle triangle(vertices);
 
-    std::array<float, 9> position = triangle.get_mesh_vertex_data();
-
+    std::vector<Vertex> position = triangle.get_mesh_vertex_data();
+    // Configure GPU memory
     VertexArray va;
-    VertexBuffer vb(&position, sizeof(&position));
+    VertexBuffer vb(&position);
 	VertexBufferLayout layout;
     layout.push_float(3);
    	va.add_buffer(vb, layout);
-
     IndexBuffer ib(&indices, 3);
 
+    // Main Render Loop
     while (!glfwWindowShouldClose(window.get_window())) {
         window.process_input(window.get_window());
 
 		glClearColor(0.0f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-        shader.use();
+        // shader.use();
 
         va.bind();
-		GL_call(glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0));
-        // va.unbind();
-
+		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+        va.unbind();
+        std::cout << "while" << std::endl;
         glfwSwapBuffers(window.get_window());
-        // std::cout << "in while loop : " << std::endl;
 		glfwPollEvents();
     }
     glfwTerminate();
