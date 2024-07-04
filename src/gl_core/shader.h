@@ -12,8 +12,7 @@ class Shader
 public:
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
-    Shader(const char* vertexPath, const char* fragmentPath)
-    {
+    Shader(const char* vertexPath, const char* fragmentPath) {
         // 1. retrieve the vertex/fragment source code from filePath
         // and open them with ifstream constructor
         std::ifstream vShaderFile(vertexPath);
@@ -22,15 +21,13 @@ public:
         // Doesn't catch an empty or null path
         if (!vShaderFile || !fShaderFile) {
             std::cout << "ERROR: vshaderfile or fshaderfile failed to open" << std::endl;
-        }
-        else {
+        } else {
             std::stringstream vShaderStream, fShaderStream;
             vShaderStream << vShaderFile.rdbuf();
             fShaderStream << fShaderFile.rdbuf();
             if (!vShaderStream || !fShaderStream) {
                 std::cout << "ERROR: vshaderstream or fshaderstream is empty" << std::endl;
-            }
-            else {
+            } else {
                 vShaderFile.close();
                 fShaderFile.close();
                 std::string vertex_code = vShaderStream.str();
@@ -60,11 +57,11 @@ public:
                     }
                 }
             }
-            const auto ready_01 = ready();
-            if (!ready_01) {
-                std::cout << "ready : " << ready_01 << std::endl;
-            }
         }
+    const auto ready_01 = ready();
+    if (!ready_01) {
+        std::cout << "ready : " << ready_01 << std::endl;
+    }
     }
     // activate the shader
 

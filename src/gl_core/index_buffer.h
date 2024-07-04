@@ -2,10 +2,10 @@
 
 class IndexBuffer {
     private:
-        unsigned int m_renderer_ID = 0;
+        unsigned int m_renderer_ID = 1;
         unsigned int m_count = 0;
     public:
-        IndexBuffer(const void* data, unsigned int count);
+        IndexBuffer(std::vector<unsigned int>* data);
         ~IndexBuffer();
 
         void bind() const;

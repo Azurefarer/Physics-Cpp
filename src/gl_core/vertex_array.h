@@ -14,5 +14,5 @@ class VertexArray {
         void add_layout();
 
     private:
-        unsigned int m_renderer_ID = 0;
+        unsigned int m_renderer_ID = 1;
 };
