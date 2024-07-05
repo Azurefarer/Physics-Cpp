@@ -43,15 +43,15 @@ public:
                     if (!m_ID) {
                         std::cout << "failed to create program" << std::endl;
                     } else {
-                        glAttachShader(m_ID, vertex);
-                        glAttachShader(m_ID, fragment);
-                        glLinkProgram(m_ID);
+                        GL_call(glAttachShader(m_ID, vertex));
+                        GL_call(glAttachShader(m_ID, fragment));
+                        GL_call(glLinkProgram(m_ID));
                         if (!checkCompileErrors(m_ID, "PROGRAM")) {
                             std::cout << "program failed to link" << std::endl;
                         } else {
                             // delete the shaders as they're linked into our program now and no longer necessary
-                            glDeleteShader(vertex);
-                            glDeleteShader(fragment);
+                            GL_call(glDeleteShader(vertex));
+                            GL_call(glDeleteShader(fragment));
                             m_ready = true;
                         }
                     }
@@ -66,24 +66,24 @@ public:
     // activate the shader
 
     void use() {
-        glUseProgram(m_ID);
+        GL_call(glUseProgram(m_ID));
     }
     // utility uniform functions
 
     void setBool(const std::string& name, bool value) const {
-        glUniform1i(glGetUniformLocation(m_ID, name.c_str()), (int)value);
+        GL_call(glUniform1i(glGetUniformLocation(m_ID, name.c_str()), (int)value));
     }
 
     void setInt(const std::string& name, int value) {
         if (glGetUniformLocation(m_ID, name.c_str()) == -1) {
             m_error = true;
         } else {
-            glUniform1i(glGetUniformLocation(m_ID, name.c_str()), value);
+            GL_call(glUniform1i(glGetUniformLocation(m_ID, name.c_str()), value));
         }
     }
 
     void setFloat(const std::string& name, float value) const {
-        glUniform1f(glGetUniformLocation(m_ID, name.c_str()), value);
+        GL_call(glUniform1f(glGetUniformLocation(m_ID, name.c_str()), value));
     }
 
     unsigned int id() const {
@@ -104,7 +104,7 @@ private:
     bool m_error = false;
     void check_shader(unsigned int shader) {
         int param;
-        glGetShaderiv(shader, GL_DELETE_STATUS, &param);
+        GL_call(glGetShaderiv(shader, GL_DELETE_STATUS, &param));
         if (param) {
             std::cout << "Flagged for deletion" << std::endl;
         }
@@ -119,14 +119,14 @@ private:
         const char* csrc = src.c_str();
         if (shader_type == "VERTEX") {
             shader = glCreateShader(GL_VERTEX_SHADER);
-            glShaderSource(shader, 1, &csrc, NULL);
-            glCompileShader(shader);
+            GL_call(glShaderSource(shader, 1, &csrc, NULL));
+            GL_call(glCompileShader(shader));
             success = checkCompileErrors(shader, "VERTEX");
         }
         else if (shader_type == "FRAGMENT") {
             shader = glCreateShader(GL_FRAGMENT_SHADER);
-            glShaderSource(shader, 1, &csrc, NULL);
-            glCompileShader(shader);
+            GL_call(glShaderSource(shader, 1, &csrc, NULL));
+            GL_call(glCompileShader(shader));
             success = checkCompileErrors(shader, "FRAGMENT");
         } else {
             std::cout << "ERROR: unhandled shader type, " << shader_type << std::endl;
@@ -146,19 +146,19 @@ private:
         char infoLog[1024];
         if (type != "PROGRAM")
         {
-            glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+            GL_call(glGetShaderiv(shader, GL_COMPILE_STATUS, &success));
             if (success == GL_FALSE)
             {
-                glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+                GL_call(glGetShaderInfoLog(shader, 1024, NULL, infoLog));
                 std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << std::endl << infoLog << std::endl;
             }
         }
         else
         {
-            glGetProgramiv(shader, GL_LINK_STATUS, &success);
+            GL_call(glGetProgramiv(shader, GL_LINK_STATUS, &success));
             if (success == GL_FALSE)
             {
-                glGetProgramInfoLog(shader, 1024, NULL, infoLog);
+                GL_call(glGetProgramInfoLog(shader, 1024, NULL, infoLog));
                 std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << std::endl << infoLog << std::endl;
             }
         }

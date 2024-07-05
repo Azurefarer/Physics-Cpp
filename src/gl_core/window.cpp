@@ -18,7 +18,9 @@ Window::Window(unsigned int width, unsigned int height, const char *title) {
 	}
 }
 
-Window::~Window() {};
+Window::~Window() {
+    glfwTerminate();
+};
 
 void Window::process_input(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)

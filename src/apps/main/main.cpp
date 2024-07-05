@@ -11,7 +11,7 @@
 int main() {
     // Set up Open GL Context
     Window window(1000, 650, "OpenGL Application");
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	GL_call(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
 
     // set up Shader(s)
     Shader shader(
@@ -20,9 +20,9 @@ int main() {
 
     // Set up Vertex Data
     std::vector<Vertex> vertices = {
-        {-0.5, -0.5, 0.0},
-        {0.5, -0.5, 0.0},
-        {0.5, 0.5, 0.0}
+        {-0.5, -0.5, 0.0, 0.2, 0.7, 0.5},
+        {0.5, -0.5, 0.0, 0.4, 0.9, 0.3},
+        {0.5, 0.5, 0.0, 0.3, 0.7, 0.1}
     };
     std::vector<unsigned int> indices = {
         0, 1, 2
@@ -35,6 +35,7 @@ int main() {
     VertexBuffer vb(&position);
 	VertexBufferLayout layout;
     layout.push_float(3);
+    layout.push_float(3);
    	va.add_buffer(vb, layout);
     IndexBuffer ib(&indices);
 
@@ -42,20 +43,19 @@ int main() {
     while (!glfwWindowShouldClose(window.get_window())) {
         window.process_input(window.get_window());
 
-		glClearColor(0.0f, 0.2f, 0.2f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		GL_call(glClearColor(0.0f, 0.2f, 0.2f, 1.0f));
+		GL_call(glClear(GL_COLOR_BUFFER_BIT));
 
         shader.use();
         float time = glfwGetTime();
 		shader.setFloat("time", time);
 
         va.bind();
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (const void*)0);
+		GL_call(glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (const void*)0));
         va.unbind();
 
         glfwSwapBuffers(window.get_window());
 		glfwPollEvents();
     }
-    glfwTerminate();
     return 0;
 }

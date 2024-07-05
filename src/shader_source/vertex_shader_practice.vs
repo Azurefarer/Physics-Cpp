@@ -1,9 +1,9 @@
 #version 330 core
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aColor;
-layout (location = 2) in vec2 aTexCoord;
+// layout (location = 2) in vec2 aTexCoord;
 out vec3 UV;
-out vec2 TexCoord;
+// out vec2 TexCoord;
 out vec3 color;
 uniform float time;
 
@@ -19,6 +19,6 @@ void main()
     vec2 rotated_positions = rotation(aPos.xy, time);
     gl_Position = vec4(rotated_positions, aPos.z, 1.0);
 	UV = aPos.rgb;
-    TexCoord = aTexCoord;
+    // TexCoord = aTexCoord;
     color = aColor;
 }

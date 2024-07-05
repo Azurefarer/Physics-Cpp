@@ -1,11 +1,10 @@
 #include "gl_core/renderer.h"
 
 void GL_clear_error() {
-    while (glGetError != GL_NO_ERROR);
+    while (glGetError() != GL_NO_ERROR);
 }
 
 bool GL_log_call(const char* function, const char* file, int line) {
-    std::cout << "GL_log_call() called" << std::endl;
     while (GLenum error = glGetError()) {
         std::cout << "[OpenGL Error] (" << error << "): " << function <<
             " " << file << ":" << line << std::endl;

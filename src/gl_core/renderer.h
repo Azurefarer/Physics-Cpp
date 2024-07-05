@@ -5,14 +5,13 @@
 #include "GLFW/glfw3.h"
 
 #define ASSERT(x) if (!(x)) __debugbreak();
-#define GL_call(x) std::cout << "hello preproccesor" << std::endl;\
-    GL_clear_error();\
+#define GL_call(x) GL_clear_error();\
     x;\
     ASSERT(GL_log_call(#x, __FILE__, __LINE__))
 
 typedef struct {
     float x, y, z;
-    // float r, g, b;
+    float r, g, b;
     // float nx, ny, nz;
     // float u, v;
 } Vertex;

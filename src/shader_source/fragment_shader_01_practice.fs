@@ -10,5 +10,5 @@ uniform float time;
 void main()
 {
     FragColor = vec4(color, 1.0);
-    FragColor *= mix(texture(texture01, TexCoord), texture(texture02, TexCoord), 0.5);
+    // FragColor *= mix(texture(texture01, TexCoord), texture(texture02, TexCoord), 0.5);
 }
