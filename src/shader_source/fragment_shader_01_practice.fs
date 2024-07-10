@@ -7,8 +7,9 @@ uniform sampler2D texture01;
 uniform sampler2D texture02;
 uniform float time;
 
-void main()
-{
-    FragColor = vec4(color, 1.0);
-    // FragColor *= mix(texture(texture01, TexCoord), texture(texture02, TexCoord), 0.5);
+void main() {
+    vec4 king_tex = texture(texture01, TexCoord);
+    vec4 awesome_tex = texture(texture02, TexCoord);
+    vec4 mix_tex = mix(king_tex, awesome_tex, abs(sin(time)));
+    FragColor = mix_tex;
 }

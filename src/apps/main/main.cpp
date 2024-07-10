@@ -7,6 +7,7 @@
 #include "gl_core/vertex_buffer.h"
 #include "gl_core/vertex_buffer_layout.h"
 #include "gl_core/index_buffer.h"
+#include "gl_core/texture_buffer.h"
 
 int main() {
     // Set up Open GL Context
@@ -20,12 +21,14 @@ int main() {
 
     // Set up Vertex Data
     std::vector<Vertex> vertices = {
-        {-0.5, -0.5, 0.0, 0.2, 0.7, 0.5},
-        {0.5, -0.5, 0.0, 0.4, 0.9, 0.3},
-        {0.5, 0.5, 0.0, 0.3, 0.7, 0.1}
+        {-0.5, -0.5, 0.0,  0.2, 0.7, 0.5,  1.0, 1.0},
+        {0.5, -0.5, 0.0,  0.4, 0.9, 0.3,  0.0, 1.0},
+        {0.5, 0.5, 0.0,  0.3, 0.7, 0.1,  0.0, 0.0},
+        {-0.5, 0.5, 0.0,  0.9, 0.7, 0.1,  1.0, 0.0}
     };
     std::vector<unsigned int> indices = {
-        0, 1, 2
+        0, 1, 2,
+        0, 2, 3
     };
     Triangle triangle(vertices);
     std::vector<Vertex> position = triangle.get_mesh_vertex_data();
@@ -36,8 +39,18 @@ int main() {
 	VertexBufferLayout layout;
     layout.push_float(3);
     layout.push_float(3);
+    layout.push_float(2);
    	va.add_buffer(vb, layout);
     IndexBuffer ib(&indices);
+
+    TextureBuffer tb;
+    tb.add_texture("../src/king_canute.png");
+    tb.add_texture("../src/awesomeface.png");
+    // tb.add_texture("../src/awesomeface.png");
+
+    shader.use();
+    shader.setInt("texture01", (int)tb.get_texture(0));
+    shader.setInt("texture02", (int)tb.get_texture(1));
 
     // Main Render Loop
     while (!glfwWindowShouldClose(window.get_window())) {
@@ -51,7 +64,7 @@ int main() {
 		shader.setFloat("time", time);
 
         va.bind();
-		GL_call(glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (const void*)0));
+		GL_call(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (const void*)0));
         va.unbind();
 
         glfwSwapBuffers(window.get_window());

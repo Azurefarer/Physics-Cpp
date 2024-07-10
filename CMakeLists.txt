@@ -39,6 +39,10 @@ add_library(stb_image
 )
 target_include_directories(stb_image PUBLIC src/external_libs)
 
+add_subdirectory(${PROJECT_SOURCE_DIR}/src/external_libs/glm ${PROJECT_SOURCE_DIR}/build/glm)
+# set(glm_DIR )
+# find_package(glm REQUIRED)
+
 add_library(glad 
   ${PROJECT_SOURCE_DIR}/src/external_libs/glad/glad.c
   ${PROJECT_SOURCE_DIR}/src/external_libs/glad/glad.h
@@ -55,6 +59,8 @@ add_library(gl_core
   ${PROJECT_SOURCE_DIR}/src/gl_core/index_buffer.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/shader.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/shader.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/texture_buffer.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/texture_buffer.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/triangle.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/triangle.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_array.cpp
@@ -71,9 +77,12 @@ target_include_directories(gl_core PUBLIC
   ${glfw3_SOURCE_DIR}/include
 )
 target_link_libraries(gl_core PUBLIC glad)
+target_link_libraries(gl_core PUBLIC stb_image)
 target_link_libraries(gl_core PUBLIC ${PROJECT_SOURCE_DIR}/build/_deps/glfw3-build/src/libglfw3.a)
 
 add_executable(physics_simulation ${PROJECT_SOURCE_DIR}/src/apps/main/main.cpp)
 target_include_directories(physics_simulation PUBLIC src)
 target_link_libraries(physics_simulation PRIVATE stb_image)
 target_link_libraries(physics_simulation PRIVATE gl_core)
+target_link_libraries(physics_simulation PRIVATE glm::glm)
+  
