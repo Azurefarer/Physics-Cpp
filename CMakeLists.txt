@@ -53,6 +53,7 @@ target_link_libraries(glad PUBLIC KHR)
 
 # src libs
 add_library(gl_core
+  ${PROJECT_SOURCE_DIR}/src/gl_core/gl_core.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/renderer.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/renderer.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/index_buffer.cpp
