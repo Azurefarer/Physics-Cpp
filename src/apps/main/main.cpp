@@ -1,9 +1,12 @@
 #include <iostream>
 #include "gl_core/gl_core.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 int main() {
     // Set up Open GL Context
-    Window window(1000, 650, "OpenGL Application");
+    Window window(1500, 1950/2, "OpenGL Application");
 	GL_call(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
 
     // set up Shader(s)
@@ -38,11 +41,11 @@ int main() {
     TextureBuffer tb;
     tb.add_texture("../src/king_canute.png");
     tb.add_texture("../src/awesomeface.png");
-    // tb.add_texture("../src/awesomeface.png");
 
     shader.use();
-    shader.setInt("texture01", (int)tb.get_texture(0));
-    shader.setInt("texture02", (int)tb.get_texture(1));
+    shader.set_int("texture01", (int)tb.get_texture(0));
+    shader.set_int("texture02", (int)tb.get_texture(1));
+
 
     // Main Render Loop
     while (!glfwWindowShouldClose(window.get_window())) {
@@ -53,7 +56,24 @@ int main() {
 
         shader.use();
         float time = glfwGetTime();
-		shader.setFloat("time", time);
+		shader.set_float("time", time);
+
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(-0.5f, -0.5f, 0.0f));
+        trans = glm::rotate(trans, time, glm::vec3(0.0f, 0.0f, 1.0f));
+        trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+        shader.use();
+        shader.set_mat4("rot", trans);
+        va.bind();
+		GL_call(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (const void*)0));
+        va.unbind();
+
+        trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(0.5, 0.5, 0.0));
+        trans = glm::rotate(trans, time, glm::vec3(0.0, 0.0, 1.0));
+        trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+        shader.use();
+        shader.set_mat4("rot", trans);
 
         va.bind();
 		GL_call(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (const void*)0));

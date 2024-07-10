@@ -40,8 +40,6 @@ add_library(stb_image
 target_include_directories(stb_image PUBLIC src/external_libs)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/external_libs/glm ${PROJECT_SOURCE_DIR}/build/glm)
-# set(glm_DIR )
-# find_package(glm REQUIRED)
 
 add_library(glad 
   ${PROJECT_SOURCE_DIR}/src/external_libs/glad/glad.c
