@@ -1,7 +1,6 @@
 #pragma once
 
 #include "gl_core/renderer.h"
-#include "gl_core/window.h"
 #include "gl_core/shader.h"
 #include "gl_core/triangle.h"
 #include "gl_core/vertex_array.h"

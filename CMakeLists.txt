@@ -68,8 +68,6 @@ add_library(gl_core
   ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_buffer_layout.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_buffer.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_buffer.h
-  ${PROJECT_SOURCE_DIR}/src/gl_core/window.cpp
-  ${PROJECT_SOURCE_DIR}/src/gl_core/window.h
 )
 target_include_directories(gl_core PUBLIC
   src

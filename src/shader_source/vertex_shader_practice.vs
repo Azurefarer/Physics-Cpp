@@ -7,21 +7,13 @@ out vec2 TexCoord;
 out vec3 color;
 uniform float time;
 uniform mat4 rot;
-
-vec2 rotation(vec2 pos, float t) {
-    vec2 rotated;
-    mat2 rot = mat2(vec2(cos(t), sin(t)), vec2(-sin(t), cos(t)));
-    rotated = rot * pos;
-    return rotated;
-}
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
 
 void main()
 {
-    vec4 rot_pos = rot * vec4(aPos, 1.0);
-    vec2 rotated_positions = rotation(aPos.xy, time);
-    gl_Position = vec4(rotated_positions, aPos.z, 1.0);
-    gl_Position = vec4(aPos, 1.0);
-    gl_Position = rot_pos * 0.1;
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
 	UV = aPos.rgb;
     TexCoord = aTexCoord;
     color = aColor;
