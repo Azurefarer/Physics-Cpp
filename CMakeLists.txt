@@ -54,6 +54,8 @@ add_library(gl_core
   ${PROJECT_SOURCE_DIR}/src/gl_core/gl_core.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/renderer.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/renderer.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/gpu_config.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/gpu_config.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/index_buffer.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/index_buffer.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/shader.cpp
@@ -77,9 +79,21 @@ target_link_libraries(gl_core PUBLIC glad)
 target_link_libraries(gl_core PUBLIC stb_image)
 target_link_libraries(gl_core PUBLIC ${PROJECT_SOURCE_DIR}/build/_deps/glfw3-build/src/libglfw3.a)
 
+add_library(gl_aux
+  ${PROJECT_SOURCE_DIR}/src/gl_aux/quad.h
+  ${PROJECT_SOURCE_DIR}/src/gl_aux/quad.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_aux/cube.h
+  ${PROJECT_SOURCE_DIR}/src/gl_aux/cube.cpp
+)
+target_include_directories(gl_core PUBLIC
+  src
+)
+target_link_libraries(gl_aux PUBLIC gl_core)
+
 add_executable(physics_simulation ${PROJECT_SOURCE_DIR}/src/apps/main/main.cpp)
 target_include_directories(physics_simulation PUBLIC src)
 target_link_libraries(physics_simulation PRIVATE stb_image)
 target_link_libraries(physics_simulation PRIVATE gl_core)
+target_link_libraries(physics_simulation PRIVATE gl_aux)
 target_link_libraries(physics_simulation PRIVATE glm::glm)
   

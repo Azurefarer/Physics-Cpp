@@ -38,7 +38,7 @@ Window::Window(unsigned int width, unsigned int height, const char *title) {
 
 Window::~Window() {
     glfwTerminate();
-};
+}
 
 void Window::process_input(GLFWwindow* window) {
     glfwGetCursorPos(window, &m_cursor_pos_x, &m_cursor_pos_y);

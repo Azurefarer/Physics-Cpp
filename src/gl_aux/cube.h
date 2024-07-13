@@ -1,14 +1,12 @@
 #pragma once
 
 #include <vector>
-#include "gl_core/gl_core.h"
+#include "gl_core/renderer.h"
 
-class Quad {
+class Cube {
     public:
-        Quad();
-        ~Quad();
-
-        void gpu_config();
+        Cube();
+        ~Cube();
 
         std::vector<Vertex> get_verts() const { return m_verts; };
         std::vector<unsigned int> get_indices() const { return m_indices; };
