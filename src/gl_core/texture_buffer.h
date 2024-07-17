@@ -3,8 +3,13 @@
 
 #include <optional>
 #include <vector>
+
 #include "gl_core/renderer.h"
 #include "stb_image/stb_image.h"
+
+typedef struct {
+    std::vector<unsigned int> id
+}
 
 class TextureBuffer {
     public:

@@ -54,6 +54,8 @@ add_library(gl_core
   ${PROJECT_SOURCE_DIR}/src/gl_core/gl_core.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/renderer.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/renderer.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/camera.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/camera.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/gpu_config.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/gpu_config.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/index_buffer.cpp
@@ -78,6 +80,8 @@ target_include_directories(gl_core PUBLIC
 target_link_libraries(gl_core PUBLIC glad)
 target_link_libraries(gl_core PUBLIC stb_image)
 target_link_libraries(gl_core PUBLIC ${PROJECT_SOURCE_DIR}/build/_deps/glfw3-build/src/libglfw3.a)
+target_link_libraries(gl_core PUBLIC glm::glm)
+
 
 add_library(gl_aux
   ${PROJECT_SOURCE_DIR}/src/gl_aux/gl_aux.h

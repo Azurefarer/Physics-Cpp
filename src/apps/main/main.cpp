@@ -1,9 +1,11 @@
 #include <iostream>
-#include "gl_core/gl_core.h"
-#include "gl_aux/gl_aux.h"
+
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+
+#include "gl_core/gl_core.h"
+#include "gl_aux/gl_aux.h"
 
 int main() {
     // Set up Open GL Context
@@ -43,29 +45,22 @@ int main() {
     shader.set_int("texture01", tex_int_01.value());
     shader.set_int("texture02", tex_int_02.value());
 
+    // Camera obj
+    Camera cam;
+
     // Main Render Loop
     while (!glfwWindowShouldClose(window.get_window())) {
         window.process_input(window.get_window());
 
-
-
-        // Camera Stuff
-        glm::vec3 camera_pos(0.0f, 0.0f, 3.0f);
-        glm::vec3 camera_target(0.0f, 0.0f, 0.0f);
-        glm::vec3 camera_direction = glm::normalize(camera_pos - camera_target);
+        // I'm going to want an abstract draw(Shader &shader) function
+        // gpu_config.draw(1); the draw fct is in GpuConfig right now.
+        // this is not very separation of concerns.
         
-        glm::vec3 up(0.0f, 1.0f, 0.0f);
-        glm::vec3 camera_right = glm::normalize(glm::cross(up, camera_direction));
-        glm::vec3 camera_up = glm::cross(camera_direction, camera_right);
+        // Something called like render_pipeline that creates/modifies
+        // appropriate model, view and projection maticies.
 
-        // lookAt() does all the math above.
-        // glm::mat4 view_cam = glm::lookAt(camera_pos, camera_target, up);
-
-        const float radius = 10.0f;
-        float cam_x = sin(glfwGetTime()) * radius;
-        float cam_z = cos(glfwGetTime()) * radius;
-        glm::mat4 view_cam = glm::lookAt(glm::vec3(cam_x, 0.0, cam_z), camera_target, up);
-
+        // This render pipeline is going to need to use the camera obj
+        // and know about all objs in the scene
 
         float g = window.get_cursor_pos_ratio()[0];
         float b = window.get_cursor_pos_ratio()[1];
@@ -82,16 +77,9 @@ int main() {
         projection = glm::perspective(glm::radians(45.0f), 1500.0f/975.0f, 0.1f, 100.0f);
         shader.use();
         shader.set_mat4("model", model);
-        shader.set_mat4("view", view_cam);
+        shader.set_mat4("view", cam.get_view());
         shader.set_mat4("projection", projection);
         gpu_config.draw(1);
-
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-2.0f, 1.0f, 1.0f));
-        model = glm::rotate(model, glm::radians(b*360.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(g*360.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-        shader.set_mat4("model", model);
-        gpu_config.draw(0);
 
         glfwSwapBuffers(window.get_window());
 		glfwPollEvents();
