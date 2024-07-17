@@ -1,4 +1,6 @@
-#pragma once
+#ifndef VERTEX_BUFFER_H_
+#define VERTEX_BUFFER_H_
+
 #include "gl_core/renderer.h"
 
 class VertexBuffer {
@@ -11,3 +13,4 @@ class VertexBuffer {
     private:
         unsigned int m_renderer_ID = 1;
 };
+#endif

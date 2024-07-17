@@ -1,4 +1,6 @@
-#pragma once
+#ifndef VERTEX_BUFFER_LAYOUT_H_
+#define VERTEX_BUFFER_LAYOUT_H_
+
 #include <vector>
 #include "gl_core/renderer.h"
 
@@ -44,3 +46,4 @@ class VertexBufferLayout {
         std::vector<VertexBufferElement> m_elements;
         unsigned int m_stride = 0;
 };
+#endif

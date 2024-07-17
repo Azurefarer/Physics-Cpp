@@ -1,14 +1,13 @@
-#pragma once
+#ifndef QUAD_H_
+#define QUAD_H_
 
 #include <vector>
-#include "gl_core/gl_core.h"
+#include "gl_core/renderer.h"
 
 class Quad {
     public:
         Quad();
         ~Quad();
-
-        void gpu_config();
 
         std::vector<Vertex> get_verts() const { return m_verts; };
         std::vector<unsigned int> get_indices() const { return m_indices; };
@@ -17,3 +16,4 @@ class Quad {
         std::vector<Vertex> m_verts;
         std::vector<unsigned int> m_indices;
 };
+#endif

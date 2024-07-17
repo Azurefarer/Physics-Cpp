@@ -1,4 +1,6 @@
-#pragma once
+#ifndef TRIANGLE_H_
+#define TRIANGLE_H_
+
 #include "gl_core/renderer.h"
 
 class Triangle {
@@ -15,3 +17,4 @@ class Triangle {
         unsigned int m_ID = 0;
         std::vector<Vertex> m_vertices;
 };
+#endif

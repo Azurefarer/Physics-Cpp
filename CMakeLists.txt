@@ -80,6 +80,7 @@ target_link_libraries(gl_core PUBLIC stb_image)
 target_link_libraries(gl_core PUBLIC ${PROJECT_SOURCE_DIR}/build/_deps/glfw3-build/src/libglfw3.a)
 
 add_library(gl_aux
+  ${PROJECT_SOURCE_DIR}/src/gl_aux/gl_aux.h
   ${PROJECT_SOURCE_DIR}/src/gl_aux/quad.h
   ${PROJECT_SOURCE_DIR}/src/gl_aux/quad.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_aux/cube.h

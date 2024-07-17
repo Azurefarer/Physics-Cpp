@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CUBE_H_
+#define CUBE_H_
 
 #include <vector>
 #include "gl_core/renderer.h"
@@ -15,3 +16,4 @@ class Cube {
         std::vector<Vertex> m_verts;
         std::vector<unsigned int> m_indices;
 };
+#endif

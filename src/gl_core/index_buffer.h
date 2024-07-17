@@ -1,4 +1,5 @@
-#pragma once
+#ifndef INDEX_BUFFER_H_
+#define INDEX_BUFFER_H_
 
 class IndexBuffer {
     private:
@@ -13,3 +14,4 @@ class IndexBuffer {
 
         unsigned int get_count() const { return m_count; }
 };
+#endif

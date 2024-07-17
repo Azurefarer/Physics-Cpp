@@ -1,4 +1,6 @@
-#pragma once
+#ifndef RENDERER_H_
+#define RENDERER_H_
+
 #include <iostream>
 #include <vector>
 #include "glad/glad.h"
@@ -39,3 +41,4 @@ class Window {
         unsigned int m_height = 0;
         std::vector<float> m_cursor_pos_ratio{0, 0};
 };
+#endif

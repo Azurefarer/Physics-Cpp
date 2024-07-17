@@ -1,4 +1,6 @@
-#pragma once
+#ifndef VERTEX_ARRAY_H_
+#define VERTEX_ARRAY_H_
+
 #include <stdint.h>
 #include "gl_core/vertex_buffer.h"
 #include "gl_core/vertex_buffer_layout.h"
@@ -16,3 +18,4 @@ class VertexArray {
     private:
         unsigned int m_renderer_ID = 1;
 };
+#endif

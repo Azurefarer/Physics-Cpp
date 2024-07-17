@@ -34,6 +34,7 @@ Window::Window(unsigned int width, unsigned int height, const char *title) {
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		throw std::runtime_error("Failed to initialize GLAD");
 	}
+    GL_call(glEnable(GL_DEPTH_TEST));
 }
 
 Window::~Window() {

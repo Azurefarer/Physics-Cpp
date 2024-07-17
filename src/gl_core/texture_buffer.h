@@ -1,4 +1,7 @@
-#pragma once
+#ifndef TEXTURE_BUFFER_H_
+#define TEXTURE_BUFFER_H_
+
+#include <optional>
 #include <vector>
 #include "gl_core/renderer.h"
 #include "stb_image/stb_image.h"
@@ -16,7 +19,7 @@ class TextureBuffer {
         void bind();
         void unbind();
         
-        unsigned int get_texture(int texture) const { return m_texture_units[texture]; }
+        std::optional<unsigned int> get_texture(int texture);
         
     private:
         std::vector<unsigned int> m_texture_ID;
@@ -25,3 +28,4 @@ class TextureBuffer {
         std::vector<unsigned int> m_texture_units;
         int m_amt_of_textures = 0;
 };
+#endif

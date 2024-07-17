@@ -1,6 +1,7 @@
 #include "gl_core/texture_buffer.h"
 
 TextureBuffer::TextureBuffer() {
+	stbi_set_flip_vertically_on_load(true);
     // GL_call(glGenTextures(1, &m_texture_ID[0]));
     // GL_call(glBindTexture(GL_TEXTURE_2D, m_texture_ID[0]));
 	// TextureBuffer::set_texture_params();
@@ -64,4 +65,11 @@ void TextureBuffer::bind() {
 
 void TextureBuffer::unbind() {
 
+}
+
+std::optional<unsigned int> TextureBuffer::get_texture(int texture) {
+	if (texture >= size(m_texture_units) || texture < 0) {
+		return std::nullopt;
+	}
+	return m_texture_units[texture];
 }

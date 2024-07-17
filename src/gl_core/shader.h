@@ -1,5 +1,5 @@
-#ifndef SHADER_CLASS_SHADER_CLASS_H_
-#define SHADER_CLASS_SHADER_CLASS_H_
+#ifndef SHADER_CLASS_SHADER_H_
+#define SHADER_CLASS_SHADER_H_
 
 #include <fstream>
 #include <iostream>
@@ -75,7 +75,7 @@ public:
         GL_call(glUniform1i(glGetUniformLocation(m_ID, name.c_str()), (int)value));
     }
 
-    void set_int(const std::string& name, int value) {
+    void set_int(const std::string& name, unsigned int value) {
         if (glGetUniformLocation(m_ID, name.c_str()) == -1) {
             m_error = true;
         } else {
