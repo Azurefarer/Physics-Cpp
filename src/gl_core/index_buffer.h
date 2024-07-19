@@ -1,5 +1,5 @@
-#ifndef INDEX_BUFFER_H_
-#define INDEX_BUFFER_H_
+#ifndef GL_CORE_INDEX_BUFFER_H_
+#define GL_CORE_INDEX_BUFFER_H_
 
 class IndexBuffer {
     private:

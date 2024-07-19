@@ -1,5 +1,5 @@
-#ifndef TEXTURE_BUFFER_H_
-#define TEXTURE_BUFFER_H_
+#ifndef GL_CORE_TEXTURE_BUFFER_H_
+#define GL_CORE_TEXTURE_BUFFER_H_
 
 #include <optional>
 #include <vector>

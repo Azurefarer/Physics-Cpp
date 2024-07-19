@@ -1,5 +1,5 @@
-#ifndef TRIANGLE_H_
-#define TRIANGLE_H_
+#ifndef GL_CORE_TRIANGLE_H_
+#define GL_CORE_TRIANGLE_H_
 
 #include "gl_core/renderer.h"
 

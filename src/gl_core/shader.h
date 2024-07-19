@@ -1,5 +1,5 @@
-#ifndef SHADER_CLASS_SHADER_H_
-#define SHADER_CLASS_SHADER_H_
+#ifndef GL_CORE_SHADER_H_
+#define GL_CORE_SHADER_H_
 
 #include <fstream>
 #include <iostream>

@@ -1,5 +1,5 @@
-#ifndef QUAD_H_
-#define QUAD_H_
+#ifndef GL_AUX_QUAD_H_
+#define GL_AUX_QUAD_H_
 
 #include <vector>
 #include "gl_core/renderer.h"

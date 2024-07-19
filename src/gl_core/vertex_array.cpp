@@ -1,7 +1,4 @@
 #include "gl_core/vertex_array.h"
-#include "gl_core/renderer.h"
-#include "gl_core/vertex_buffer.h"
-#include "gl_core/vertex_buffer_layout.h"
 
 VertexArray::VertexArray() {
     GL_call(glGenVertexArrays(1, &m_renderer_ID));
@@ -30,8 +27,4 @@ void VertexArray::bind() {
 
 void VertexArray::unbind() {
     GL_call(glBindVertexArray(0));
-}
-
-void add_layout(VertexBufferLayout layout) {
-
 }

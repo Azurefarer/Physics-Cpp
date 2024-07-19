@@ -27,10 +27,8 @@ int main() {
     std::vector<unsigned int> cube_indices = cube.get_indices();
 
     GpuConfig gpu_config;
-    gpu_config.shove_vertex_data("QUAD", &quad_verts);
-    gpu_config.shove_index_data("QUAD", &quad_indices);
-    gpu_config.shove_vertex_data("CUBE", &cube_verts);
-    gpu_config.shove_index_data("CUBE", &cube_indices);
+    gpu_config.shove_vertex_index_data("QUAD", &quad_verts, &quad_indices);
+    gpu_config.shove_vertex_index_data("CUBE", &cube_verts, &cube_indices);
 
     TextureBuffer tb;
     tb.add_texture("../src/king_canute.png");
@@ -53,7 +51,7 @@ int main() {
         window.process_input(window.get_window());
 
         // I'm going to want an abstract draw(Shader &shader) function
-        // The draw fct is in GpuConfig right now. gpu_config.draw(1);
+        // The draw fct is in GpuConfig right now. gpu_config.draw("Shape");
         // this is not very separation of concerns.
         
         // Something called like render_pipeline that creates/modifies

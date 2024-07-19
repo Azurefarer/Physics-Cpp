@@ -1,5 +1,5 @@
-#ifndef CUBE_H_
-#define CUBE_H_
+#ifndef GL_AUX_CUBE_H_
+#define GL_AUX_CUBE_H_
 
 #include <vector>
 #include "gl_core/renderer.h"

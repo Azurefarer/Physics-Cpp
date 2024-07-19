@@ -1,5 +1,5 @@
-#ifndef VERTEX_BUFFER_H_
-#define VERTEX_BUFFER_H_
+#ifndef GL_CORE_VERTEX_BUFFER_H_
+#define GL_CORE_VERTEX_BUFFER_H_
 
 #include "gl_core/renderer.h"
 
