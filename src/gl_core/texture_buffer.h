@@ -8,8 +8,8 @@
 #include "stb_image/stb_image.h"
 
 typedef struct {
-    std::vector<unsigned int> id
-}
+    std::vector<unsigned int> id;
+} Texture;
 
 class TextureBuffer {
     public:
