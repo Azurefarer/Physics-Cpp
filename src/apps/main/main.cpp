@@ -26,7 +26,7 @@ int main() {
     std::vector<Vertex> cube_verts = cube.get_verts();
     std::vector<unsigned int> cube_indices = cube.get_indices();
 
-    GpuConfig gpu_config;
+    ShapesDict gpu_config;
     gpu_config.shove_vertex_index_data("QUAD", &quad_verts, &quad_indices);
     gpu_config.shove_vertex_index_data("CUBE", &cube_verts, &cube_indices);
 

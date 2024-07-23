@@ -3,6 +3,7 @@
 
 #include <map>
 #include <memory>
+#include <string>
 
 #include "gl_core/renderer.h"
 #include "gl_core/vertex_array.h"
@@ -11,31 +12,34 @@
 #include "gl_core/index_buffer.h"
 
 struct Shape {
-    const char* name;
-    VertexArray* va;
-    VertexBuffer* vb;
-    VertexBufferLayout* layout;
-    IndexBuffer* ib;
+    std::string shape_id;
+    std::unique_ptr<VertexArray> va{new VertexArray()};
+    std::unique_ptr<VertexBuffer> vb;
+    std::unique_ptr<VertexBufferLayout> layout{new VertexBufferLayout()};
+    std::unique_ptr<IndexBuffer> ib;
     unsigned int element_count;
+    Shape();
+    Shape(std::string name, std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_data);
+
 };
 
-class GpuConfig {
+class ShapesDict {
     public:
-        GpuConfig();
-        ~GpuConfig();
+        ShapesDict();
+        ~ShapesDict();
 
-        void shove_vertex_index_data(const char* key, std::vector<Vertex>* data, std::vector<unsigned int>* index_data);
+        void shove_vertex_index_data(std::string key, std::vector<Vertex>* data, std::vector<unsigned int>* index_data);
 
-        void draw(const char* key);
+        void draw(std::string key);
 
         // FIXME: would like this to be marked as const,  but throws
         // "passing 'const std::map<const char*, Shape>' as 'this' argument discards qualifiers"
-        Shape get_shape(const char* key) { return m_shapes[key]; }
+        Shape get_shape(std::string key) { return m_shapes[key]; }
 
-        void bind_vertex_array(const char* key) { (*m_shapes[key].va).bind(); }
-        void unbind_vertex_array(const char* key) { (*m_shapes[key].va).unbind(); }
+        void bind_vertex_array(std::string key) { (*m_shapes[key].va).bind(); }
+        void unbind_vertex_array(std::string key) { (*m_shapes[key].va).unbind(); }
 
     private:
-        std::map<const char*, Shape> m_shapes;
+        std::map<std::string, Shape> m_shapes;
     };
 #endif
