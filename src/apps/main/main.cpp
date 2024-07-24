@@ -26,9 +26,10 @@ int main() {
     std::vector<Vertex> cube_verts = cube.get_verts();
     std::vector<unsigned int> cube_indices = cube.get_indices();
 
-    ShapesDict gpu_config;
-    gpu_config.shove_vertex_index_data("QUAD", &quad_verts, &quad_indices);
-    gpu_config.shove_vertex_index_data("CUBE", &cube_verts, &cube_indices);
+    ShapesDict shapes_dict;
+    std::cout << "shapes dict inst" << std::endl;
+    shapes_dict.shove_vertex_index_data("QUAD", &quad_verts, &quad_indices);
+    shapes_dict.shove_vertex_index_data("CUBE", &cube_verts, &cube_indices);
 
     TextureBuffer tb;
     tb.add_texture("../src/king_canute.png");
@@ -45,6 +46,8 @@ int main() {
 
     // Camera obj
     Camera cam;
+
+    std::cout << "set up cleared" << std::endl;
 
     // Main Render Loop
     while (!glfwWindowShouldClose(window.get_window())) {
@@ -77,7 +80,7 @@ int main() {
         shader.set_mat4("model", model);
         shader.set_mat4("view", cam.get_view());
         shader.set_mat4("projection", projection);
-        gpu_config.draw("CUBE");
+        shapes_dict.draw("CUBE");
 
         glfwSwapBuffers(window.get_window());
 		glfwPollEvents();

@@ -11,16 +11,19 @@
 #include "gl_core/vertex_buffer_layout.h"
 #include "gl_core/index_buffer.h"
 
-struct Shape {
-    std::string shape_id;
-    std::unique_ptr<VertexArray> va{new VertexArray()};
-    std::unique_ptr<VertexBuffer> vb;
-    std::unique_ptr<VertexBufferLayout> layout{new VertexBufferLayout()};
-    std::unique_ptr<IndexBuffer> ib;
-    unsigned int element_count;
-    Shape();
-    Shape(std::string name, std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_data);
+class Shape {
+    public:
+        
+    private:
 
+}
+
+struct Shape {
+    VertexArray va;
+    VertexBuffer vb;
+    VertexBufferLayout layout;
+    unsigned int element_count;
+    Shape(std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_data);
 };
 
 class ShapesDict {
@@ -34,10 +37,7 @@ class ShapesDict {
 
         // FIXME: would like this to be marked as const,  but throws
         // "passing 'const std::map<const char*, Shape>' as 'this' argument discards qualifiers"
-        Shape get_shape(std::string key) { return m_shapes[key]; }
-
-        void bind_vertex_array(std::string key) { (*m_shapes[key].va).bind(); }
-        void unbind_vertex_array(std::string key) { (*m_shapes[key].va).unbind(); }
+        struct Shape get_shape(std::string key) { return m_shapes.at(key); }
 
     private:
         std::map<std::string, Shape> m_shapes;
