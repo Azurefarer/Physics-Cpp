@@ -13,18 +13,23 @@
 
 class Shape {
     public:
-        
+        Shape(std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_data);
+        ~Shape();
+
     private:
-
-}
-
-struct Shape {
-    VertexArray va;
-    VertexBuffer vb;
-    VertexBufferLayout layout;
-    unsigned int element_count;
-    Shape(std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_data);
+        VertexArray va;
+        VertexBuffer vb;
+        VertexBufferLayout layout;
+        unsigned int element_count;    
 };
+
+// struct Shape {
+//     VertexArray va;
+//     VertexBuffer vb;
+//     VertexBufferLayout layout;
+//     unsigned int element_count;
+//     Shape(std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_data);
+// };
 
 class ShapesDict {
     public:

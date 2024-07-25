@@ -10,6 +10,16 @@ Shape::Shape(std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_
     IndexBuffer ib(index_data);
     element_count = std::size(*index_data);
 }
+// Shape::Shape(std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_data) {
+//     va.bind();
+//     vb(vertex_data);
+//     layout.push_float(3);
+//     layout.push_float(3);
+//     layout.push_float(2);
+//     va.add_buffer(vb, layout);
+//     IndexBuffer ib(index_data);
+//     element_count = std::size(*index_data);
+// }
 
 ShapesDict::ShapesDict() {
 
