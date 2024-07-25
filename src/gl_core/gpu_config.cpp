@@ -1,7 +1,7 @@
 #include "gl_core/gpu_config.h"
 
 Shape::Shape(std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_data) {
-    va.bind();
+    m_va_ptr = std::make_unique<VertexArray>;
     vb(vertex_data);
     layout.push_float(3);
     layout.push_float(3);

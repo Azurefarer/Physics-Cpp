@@ -17,9 +17,9 @@ class Shape {
         ~Shape();
 
     private:
-        VertexArray va;
-        VertexBuffer vb;
-        VertexBufferLayout layout;
+        std::unique_ptr<VertexArray> m_va_ptr;
+        std::unique_ptr<VertexBuffer> m_vb_ptr;
+        std::unique_ptr<VertexBufferLayout> m_layout_ptr;
         unsigned int element_count;    
 };
 
