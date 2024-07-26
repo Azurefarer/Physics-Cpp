@@ -12,9 +12,7 @@ Shape::Shape(std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_
     m_element_count = std::size(*index_data);
 }
 
-Shape::~Shape() {
-
-}
+Shape::~Shape() {}
 
 ShapeDict::ShapeDict() {}
 

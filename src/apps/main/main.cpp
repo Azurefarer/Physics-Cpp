@@ -27,7 +27,6 @@ int main() {
     std::vector<unsigned int> cube_indices = cube.get_indices();
 
     ShapeDict shape_dict;
-    std::cout << "shapes dict inst" << std::endl;
     shape_dict.shove_vertex_index_data("QUAD", &quad_verts, &quad_indices);
     shape_dict.shove_vertex_index_data("CUBE", &cube_verts, &cube_indices);
 

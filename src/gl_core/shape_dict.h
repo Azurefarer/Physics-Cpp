@@ -35,10 +35,6 @@ class ShapeDict {
 
         void draw(std::string key);
 
-        // FIXME: would like this to be marked as const,  but throws
-        // "passing 'const std::map<const char*, Shape>' as 'this' argument discards qualifiers"
-        // struct Shape get_shape(std::string key) { return (*m_shapes.at(key).get()); }
-
     private:
         std::map<std::string, std::unique_ptr<Shape>> m_shapes;
     };
