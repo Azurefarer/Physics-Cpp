@@ -25,9 +25,7 @@ ShapesDict::~ShapesDict() {
 }
 
 void ShapesDict::shove_vertex_index_data(std::string key, std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_data) {
-    m_shapes[key] = std::make_unique<Shape>(vertex_data, index_data);   
-    std::cout << "step success" << std::endl;
-
+    m_shapes[key] = std::make_unique<Shape>(vertex_data, index_data);
 }
 
 void ShapesDict::draw(std::string key) {

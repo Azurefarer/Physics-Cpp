@@ -47,8 +47,6 @@ int main() {
     // Camera obj
     Camera cam;
 
-    std::cout << "set up cleared" << std::endl;
-
     // Main Render Loop
     while (!glfwWindowShouldClose(window.get_window())) {
         window.process_input(window.get_window());
