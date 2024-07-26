@@ -58,20 +58,22 @@ add_library(gl_core
   ${PROJECT_SOURCE_DIR}/src/gl_core/camera.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/gpu_config.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/gpu_config.h
-  ${PROJECT_SOURCE_DIR}/src/gl_core/index_buffer.cpp
-  ${PROJECT_SOURCE_DIR}/src/gl_core/index_buffer.h
+  # ${PROJECT_SOURCE_DIR}/src/gl_core/index_buffer.cpp
+  # ${PROJECT_SOURCE_DIR}/src/gl_core/index_buffer.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/shader.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/shader.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/shape_dict.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/shape_dict.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/texture_buffer.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/texture_buffer.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/triangle.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/triangle.h
-  ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_array.cpp
-  ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_array.h
-  ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_buffer_layout.cpp
-  ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_buffer_layout.h
-  ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_buffer.cpp
-  ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_buffer.h
+  # ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_array.cpp
+  # ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_array.h
+  # ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_buffer_layout.cpp
+  # ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_buffer_layout.h
+  # ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_buffer.cpp
+  # ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_buffer.h
 )
 target_include_directories(gl_core PUBLIC
   src

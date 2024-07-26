@@ -1,48 +1,90 @@
 #ifndef GL_CORE_GPU_CONFIG_H_
 #define GL_CORE_GPU_CONFIG_H_
 
-#include <map>
-#include <memory>
-#include <string>
+#include <stdint.h>
+#include <vector>
 
 #include "gl_core/renderer.h"
-#include "gl_core/vertex_array.h"
-#include "gl_core/vertex_buffer.h"
-#include "gl_core/vertex_buffer_layout.h"
-#include "gl_core/index_buffer.h"
 
-class Shape {
-    public:
-        Shape(std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_data);
-        ~Shape();
+struct VertexBufferElement {
+    unsigned int type;
+    unsigned int count;
+    unsigned char normalized;
 
-        void bind() const { (*m_va_ptr.get()).bind(); }
-        void unbind() const { (*m_va_ptr.get()).unbind(); }
-
-        unsigned int get_element_count() const { return m_element_count; }
-
-    private:
-        std::unique_ptr<VertexArray> m_va_ptr;
-        std::unique_ptr<VertexBuffer> m_vb_ptr;
-        std::unique_ptr<VertexBufferLayout> m_layout_ptr;
-        std::unique_ptr<IndexBuffer> m_ib_ptr;
-        unsigned int m_element_count;
+    static unsigned int get_size_of_type(unsigned int type) {
+        switch (type) {
+            case GL_FLOAT: return 4;
+            case GL_UNSIGNED_INT: return 4;
+            case GL_UNSIGNED_BYTE: return 1;
+        }
+        return 0;
+    }
 };
 
-class ShapesDict {
+class IndexBuffer {
     public:
-        ShapesDict();
-        ~ShapesDict();
+        IndexBuffer(std::vector<unsigned int>* data);
+        ~IndexBuffer();
 
-        void shove_vertex_index_data(std::string key, std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_data);
+        void bind() const;
+        void unbind() const;
 
-        void draw(std::string key);
+        unsigned int get_count() const { return m_count; }
+    private:
+        unsigned int m_renderer_ID = 1;
+        unsigned int m_count = 0;
+};
 
-        // FIXME: would like this to be marked as const,  but throws
-        // "passing 'const std::map<const char*, Shape>' as 'this' argument discards qualifiers"
-        // struct Shape get_shape(std::string key) { return (*m_shapes.at(key).get()); }
+class VertexBuffer {
+    public:
+        VertexBuffer(std::vector<Vertex>* data);
+        ~VertexBuffer();
+
+        void bind() const;
+        void unbind() const;
+    private:
+        unsigned int m_renderer_ID = 1;
+};
+
+class VertexBufferLayout {
+    public:
+        VertexBufferLayout();
+        ~VertexBufferLayout();
+
+        void push_float(unsigned int count) {
+            m_elements.push_back({GL_FLOAT, count, GL_FALSE});
+            m_stride += count * VertexBufferElement::get_size_of_type(GL_FLOAT);
+        }
+
+        void push_unsigned_int(unsigned int count) {
+            m_elements.push_back({GL_UNSIGNED_INT, count, GL_FALSE});
+            m_stride += count * VertexBufferElement::get_size_of_type(GL_UNSIGNED_INT);
+        }
+
+        void push_unsigned_char(unsigned int count) {
+            m_elements.push_back({GL_UNSIGNED_BYTE, count, GL_TRUE});
+            m_stride += count * VertexBufferElement::get_size_of_type(GL_UNSIGNED_BYTE);
+        }
+
+        const std::vector<VertexBufferElement> get_elements() const { return m_elements; }
+        unsigned int get_stride() const { return m_stride; }
 
     private:
-        std::map<std::string, std::unique_ptr<Shape>> m_shapes;
-    };
+        std::vector<VertexBufferElement> m_elements;
+        unsigned int m_stride = 0;
+};
+
+class VertexArray {
+    public:
+        VertexArray();
+        ~VertexArray();
+
+        void add_buffer(const VertexBuffer& vb, const VertexBufferLayout& layout);
+        void bind();
+        void unbind();
+
+    private:
+        unsigned int m_renderer_ID = 1;
+};
+
 #endif
