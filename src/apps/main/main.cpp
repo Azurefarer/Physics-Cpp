@@ -50,15 +50,23 @@ int main() {
     while (!glfwWindowShouldClose(window.get_window())) {
         window.process_input(window.get_window());
 
+        { // Completed:
         // I'm going to want an abstract draw(Shader &shader) function
         // The draw fct is in GpuConfig right now. gpu_config.draw("Shape");
         // this is not very separation of concerns.
+
+        // Put this in a ShapeDict class that knows about all the Shapes it can draw    
+        }
         
+        { // TODO:
         // Something called like render_pipeline that creates/modifies
         // appropriate model, view and projection maticies.
+        }
 
+        { // TODO:
         // This render pipeline is going to need to use the camera obj
         // and know about all objs in the scene
+        }
 
         float g = window.get_cursor_pos_ratio()[0];
         float b = window.get_cursor_pos_ratio()[1];

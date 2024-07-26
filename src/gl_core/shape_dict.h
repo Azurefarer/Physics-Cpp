@@ -35,7 +35,10 @@ class ShapeDict {
 
         void draw(std::string key);
 
+        Shape* get_shape(std::string key) { return &(*m_shapes.at(key).get()); }
+
     private:
         std::map<std::string, std::unique_ptr<Shape>> m_shapes;
     };
+
 #endif

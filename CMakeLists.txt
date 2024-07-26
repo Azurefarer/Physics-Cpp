@@ -64,8 +64,6 @@ add_library(gl_core
   ${PROJECT_SOURCE_DIR}/src/gl_core/shape_dict.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/texture_buffer.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/texture_buffer.h
-  ${PROJECT_SOURCE_DIR}/src/gl_core/triangle.cpp
-  ${PROJECT_SOURCE_DIR}/src/gl_core/triangle.h
 )
 target_include_directories(gl_core PUBLIC
   src
