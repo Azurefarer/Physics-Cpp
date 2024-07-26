@@ -1,4 +1,4 @@
-#include "gl_core/shape_dict.h"
+#include "gl_core/shape_man.h"
 
 Shape::Shape(std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_data) {
     m_va_ptr.reset(new VertexArray());
@@ -14,15 +14,15 @@ Shape::Shape(std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_
 
 Shape::~Shape() {}
 
-ShapeDict::ShapeDict() {}
+ShapeMan::ShapeMan() {}
 
-ShapeDict::~ShapeDict() {}
+ShapeMan::~ShapeMan() {}
 
-void ShapeDict::shove_vertex_index_data(std::string key, std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_data) {
+void ShapeMan::shove_vertex_index_data(std::string key, std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_data) {
     m_shapes[key] = std::make_unique<Shape>(vertex_data, index_data);
 }
 
-void ShapeDict::draw(std::string key) {
+void ShapeMan::draw(std::string key) {
     (*m_shapes.at(key).get()).bind();
     GL_call(glDrawElements(GL_TRIANGLES, (*m_shapes.at(key).get()).get_element_count(), GL_UNSIGNED_INT, (const void*)0));
     (*m_shapes.at(key).get()).unbind();

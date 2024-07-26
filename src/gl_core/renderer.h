@@ -19,8 +19,6 @@ struct Vertex {
     float u, v;
 };
 
-
-
 void GL_clear_error();
 bool GL_log_call(const char* function, const char* file, int line);
 void viewport_size_callback(GLFWwindow* window, int width, int height);

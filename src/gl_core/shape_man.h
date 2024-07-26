@@ -1,5 +1,5 @@
-#ifndef GL_CORE_SHAPE_DICT_H_
-#define GL_CORE_SHAPE_DICT_H_
+#ifndef GL_CORE_SHAPE_MAN_H_
+#define GL_CORE_SHAPE_MAN_H_
 
 #include <map>
 #include <memory>
@@ -26,10 +26,10 @@ class Shape {
         unsigned int m_element_count;
 };
 
-class ShapeDict {
+class ShapeMan {
     public:
-        ShapeDict();
-        ~ShapeDict();
+        ShapeMan();
+        ~ShapeMan();
 
         void shove_vertex_index_data(std::string key, std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_data);
 

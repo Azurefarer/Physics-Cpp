@@ -26,17 +26,17 @@ int main() {
     std::vector<Vertex> cube_verts = cube.get_verts();
     std::vector<unsigned int> cube_indices = cube.get_indices();
 
-    ShapeDict shape_dict;
-    shape_dict.shove_vertex_index_data("QUAD", &quad_verts, &quad_indices);
-    shape_dict.shove_vertex_index_data("CUBE", &cube_verts, &cube_indices);
+    ShapeMan shape_man;
+    shape_man.shove_vertex_index_data("QUAD", &quad_verts, &quad_indices);
+    shape_man.shove_vertex_index_data("CUBE", &cube_verts, &cube_indices);
 
-    TextureBuffer tb;
-    tb.add_texture("../src/king_canute.png");
-    tb.add_texture("../src/awesomeface.png");
+    TextureMan texture_man;
+    texture_man.add_texture("king_canute", "../src/king_canute.png");
+    texture_man.add_texture("awesome_face", "../src/awesomeface.png");
 
     shader.use();
-    auto tex_int_01 = tb.get_texture(0);
-    auto tex_int_02 = tb.get_texture(1);
+    auto tex_int_01 = texture_man.get_texture("king_canute");
+    auto tex_int_02 = texture_man.get_texture("awesome_face");
     if (!tex_int_01.has_value() || !tex_int_02.has_value()) {
         throw std::runtime_error("invalid tex");
     }
@@ -85,7 +85,7 @@ int main() {
         shader.set_mat4("model", model);
         shader.set_mat4("view", cam.get_view());
         shader.set_mat4("projection", projection);
-        shape_dict.draw("CUBE");
+        shape_man.draw("CUBE");
 
         glfwSwapBuffers(window.get_window());
 		glfwPollEvents();

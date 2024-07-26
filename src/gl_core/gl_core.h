@@ -5,7 +5,7 @@
 #include "gl_core/gpu_config.h"
 #include "gl_core/renderer.h"
 #include "gl_core/shader.h"
-#include "gl_core/shape_dict.h"
-#include "gl_core/texture_buffer.h"
+#include "gl_core/shape_man.h"
+#include "gl_core/texture_man.h"
 
 #endif
