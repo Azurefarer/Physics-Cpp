@@ -14,7 +14,7 @@ struct Texture {
     unsigned int id;
     int width, height, nrChannels;
     unsigned int texture_units;
-    Texture() { id = 0; width = 0; height = 0; nrChannels = 0; texture_units = 0;}
+    Texture(unsigned int count) { id = 0; width = 0; height = 0; nrChannels = 0; texture_units = count;}
 };
 
 class TextureMan {
@@ -34,10 +34,6 @@ class TextureMan {
         
     private:
         std::map<std::string, std::unique_ptr<Texture>> m_textures;
-        std::vector<unsigned int> m_texture_ID;
-        std::vector<int> m_width, m_height, m_nrChannels;
-
-        std::vector<unsigned int> m_texture_units;
         int m_amt_of_textures = 0;
 };
 
