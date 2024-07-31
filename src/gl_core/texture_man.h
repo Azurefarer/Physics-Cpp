@@ -23,7 +23,6 @@ class TextureMan {
         TextureMan(std::string key, std::string path);
         ~TextureMan();
 
-        // void set_texture(const char* path, int texture);
         void add_texture(std::string key, std::string path);
         void set_texture_params();
 

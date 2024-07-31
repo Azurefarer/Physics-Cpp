@@ -54,8 +54,6 @@ add_library(gl_core
   ${PROJECT_SOURCE_DIR}/src/gl_core/gl_core.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/renderer.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/renderer.h
-  ${PROJECT_SOURCE_DIR}/src/gl_core/camera.cpp
-  ${PROJECT_SOURCE_DIR}/src/gl_core/camera.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/gpu_config.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/gpu_config.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/shader.cpp
