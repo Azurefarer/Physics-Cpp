@@ -43,10 +43,11 @@ class Camera {
         ~Camera();
 
         void process_keyboard(CameraMovement direction, float delta_time);
-        void process_mouse_movement(float x_offset, float y_offset, GLboolean constrain_pitch = true);
-        void process_mouse_scroll(float y_offset);
+        void process_mouse_movement(double x_offset, double y_offset, GLboolean constrain_pitch = true);
+        void process_mouse_scroll(double y_offset);
 
         float get_pos() const { return m_pos.x; }
+        float get_zoom() const { return m_zoom; }
 
         glm::mat4 get_view() const { return glm::lookAt(m_pos, m_pos + m_front, m_up); }
     
@@ -55,25 +56,26 @@ class Camera {
         float m_pitch = 0.0f;
         float m_movement_speed = 2.5f;
         float m_mouse_sensitivity = 0.1f;
-        float m_zoom = 45.0f;
+        double m_zoom = 45.0f;
 
-        glm::vec3 m_pos = glm::vec3(0.0f, 0.0f, 0.0f);
+        glm::vec3 m_pos = glm::vec3(0.0f, 0.0f, 3.0f);
         glm::vec3 m_front = glm::vec3(0.0f, 0.0f, -1.0f);
         glm::vec3 m_up = glm::vec3(0.0f, 1.0f, 0.0f);
         glm::vec3 m_world_up = glm::vec3(0.0f, 1.0f, 0.0f);
         glm::vec3 m_right = glm::normalize(glm::cross(m_front, m_world_up));
 
         void update_camera_vectors();
-
 };
 
 class RenderPipelineContext {
     public:
-        RenderPipelineContext(unsigned int width, unsigned int height, std::string title);
+        RenderPipelineContext(int width, int height, std::string title);
         ~RenderPipelineContext();
 
         void process_input(GLFWwindow* window);
         float get_delta();
+
+        void run();
 
         void set_transforms();
         glm::mat4 get_transform(std::string key) const { return m_transforms.at(key); };
@@ -85,8 +87,9 @@ class RenderPipelineContext {
 
     private:
         GLFWwindow* m_window;
-        unsigned int m_width = 0;
-        unsigned int m_height = 0;
+        int m_width;
+        int m_height;
+        float m_aspect_ratio = 0;
 
         float m_delta = 0.0f;
         float m_last_frame = 0.0f;
@@ -105,9 +108,9 @@ class RenderPipelineContext {
 
         // std::unique_ptr<Shader> m_shader;
         void set_callbacks();
-        static void keyboard_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-        static void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
-        static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+        void keyboard_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+        void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
+        void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 };
 
 #endif

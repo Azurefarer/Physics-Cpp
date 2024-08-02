@@ -40,9 +40,7 @@ int main() {
     shader.set_int("texture02", tex_int_02.value());
 
     while (!glfwWindowShouldClose(context.get_window())) {
-        context.process_input(context.get_window());
-        float delta_time = context.get_delta();
-        context.set_transforms();
+        context.run();
         { // TODO:
         // Something called like render_pipeline that creates/modifies
         // appropriate model, view and projection maticies.
@@ -52,9 +50,6 @@ int main() {
         // This render pipeline is going to need to use the camera obj
         // and know about all objs in the scene
         }
-
-		GL_call(glClearColor(0.0f, context.get_cursor_pos_ratio()[0], context.get_cursor_pos_ratio()[1], 1.0f));
-		GL_call(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
         
         shader.use();
         shader.set_mat4("model", context.get_transform("MODEL"));
