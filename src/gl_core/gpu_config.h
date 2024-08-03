@@ -4,7 +4,9 @@
 #include <stdint.h>
 #include <vector>
 
-#include "gl_core/renderer.h"
+#include "glad/glad.h"
+
+#include "gl_aux/vertex.h"
 
 struct VertexBufferElement {
     unsigned int type;
@@ -23,7 +25,7 @@ struct VertexBufferElement {
 
 class IndexBuffer {
     public:
-        IndexBuffer(std::vector<unsigned int>* data);
+        IndexBuffer(std::vector<unsigned int> data);
         ~IndexBuffer();
 
         void bind() const;
@@ -37,7 +39,7 @@ class IndexBuffer {
 
 class VertexBuffer {
     public:
-        VertexBuffer(std::vector<Vertex>* data);
+        VertexBuffer(std::vector<Vertex> data);
         ~VertexBuffer();
 
         void bind() const;

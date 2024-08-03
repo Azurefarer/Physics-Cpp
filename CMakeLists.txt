@@ -9,7 +9,7 @@ LANGUAGES CXX
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 endif()
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 # set(CMAKE_MODULE_PATH )
 enable_language(C)
@@ -74,11 +74,11 @@ target_link_libraries(gl_core PUBLIC glm::glm)
 
 
 add_library(gl_aux
-  ${PROJECT_SOURCE_DIR}/src/gl_aux/gl_aux.h
   ${PROJECT_SOURCE_DIR}/src/gl_aux/quad.h
   ${PROJECT_SOURCE_DIR}/src/gl_aux/quad.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_aux/cube.h
   ${PROJECT_SOURCE_DIR}/src/gl_aux/cube.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_aux/vertex.h
 )
 target_include_directories(gl_core PUBLIC
   src

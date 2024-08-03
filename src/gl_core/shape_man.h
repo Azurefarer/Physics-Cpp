@@ -5,12 +5,11 @@
 #include <memory>
 #include <string>
 
-#include "gl_core/renderer.h"
 #include "gl_core/gpu_config.h"
 
 class Shape {
     public:
-        Shape(std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_data);
+        Shape(std::vector<Vertex> vertex_data, std::vector<unsigned int> index_data);
         ~Shape();
 
         void bind() const { (*m_va_ptr.get()).bind(); }
@@ -31,11 +30,9 @@ class ShapeMan {
         ShapeMan();
         ~ShapeMan();
 
-        void shove_vertex_index_data(std::string key, std::vector<Vertex>* vertex_data, std::vector<unsigned int>* index_data);
+        void shove_vertex_index_data(std::string key, std::vector<Vertex> vertex_data, std::vector<unsigned int> index_data);
 
         void draw(std::string key);
-
-        Shape* get_shape(std::string key) { return &(*m_shapes.at(key).get()); }
 
     private:
         std::map<std::string, std::unique_ptr<Shape>> m_shapes;

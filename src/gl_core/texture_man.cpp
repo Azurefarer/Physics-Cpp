@@ -7,9 +7,9 @@ TextureMan::TextureMan() {
 TextureMan::TextureMan(std::string key, std::string path) {
 	stbi_set_flip_vertically_on_load(true);
 	m_textures[key] = std::make_unique<Texture>(m_amt_of_textures);
-    GL_call(glGenTextures(1, &m_textures[key]->id));
-	GL_call(glActiveTexture(GL_TEXTURE0 + m_amt_of_textures));
-    GL_call(glBindTexture(GL_TEXTURE_2D, m_textures[key]->id));
+    glGenTextures(1, &m_textures[key]->id);
+	glActiveTexture(GL_TEXTURE0 + m_amt_of_textures);
+    glBindTexture(GL_TEXTURE_2D, m_textures[key]->id);
 
 	TextureMan::set_texture_params();
 
@@ -24,7 +24,7 @@ TextureMan::TextureMan(std::string key, std::string path) {
 
 TextureMan::~TextureMan() {
 	for (auto iter=m_textures.begin(); iter!=m_textures.end(); ++iter) {
-    	GL_call(glDeleteTextures(1, &(iter->second->id)));
+    	glDeleteTextures(1, &(iter->second->id));
 	}
 }
 
@@ -33,9 +33,9 @@ void TextureMan::add_texture(std::string key, std::string path) {
 		throw std::runtime_error("OpenGL can only handle 20 textures at a time, you've inputted more than 20");
 	} else {
 		m_textures[key] = std::make_unique<Texture>(m_amt_of_textures);
-		GL_call(glGenTextures(1, &m_textures[key]->id));
-		GL_call(glActiveTexture(GL_TEXTURE0 + m_amt_of_textures));
-		GL_call(glBindTexture(GL_TEXTURE_2D, m_textures[key]->id));
+		glGenTextures(1, &m_textures[key]->id);
+		glActiveTexture(GL_TEXTURE0 + m_amt_of_textures);
+		glBindTexture(GL_TEXTURE_2D, m_textures[key]->id);
 
 		TextureMan::set_texture_params();
 
@@ -50,10 +50,10 @@ void TextureMan::add_texture(std::string key, std::string path) {
 }
 
 void TextureMan::set_texture_params() {
-	GL_call(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
-	GL_call(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
-	GL_call(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-	GL_call(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
 void TextureMan::bind() {

@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#include "gl_core/renderer.h"
+#include "glad/glad.h"
 #include "stb_image/stb_image.h"
 
 struct Texture {
