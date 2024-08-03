@@ -1,13 +1,12 @@
-#ifndef QUAD_H_
-#define QUAD_H_
+#ifndef GL_AUX_QUAD_H_
+#define GL_AUX_QUAD_H_
 
 #include <vector>
-#include "gl_core/renderer.h"
+#include "gl_aux/vertex.h"
 
 class Quad {
     public:
         Quad();
-        ~Quad();
 
         std::vector<Vertex> get_verts() const { return m_verts; };
         std::vector<unsigned int> get_indices() const { return m_indices; };

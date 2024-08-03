@@ -1,7 +1,7 @@
 #include "gl_aux/cube.h"
 
-Cube::Cube() {
-    m_verts = {
+Cube::Cube()
+    : m_verts({
         {-0.5, -0.5, -0.5,  0.0, 0.0, 1.0,  1.0, 0.0}, //back bottom left
         {-0.5, -0.5, 0.5,  1.0, 1.0, 1.0,  0.0, 0.0}, //front bottom left
         {-0.5, 0.5, -0.5,  0.0, 0.0, 1.0,  1.0, 1.0}, //back top left
@@ -10,8 +10,8 @@ Cube::Cube() {
         {0.5, -0.5, 0.5,  0.0, 1.0, 0.0,  1.0, 0.0}, //front bottom right
         {0.5, 0.5, -0.5,  1.0, 0.0, 0.0,  0.0, 1.0}, //back top right
         {0.5, 0.5, 0.5,  0.0, 1.0, 0.0,  1.0, 1.0} //front top right
-    };
-    m_indices = {
+    }),
+    m_indices({
         // left face
         0, 1, 2,
         1, 2, 3,
@@ -30,9 +30,5 @@ Cube::Cube() {
         // top face
         6, 7, 2,
         7, 2, 3
-    };
-}
-
-Cube::~Cube() {
-    
-}
+    })
+{}

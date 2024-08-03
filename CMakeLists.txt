@@ -9,7 +9,7 @@ LANGUAGES CXX
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 endif()
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 # set(CMAKE_MODULE_PATH )
 enable_language(C)
@@ -54,24 +54,14 @@ add_library(gl_core
   ${PROJECT_SOURCE_DIR}/src/gl_core/gl_core.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/renderer.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/renderer.h
-  ${PROJECT_SOURCE_DIR}/src/gl_core/camera.cpp
-  ${PROJECT_SOURCE_DIR}/src/gl_core/camera.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/gpu_config.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/gpu_config.h
-  ${PROJECT_SOURCE_DIR}/src/gl_core/index_buffer.cpp
-  ${PROJECT_SOURCE_DIR}/src/gl_core/index_buffer.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/shader.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/shader.h
-  ${PROJECT_SOURCE_DIR}/src/gl_core/texture_buffer.cpp
-  ${PROJECT_SOURCE_DIR}/src/gl_core/texture_buffer.h
-  ${PROJECT_SOURCE_DIR}/src/gl_core/triangle.cpp
-  ${PROJECT_SOURCE_DIR}/src/gl_core/triangle.h
-  ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_array.cpp
-  ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_array.h
-  ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_buffer_layout.cpp
-  ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_buffer_layout.h
-  ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_buffer.cpp
-  ${PROJECT_SOURCE_DIR}/src/gl_core/vertex_buffer.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/shape_man.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/shape_man.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/texture_man.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/texture_man.h
 )
 target_include_directories(gl_core PUBLIC
   src
@@ -84,11 +74,11 @@ target_link_libraries(gl_core PUBLIC glm::glm)
 
 
 add_library(gl_aux
-  ${PROJECT_SOURCE_DIR}/src/gl_aux/gl_aux.h
   ${PROJECT_SOURCE_DIR}/src/gl_aux/quad.h
   ${PROJECT_SOURCE_DIR}/src/gl_aux/quad.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_aux/cube.h
   ${PROJECT_SOURCE_DIR}/src/gl_aux/cube.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_aux/vertex.h
 )
 target_include_directories(gl_core PUBLIC
   src
