@@ -10,26 +10,32 @@
 #include "glad/glad.h"
 #include "stb_image/stb_image.h"
 
+enum ArtStyle {
+    PIXEL,
+    REALISTIC
+};
+
 struct Texture {
     unsigned int id;
     int width, height, nrChannels;
     unsigned int texture_units;
-    Texture(unsigned int count) { id = 0; width = 0; height = 0; nrChannels = 0; texture_units = count;}
+    std::string uniform;
+    Texture(std::string uniform_name, unsigned int count) { id = 0; width = 0; height = 0; nrChannels = 0; texture_units = count, uniform = uniform_name;}
 };
 
 class TextureMan {
     public:
         TextureMan();
-        TextureMan(std::string key, std::string path);
+        TextureMan(std::string key, std::string path, std::string uniform_name);
         ~TextureMan();
 
-        void add_texture(std::string key, std::string path);
+        void add_texture(std::string key, std::string path, std::string uniform_name, std::string style);
         void set_texture_params();
-
-        void bind();
-        void unbind();
+        void set_pixel_texture_params();
+        // TODO: add remove functionality
         
-        std::optional<unsigned int> get_texture(std::string texture);
+        std::optional<unsigned int> get_tex_int(std::string texture);
+        std::optional<std::string> get_tex_uniform(std::string texture);
         
     private:
         std::map<std::string, std::unique_ptr<Texture>> m_textures;

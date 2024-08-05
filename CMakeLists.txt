@@ -20,12 +20,65 @@ FetchContent_Declare(
   glfw3
   GIT_REPOSITORY https://github.com/glfw/glfw.git
   GIT_TAG 3.4
-  SOURCE_DIR ${PROJECT_BINARY_DIR}/opencv
+  SOURCE_DIR ${PROJECT_BINARY_DIR}/opencv/glfw3
   )
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(glfw3)
+
+# -------------- IMGUI static library creation`
+# TODO: write my own imgui cmake file
+add_library(imgui
+  ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui.cpp
+  ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui.h
+  ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_demo.cpp
+  ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_draw.cpp
+  ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_tables.cpp
+  ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_widgets.cpp
+  ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imconfig.h
+  ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_internal.h
+  ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imstb_rectpack.h
+  ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imstb_truetype.h
+  ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imstb_textedit.h
+  ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_impl_opengl3.cpp
+  ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_impl_opengl3_loader.h
+  ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_impl_opengl3.h
+  ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_impl_glfw.cpp
+  ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_impl_glfw.h
+)
+target_include_directories(imgui PUBLIC ${PROJECT_SOURCE_DIR}/src/external_libs/imgui)
+target_include_directories(imgui PUBLIC ${glfw3_SOURCE_DIR}/include)
+target_link_libraries(imgui PUBLIC ${PROJECT_SOURCE_DIR}/build/_deps/glfw3-build/src/libglfw3.a)
+
+
+# add_library(imgui
+  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui.cpp
+  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui.h
+  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_demo.cpp
+  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_draw.cpp
+  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_tables.cpp
+  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_widgets.cpp
+  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imconfig.h
+  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_internal.h
+  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imstb_rectpack.h
+  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imstb_truetype.h
+  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imstb_textedit.h
+# )
+# target_include_directories(imgui PUBLIC ${PROJECT_SOURCE_DIR}/src/external_libs/imgui)
+# target_include_directories(imgui PUBLIC ${glfw3_SOURCE_DIR}/include)
+# target_link_libraries(imgui PUBLIC ${PROJECT_SOURCE_DIR}/build/_deps/glfw3-build/src/libglfw3.a)
+
+# add_library(imgui_back
+# ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/backends/imgui_impl_glfw.cpp
+# ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/backends/imgui_impl_glfw.h
+# ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/backends/imgui_impl_opengl3.cpp
+# ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/backends/imgui_impl_opengl3.h
+# )
+# target_include_directories(imgui_back PUBLIC ${PROJECT_SOURCE_DIR}/src/external_libs/imgui)
+# target_include_directories(imgui_back PUBLIC ${PROJECT_SOURCE_DIR}/src/external_libs)
+# target_link_libraries(imgui_back PUBLIC imgui)
+# ----------------------------------------------------------------------
 
 add_library(KHR 
   ${PROJECT_SOURCE_DIR}/src/external_libs/KHR/KHR.cpp
@@ -67,6 +120,7 @@ target_include_directories(gl_core PUBLIC
   src
   ${glfw3_SOURCE_DIR}/include
 )
+target_link_libraries(gl_core PUBLIC imgui)
 target_link_libraries(gl_core PUBLIC glad)
 target_link_libraries(gl_core PUBLIC stb_image)
 target_link_libraries(gl_core PUBLIC ${PROJECT_SOURCE_DIR}/build/_deps/glfw3-build/src/libglfw3.a)
@@ -87,8 +141,9 @@ target_link_libraries(gl_aux PUBLIC gl_core)
 
 add_executable(physics_simulation ${PROJECT_SOURCE_DIR}/src/apps/main/main.cpp)
 target_include_directories(physics_simulation PUBLIC src)
+target_link_libraries(physics_simulation PRIVATE glm::glm)
+target_link_libraries(physics_simulation PRIVATE imgui)
 target_link_libraries(physics_simulation PRIVATE stb_image)
 target_link_libraries(physics_simulation PRIVATE gl_core)
 target_link_libraries(physics_simulation PRIVATE gl_aux)
-target_link_libraries(physics_simulation PRIVATE glm::glm)
   

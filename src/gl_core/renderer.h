@@ -9,6 +9,9 @@
 #include <memory>
 #include <vector>
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -67,10 +70,12 @@ class RenderPipelineContext {
         RenderPipelineContext(int width, int height, std::string title);
         ~RenderPipelineContext();
 
+        void init_imgui();
+        void run_imgui();
         void process_input(GLFWwindow* window);
         float get_delta();
 
-        void set_textures();
+        void set_texture(std::string tex_name);
         void set_transforms();
         void run();
 
