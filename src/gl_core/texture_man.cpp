@@ -4,9 +4,9 @@ TextureMan::TextureMan() {
 	stbi_set_flip_vertically_on_load(true);
 }
 
-TextureMan::TextureMan(std::string key, std::string path, std::string uniform_name) {
+TextureMan::TextureMan(std::string key, std::string path) {
 	stbi_set_flip_vertically_on_load(true);
-	m_textures[key] = std::make_unique<Texture>(uniform_name, m_amt_of_textures);
+	m_textures[key] = std::make_unique<Texture>(m_amt_of_textures);
     glGenTextures(1, &m_textures[key]->id);
 	glActiveTexture(GL_TEXTURE0 + m_amt_of_textures);
     glBindTexture(GL_TEXTURE_2D, m_textures[key]->id);
@@ -28,11 +28,11 @@ TextureMan::~TextureMan() {
 	}
 }
 
-void TextureMan::add_texture(std::string key, std::string path, std::string uniform_name, std::string style) {
+void TextureMan::add_texture(std::string key, std::string path, std::string style) {
 	if (m_amt_of_textures >= 20) {
 		throw std::runtime_error("OpenGL can only handle 20 textures at a time, you've inputted more than 20");
 	} else {
-		m_textures[key] = std::make_unique<Texture>(uniform_name, m_amt_of_textures);
+		m_textures[key] = std::make_unique<Texture>(m_amt_of_textures);
 		glGenTextures(1, &m_textures[key]->id);
 		glActiveTexture(GL_TEXTURE0 + m_amt_of_textures);
 		glBindTexture(GL_TEXTURE_2D, m_textures[key]->id);
@@ -73,12 +73,4 @@ std::optional<unsigned int> TextureMan::get_tex_int(std::string key) {
 		return std::nullopt;
 	}
 	return m_textures[key]->texture_units;
-}
-
-std::optional<std::string> TextureMan::get_tex_uniform(std::string key) {
-	auto iter = m_textures.find(key);
-	if (iter == m_textures.end()) {
-		return std::nullopt;
-	}
-	return m_textures[key]->uniform;
 }

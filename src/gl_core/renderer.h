@@ -21,13 +21,12 @@
 
 #include "gl_aux/cube.h"
 #include "gl_aux/quad.h"
+#include "gl_core/batch_renderer.h"
 #include "gl_core/shader.h"
 #include "gl_core/shape_man.h"
 #include "gl_core/texture_man.h"
 
 double radian(double degrees);
-void GL_clear_error();
-bool GL_log_call(const char* function, const char* file, int line);
 
 enum CameraMovement {
     FORWARD = GLFW_KEY_W,
@@ -40,6 +39,8 @@ class Camera {
     public:
         Camera();
 
+        void set_control(bool activity);
+
         void process_keyboard(int key, float delta_time);
         void process_mouse_movement(double x_offset, double y_offset, GLboolean constrain_pitch = true);
         void process_mouse_scroll(double y_offset);
@@ -50,6 +51,8 @@ class Camera {
         glm::mat4 get_view() const { return glm::lookAt(m_pos, m_pos + m_front, m_up); }
     
     private:
+        bool m_active = true;
+        
         double m_yaw = -(std::numbers::pi / 2);
         double m_pitch = 0.0;
         double m_movement_speed = 2.5;
@@ -72,10 +75,14 @@ class RenderPipelineContext {
 
         void init_imgui();
         void run_imgui();
+        void imgui_roll_cube();
+        void imgui_tex_set();
+
         void process_input(GLFWwindow* window);
         float get_delta();
 
-        void set_texture(std::string tex_name);
+        void set_shader_uniforms();
+        void set_shader_texture(std::string tex_name, std::string uniform);
         void set_transforms();
         void run();
 
@@ -99,10 +106,16 @@ class RenderPipelineContext {
 
         std::map<std::string, glm::mat4> m_transforms;
 
+        std::unique_ptr<BatchRenderer> m_batch = nullptr;
         std::unique_ptr<Camera> m_camera = std::make_unique<Camera>();
         std::unique_ptr<Shader> m_shader = nullptr;
         std::unique_ptr<ShapeMan> m_shape_man = nullptr;
         std::unique_ptr<TextureMan> m_texture_man = nullptr;
+
+        bool m_set_null = false;
+        bool m_set_king = false;
+        bool m_set_face = false;
+        float m_imgui_y = 0;
 
         void set_callbacks();
         void viewport_size_callback(GLFWwindow* window, int width, int height);

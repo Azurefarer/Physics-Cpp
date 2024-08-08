@@ -51,35 +51,6 @@ target_include_directories(imgui PUBLIC ${PROJECT_SOURCE_DIR}/src/external_libs/
 target_include_directories(imgui PUBLIC ${glfw3_SOURCE_DIR}/include)
 target_link_libraries(imgui PUBLIC ${PROJECT_SOURCE_DIR}/build/_deps/glfw3-build/src/libglfw3.a)
 
-
-# add_library(imgui
-  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui.cpp
-  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui.h
-  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_demo.cpp
-  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_draw.cpp
-  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_tables.cpp
-  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_widgets.cpp
-  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imconfig.h
-  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imgui_internal.h
-  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imstb_rectpack.h
-  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imstb_truetype.h
-  # ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/imstb_textedit.h
-# )
-# target_include_directories(imgui PUBLIC ${PROJECT_SOURCE_DIR}/src/external_libs/imgui)
-# target_include_directories(imgui PUBLIC ${glfw3_SOURCE_DIR}/include)
-# target_link_libraries(imgui PUBLIC ${PROJECT_SOURCE_DIR}/build/_deps/glfw3-build/src/libglfw3.a)
-
-# add_library(imgui_back
-# ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/backends/imgui_impl_glfw.cpp
-# ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/backends/imgui_impl_glfw.h
-# ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/backends/imgui_impl_opengl3.cpp
-# ${PROJECT_SOURCE_DIR}/src/external_libs/imgui/backends/imgui_impl_opengl3.h
-# )
-# target_include_directories(imgui_back PUBLIC ${PROJECT_SOURCE_DIR}/src/external_libs/imgui)
-# target_include_directories(imgui_back PUBLIC ${PROJECT_SOURCE_DIR}/src/external_libs)
-# target_link_libraries(imgui_back PUBLIC imgui)
-# ----------------------------------------------------------------------
-
 add_library(KHR 
   ${PROJECT_SOURCE_DIR}/src/external_libs/KHR/KHR.cpp
   ${PROJECT_SOURCE_DIR}/src/external_libs/KHR/khrplatform.h
@@ -104,9 +75,10 @@ target_link_libraries(glad PUBLIC KHR)
 
 # src libs
 add_library(gl_core
-  ${PROJECT_SOURCE_DIR}/src/gl_core/gl_core.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/renderer.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/renderer.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/batch_renderer.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/batch_renderer.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/gpu_config.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/gpu_config.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/shader.cpp

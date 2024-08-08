@@ -5,19 +5,6 @@ double radian(double degrees) {
     return degrees * std::numbers::pi / 180;
 }
 
-void GL_clear_error() {
-    while (glGetError() != GL_NO_ERROR);
-}
-
-bool GL_log_call(const char* function, const char* file, int line) {
-    while (GLenum error = glGetError()) {
-        std::cout << "[OpenGL Error] (" << error << "): " << function <<
-            " " << file << ":" << line << std::endl;
-        return false;
-    }
-    return true;
-}
-
 Camera::Camera() : 
     m_pos(glm::vec3(0.0f, 0.0f, 3.0f)),
     m_front(glm::vec3(0.0f, 0.0f, -1.0f)),
@@ -26,33 +13,46 @@ Camera::Camera() :
     m_right(glm::vec3(1.0f, 0.0f, 0.0f))
 {}
 
+void Camera::set_control(bool activity) {
+    m_active = activity;
+}
+
 void Camera::process_keyboard(int key, float delta_time) {
-    float velocity = m_movement_speed * delta_time;
-    if (key == GLFW_KEY_W)
-        m_pos += m_front * velocity;
-    if (key == GLFW_KEY_S)
-        m_pos -= m_front * velocity;
-    if (key == GLFW_KEY_A)
-        m_pos -= m_right * velocity;
-    if (key == GLFW_KEY_D)
-        m_pos += m_right * velocity;
+    if (!m_active) { return; }
+    else {
+        float velocity = m_movement_speed * delta_time;
+        if (key == GLFW_KEY_W)
+            m_pos += m_front * velocity;
+        if (key == GLFW_KEY_S)
+            m_pos -= m_front * velocity;
+        if (key == GLFW_KEY_A)
+            m_pos -= m_right * velocity;
+        if (key == GLFW_KEY_D)
+            m_pos += m_right * velocity;
+    }
 }
 
 void Camera::process_mouse_movement(double x_offset, double y_offset, GLboolean constrain_pitch) {
-    x_offset *= m_mouse_sensitivity;
-    y_offset *= m_mouse_sensitivity;
-    m_yaw += x_offset;
-    m_pitch += y_offset;
-    // if (m_pitch > std::numbers::pi / 4)
-    //     m_pitch = std::numbers::pi / 4;
-    // if (m_pitch < -std::numbers::pi / 4)
-    //     m_pitch = -std::numbers::pi / 4;
+    if (!m_active) { return; }
+    else {
+        x_offset *= m_mouse_sensitivity;
+        y_offset *= m_mouse_sensitivity;
+        m_yaw += x_offset;
+        m_pitch += y_offset;
+        if (m_pitch > std::numbers::pi / 4)
+            m_pitch = std::numbers::pi / 4;
+        if (m_pitch < -std::numbers::pi / 4)
+            m_pitch = -std::numbers::pi / 4;
 
-    Camera::update_camera_vectors();
+        Camera::update_camera_vectors();
+    }
 }
 
 void Camera::process_mouse_scroll(double y_offset) {
-    m_zoom -= y_offset;
+    if (!m_active) { return; }
+    else {
+        m_zoom -= y_offset;
+    }
 }
 
 void Camera::update_camera_vectors() {
@@ -91,6 +91,7 @@ RenderPipelineContext::RenderPipelineContext(int width, int height, std::string 
 
     RenderPipelineContext::set_transforms();
 
+    m_batch = std::make_unique<BatchRenderer>();
     m_shader = std::make_unique<Shader>(
         "../src/shader_source/vertex_shader_practice.vs",
         "../src/shader_source/fragment_shader_01_practice.fs");
@@ -101,10 +102,10 @@ RenderPipelineContext::RenderPipelineContext(int width, int height, std::string 
     m_shape_man->shove_vertex_index_data("QUAD", quad.get_verts(), quad.get_indices());
     m_shape_man->shove_vertex_index_data("CUBE", cube.get_verts(), cube.get_indices());
     m_texture_man = std::make_unique<TextureMan>();
-    m_texture_man->add_texture("king_canute", "../src/king_canute.png", "texture01", "PIXEL");
-    m_texture_man->add_texture("awesome_face", "../src/awesomeface.png", "texture02", "REALISTIC");
-    RenderPipelineContext::set_texture("king_canute");    
-    RenderPipelineContext::set_texture("awesome_face");    
+    m_texture_man->add_texture("NULL", "", "");
+    m_texture_man->add_texture("king_canute", "../src/king_canute.png", "PIXEL");
+    m_texture_man->add_texture("awesome_face", "../src/awesomeface.png", "REALISTIC");
+    RenderPipelineContext::set_shader_texture("NULL", "texture01");    
 }
 
 RenderPipelineContext::~RenderPipelineContext() {
@@ -123,37 +124,38 @@ void RenderPipelineContext::init_imgui() {
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init(nullptr);
-    std::cout << "imgui gone" << std::endl;                             
 }
 
 void RenderPipelineContext::run_imgui() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-    // ImGui::ShowDemoWindow();
-            static float f = 0.0f;
-            static int counter = 0;
-    bool show_demo_window = true;
-    bool show_another_window = false;
-        ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    ImGui::Begin("Hello, world!");
+    ImGui::Text("Draw Calls/Frame: ");
+    ImGui::SameLine();
+    ImGui::Text(std::to_string(m_batch->m_draw_count).c_str());
+    ImGui::Text("Quad Count: ");
+    ImGui::SameLine();
+    ImGui::Text(std::to_string(m_batch->m_quad_count).c_str());
 
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+    ImGui::Text("Set Different Textures Here :D");
+    ImGui::Checkbox("Blank", &m_set_null);
+        if (m_set_null) { RenderPipelineContext::set_shader_texture("NULL", "texture01"); }
+    ImGui::Checkbox("King Canute", &m_set_king);
+        if (m_set_king) { RenderPipelineContext::set_shader_texture("king_canute", "texture01"); }
+    ImGui::Checkbox("Awesome Face", &m_set_face);
+        if (m_set_face) { RenderPipelineContext::set_shader_texture("awesome_face", "texture01"); }
+    ImGui::SliderFloat("y pos of floor", &m_imgui_y, -10.0, 10.0);
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+    ImGui::End();    
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
 
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-            ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &show_another_window);
+void RenderPipelineContext::imgui_roll_cube() {
 
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-            // ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-            ImGui::End();    
-            ImGui::Render();
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void RenderPipelineContext::process_input(GLFWwindow* window) {
@@ -172,17 +174,26 @@ float RenderPipelineContext::get_delta() {
     float current_frame = glfwGetTime();
     m_delta = current_frame - m_last_frame;
     m_last_frame = current_frame;
+
+    m_shader->set_float("time", current_frame);
+
     return m_delta;
 }
 
-void RenderPipelineContext::set_texture(std::string tex_name) {
+void RenderPipelineContext::set_shader_uniforms() {
+    m_shader->use();
+    m_shader->set_mat4("model", m_transforms.at("MODEL"));
+    m_shader->set_mat4("view", m_transforms.at("VIEW"));
+    m_shader->set_mat4("projection", m_transforms.at("PROJECTION"));
+}
+
+void RenderPipelineContext::set_shader_texture(std::string tex_name, std::string uniform) {
     auto tex_int = m_texture_man->get_tex_int(tex_name.c_str());
-    auto tex_uniform = m_texture_man->get_tex_uniform(tex_name.c_str());
-    if (!tex_int.has_value() || !tex_uniform.has_value()) {
+    if (!tex_int.has_value()) {
         throw std::runtime_error("invalid tex");
     }
     m_shader->use();
-    m_shader->set_int(tex_uniform.value(), tex_int.value());
+    m_shader->set_int(uniform, tex_int.value());
 }
 
 void RenderPipelineContext::set_transforms() {
@@ -199,15 +210,25 @@ void RenderPipelineContext::run() {
     while (!glfwWindowShouldClose(m_window)) {
         RenderPipelineContext::process_input(m_window);
         RenderPipelineContext::set_transforms();
-        glClearColor(0.0f, RenderPipelineContext::get_cursor_pos_ratio()[0], RenderPipelineContext::get_cursor_pos_ratio()[1], 1.0f);
+        glClearColor(0.35f, 0.7f, 0.9f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        m_shader->use();
-        m_shader->set_mat4("model", m_transforms.at("MODEL"));
-        m_shader->set_mat4("view", m_transforms.at("VIEW"));
-        m_shader->set_mat4("projection", m_transforms.at("PROJECTION"));
+
+        m_batch->begin_batch();
+        for (float z = -10.0f; z < 10.0f; z += 0.1f) {
+            for (float x = -10.0f; x < 10.0f; x += 0.1f) {
+                glm::vec4 color = { (x + 10) / 20.0f, 0.2f, (z + 10) /20.0f, 1.0f };
+                m_batch->draw_quad(glm::vec3(x, m_imgui_y, z), glm::vec2(0.09f, 0.09f), color);
+            }
+        }
+        m_batch->end_batch();
+        RenderPipelineContext::set_shader_uniforms();
+        m_batch->flush();
+        
         m_shape_man->draw("CUBE");
 
         RenderPipelineContext::run_imgui();
+        m_batch->m_draw_count = 0;
+        m_batch->m_quad_count = 0;
 
         glfwSwapBuffers(m_window);
 		glfwPollEvents();
@@ -270,13 +291,14 @@ void RenderPipelineContext::keyboard_callback(GLFWwindow* window, int key, int s
     if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
         if (k%2 == 0) {
             glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            m_camera->set_control(false);
             k++;
         } else {
             glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            m_camera->set_control(true);
             k++;
         }
     }
-    std::cout << k << std::endl;
 }
 
 void RenderPipelineContext::cursor_pos_callback(GLFWwindow* window, double xposIn, double yposIn) {

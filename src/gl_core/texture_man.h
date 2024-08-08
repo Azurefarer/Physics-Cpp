@@ -19,17 +19,16 @@ struct Texture {
     unsigned int id;
     int width, height, nrChannels;
     unsigned int texture_units;
-    std::string uniform;
-    Texture(std::string uniform_name, unsigned int count) { id = 0; width = 0; height = 0; nrChannels = 0; texture_units = count, uniform = uniform_name;}
+    Texture(unsigned int count) { id = 0; width = 0; height = 0; nrChannels = 0; texture_units = count; }
 };
 
 class TextureMan {
     public:
         TextureMan();
-        TextureMan(std::string key, std::string path, std::string uniform_name);
+        TextureMan(std::string key, std::string path);
         ~TextureMan();
 
-        void add_texture(std::string key, std::string path, std::string uniform_name, std::string style);
+        void add_texture(std::string key, std::string path, std::string style);
         void set_texture_params();
         void set_pixel_texture_params();
         // TODO: add remove functionality

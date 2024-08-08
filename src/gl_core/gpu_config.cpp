@@ -12,11 +12,11 @@ IndexBuffer::~IndexBuffer() {
 }
 
 void IndexBuffer::bind() const {
-    glBindBuffer(GL_ARRAY_BUFFER, m_renderer_ID);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_renderer_ID);
 }
 
 void IndexBuffer::unbind() const {
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 VertexBuffer::VertexBuffer(std::vector<Vertex> data) {
