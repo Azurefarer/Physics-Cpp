@@ -6,7 +6,7 @@ double radian(double degrees) {
 }
 
 Camera::Camera() : 
-    m_pos(glm::vec3(0.0f, 0.0f, 3.0f)),
+    m_pos(glm::vec3(0.0f, 3.0f, 10.0f)),
     m_front(glm::vec3(0.0f, 0.0f, -1.0f)),
     m_up(glm::vec3(0.0f, 1.0f, 0.0f)),
     m_world_up(glm::vec3(0.0f, 1.0f, 0.0f)),
@@ -89,12 +89,15 @@ RenderPipelineContext::RenderPipelineContext(int width, int height, std::string 
 
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    RenderPipelineContext::set_transforms();
+    RenderPipelineContext::set_transforms(glm::vec3(0.0f));
 
     m_batch = std::make_unique<BatchRenderer>();
     m_shader = std::make_unique<Shader>(
         "../src/shader_source/vertex_shader_practice.vs",
         "../src/shader_source/fragment_shader_01_practice.fs");
+    m_shader2 = std::make_unique<Shader>(
+        "../src/shader_source/vertex_lighting_shader.vs",
+        "../src/shader_source/fragment_lighting_shader.fs");
     // TODO: make constructor that just takes in the shapes so I can get rid of the 4 lines below
     m_shape_man = std::make_unique<ShapeMan>();
     Quad quad;
@@ -139,6 +142,12 @@ void RenderPipelineContext::run_imgui() {
     ImGui::SameLine();
     ImGui::Text(std::to_string(m_batch->m_quad_count).c_str());
 
+    auto y_pos = [this](float y_pos) { m_batch->set_config_param_ypos(y_pos); };
+    auto width = [this](float width) { m_batch->set_config_param_width(width); };
+    auto length = [this](float length) { m_batch->set_config_param_length(length); };
+    auto subdivide_width = [this](float subdivide) { m_batch->set_config_param_subdivide_width(subdivide); };
+    auto subdivide_length = [this](float subdivide) { m_batch->set_config_param_subdivide_length(subdivide); };
+
     ImGui::Text("Set Different Textures Here :D");
     ImGui::Checkbox("Blank", &m_set_null);
         if (m_set_null) { RenderPipelineContext::set_shader_texture("NULL", "texture01"); }
@@ -146,10 +155,26 @@ void RenderPipelineContext::run_imgui() {
         if (m_set_king) { RenderPipelineContext::set_shader_texture("king_canute", "texture01"); }
     ImGui::Checkbox("Awesome Face", &m_set_face);
         if (m_set_face) { RenderPipelineContext::set_shader_texture("awesome_face", "texture01"); }
+
     ImGui::SliderFloat("y pos of floor", &m_imgui_y, -10.0, 10.0);
+    y_pos(m_imgui_y);
+    
+    ImGui::SliderFloat("width", &m_imgui_width, 0.01, 100.0);
+    width(m_imgui_width);
+    
+    ImGui::SliderFloat("length", &m_imgui_length, 0.01, 100.0);
+    length(m_imgui_length);
+    
+    ImGui::SliderFloat("width sub divisions", &m_imgui_sub_width, 0.01, 1.0);
+    subdivide_width(m_imgui_sub_width);
+    
+    ImGui::SliderFloat("length sub divisions", &m_imgui_sub_length, 0.01, 1.0);
+    subdivide_length(m_imgui_sub_length);
+    
+    
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-    ImGui::End();    
+    ImGui::End();
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -187,6 +212,13 @@ void RenderPipelineContext::set_shader_uniforms() {
     m_shader->set_mat4("projection", m_transforms.at("PROJECTION"));
 }
 
+void RenderPipelineContext::set_shader2_uniforms() {
+    m_shader2->use();
+    m_shader2->set_mat4("model", m_transforms.at("MODEL"));
+    m_shader2->set_mat4("view", m_transforms.at("VIEW"));
+    m_shader2->set_mat4("projection", m_transforms.at("PROJECTION"));
+}
+
 void RenderPipelineContext::set_shader_texture(std::string tex_name, std::string uniform) {
     auto tex_int = m_texture_man->get_tex_int(tex_name.c_str());
     if (!tex_int.has_value()) {
@@ -196,11 +228,12 @@ void RenderPipelineContext::set_shader_texture(std::string tex_name, std::string
     m_shader->set_int(uniform, tex_int.value());
 }
 
-void RenderPipelineContext::set_transforms() {
+void RenderPipelineContext::set_transforms(glm::vec3 model_offset) {
     glm::mat4 model(1.0f);
+    model = glm::translate(model, model_offset);
     glm::mat4 view(m_camera->get_view());
     glm::mat4 projection(1.0f);
-    projection = glm::perspective(glm::radians(m_camera->get_zoom()), m_aspect_ratio, 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(m_camera->get_zoom()), m_aspect_ratio, 0.1f, 500.0f);
     m_transforms["MODEL"] = model;
     m_transforms["VIEW"] = view;
     m_transforms["PROJECTION"] = projection;
@@ -209,21 +242,19 @@ void RenderPipelineContext::set_transforms() {
 void RenderPipelineContext::run() {
     while (!glfwWindowShouldClose(m_window)) {
         RenderPipelineContext::process_input(m_window);
-        RenderPipelineContext::set_transforms();
+        RenderPipelineContext::set_transforms(glm::vec3(0.0f));
         glClearColor(0.35f, 0.7f, 0.9f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        m_shader->use();
+        m_batch->run_batch();
 
-        m_batch->begin_batch();
-        for (float z = -10.0f; z < 10.0f; z += 0.1f) {
-            for (float x = -10.0f; x < 10.0f; x += 0.1f) {
-                glm::vec4 color = { (x + 10) / 20.0f, 0.2f, (z + 10) /20.0f, 1.0f };
-                m_batch->draw_quad(glm::vec3(x, m_imgui_y, z), glm::vec2(0.09f, 0.09f), color);
-            }
-        }
-        m_batch->end_batch();
         RenderPipelineContext::set_shader_uniforms();
-        m_batch->flush();
-        
+
+        m_shape_man->draw("CUBE");
+
+        RenderPipelineContext::set_transforms(glm::vec3(10.0f, 7.0f, -3.0f));
+        RenderPipelineContext::set_shader2_uniforms();
+        m_shader2->use();
         m_shape_man->draw("CUBE");
 
         RenderPipelineContext::run_imgui();
@@ -235,7 +266,7 @@ void RenderPipelineContext::run() {
     }
 }
 
-void RenderPipelineContext::set_callbacks() {    
+void RenderPipelineContext::set_callbacks() {   
     static auto viewport_callback_static = [this](GLFWwindow* window, int width, int height) {
         RenderPipelineContext::viewport_size_callback(window, width, height);
     };

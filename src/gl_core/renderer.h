@@ -55,7 +55,7 @@ class Camera {
         
         double m_yaw = -(std::numbers::pi / 2);
         double m_pitch = 0.0;
-        double m_movement_speed = 2.5;
+        double m_movement_speed = 6.0;
         double m_mouse_sensitivity = 0.001;
         double m_zoom = 45.0;
 
@@ -82,8 +82,9 @@ class RenderPipelineContext {
         float get_delta();
 
         void set_shader_uniforms();
+        void set_shader2_uniforms();
         void set_shader_texture(std::string tex_name, std::string uniform);
-        void set_transforms();
+        void set_transforms(glm::vec3 model_offset);
         void run();
 
         glm::mat4 get_transform(std::string key) const { return m_transforms.at(key); };
@@ -108,7 +109,8 @@ class RenderPipelineContext {
 
         std::unique_ptr<BatchRenderer> m_batch = nullptr;
         std::unique_ptr<Camera> m_camera = std::make_unique<Camera>();
-        std::unique_ptr<Shader> m_shader = nullptr;
+        std::unique_ptr<Shader> m_shader =  nullptr;
+        std::unique_ptr<Shader> m_shader2 =  nullptr;
         std::unique_ptr<ShapeMan> m_shape_man = nullptr;
         std::unique_ptr<TextureMan> m_texture_man = nullptr;
 
@@ -116,6 +118,10 @@ class RenderPipelineContext {
         bool m_set_king = false;
         bool m_set_face = false;
         float m_imgui_y = 0;
+        float m_imgui_width = 10.0;
+        float m_imgui_length = 10.0;
+        float m_imgui_sub_width = 0.1;
+        float m_imgui_sub_length = 0.1;
 
         void set_callbacks();
         void viewport_size_callback(GLFWwindow* window, int width, int height);
