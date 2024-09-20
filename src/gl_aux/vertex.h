@@ -3,6 +3,8 @@
 
 #include "glm/glm.hpp"
 
+// TODO: Add a sphere
+
 struct Vertex {
     glm::vec3 position;
     glm::vec4 color;

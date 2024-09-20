@@ -1,10 +1,12 @@
 #include "gl_core/texture_man.h"
 
 TextureMan::TextureMan() {
+	load_stock_textures();
 	stbi_set_flip_vertically_on_load(true);
 }
 
 TextureMan::TextureMan(std::string key, std::string path) {
+	load_stock_textures();
 	stbi_set_flip_vertically_on_load(true);
 	m_textures[key] = std::make_unique<Texture>(m_amt_of_textures);
     glGenTextures(1, &m_textures[key]->id);
@@ -26,6 +28,12 @@ TextureMan::~TextureMan() {
 	for (auto iter=m_textures.begin(); iter!=m_textures.end(); ++iter) {
     	glDeleteTextures(1, &(iter->second->id));
 	}
+}
+
+void TextureMan::load_stock_textures() {
+	TextureMan::add_texture("NULL", "", "");
+    TextureMan::add_texture("king_canute", "../src/king_canute.png", "PIXEL");
+    TextureMan::add_texture("awesome_face", "../src/awesomeface.png", "REALISTIC");
 }
 
 void TextureMan::add_texture(std::string key, std::string path, std::string style) {

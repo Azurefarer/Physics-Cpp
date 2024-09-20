@@ -15,7 +15,12 @@ Shape::Shape(std::vector<Vertex> vertex_data, std::vector<unsigned int> index_da
 
 Shape::~Shape() {}
 
-ShapeMan::ShapeMan() {}
+ShapeMan::ShapeMan() {
+    Quad quad;
+    Cube cube;
+    shove_vertex_index_data("QUAD", quad.get_verts(), quad.get_indices());
+    shove_vertex_index_data("CUBE", cube.get_verts(), cube.get_indices());
+}
 
 ShapeMan::~ShapeMan() {}
 

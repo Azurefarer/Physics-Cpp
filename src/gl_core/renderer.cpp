@@ -39,19 +39,12 @@ void Camera::process_mouse_movement(double x_offset, double y_offset, GLboolean 
         y_offset *= m_mouse_sensitivity;
         m_yaw += x_offset;
         m_pitch += y_offset;
-        if (m_pitch > std::numbers::pi / 4)
-            m_pitch = std::numbers::pi / 4;
-        if (m_pitch < -std::numbers::pi / 4)
-            m_pitch = -std::numbers::pi / 4;
+        if (m_pitch > std::numbers::pi / 2)
+            m_pitch = std::numbers::pi / 2;
+        if (m_pitch < -std::numbers::pi / 2)
+            m_pitch = -std::numbers::pi / 2;
 
         Camera::update_camera_vectors();
-    }
-}
-
-void Camera::process_mouse_scroll(double y_offset) {
-    if (!m_active) { return; }
-    else {
-        m_zoom -= y_offset;
     }
 }
 
@@ -59,10 +52,19 @@ void Camera::update_camera_vectors() {
     glm::vec3 front;
     front.x = cos(m_yaw) * cos(m_pitch);
     front.y = sin(m_pitch);
+    std::cout << front.y << std::endl;
+    std::cout << m_pitch << std::endl;
     front.z = sin(m_yaw) * cos(m_pitch);
     m_front = glm::normalize(front);
     m_right = glm::normalize(glm::cross(m_front, m_world_up));
     m_up = glm::normalize(glm::cross(m_right, m_front));
+}
+
+void Camera::process_mouse_scroll(double y_offset) {
+    if (!m_active) { return; }
+    else {
+        m_zoom -= y_offset;
+    }
 }
 
 RenderPipelineContext::RenderPipelineContext(int width, int height, std::string title) 
@@ -100,14 +102,8 @@ RenderPipelineContext::RenderPipelineContext(int width, int height, std::string 
         "../src/shader_source/fragment_lighting_shader.fs");
     // TODO: make constructor that just takes in the shapes so I can get rid of the 4 lines below
     m_shape_man = std::make_unique<ShapeMan>();
-    Quad quad;
-    Cube cube;
-    m_shape_man->shove_vertex_index_data("QUAD", quad.get_verts(), quad.get_indices());
-    m_shape_man->shove_vertex_index_data("CUBE", cube.get_verts(), cube.get_indices());
     m_texture_man = std::make_unique<TextureMan>();
-    m_texture_man->add_texture("NULL", "", "");
-    m_texture_man->add_texture("king_canute", "../src/king_canute.png", "PIXEL");
-    m_texture_man->add_texture("awesome_face", "../src/awesomeface.png", "REALISTIC");
+
     RenderPipelineContext::set_shader_texture("NULL", "texture01");    
 }
 

@@ -5,6 +5,8 @@
 #include <memory>
 #include <string>
 
+#include "gl_aux/cube.h"
+#include "gl_aux/quad.h"
 #include "gl_core/gpu_config.h"
 
 class Shape {

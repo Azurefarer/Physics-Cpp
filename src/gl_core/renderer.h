@@ -19,8 +19,7 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
-#include "gl_aux/cube.h"
-#include "gl_aux/quad.h"
+
 #include "gl_core/batch_renderer.h"
 #include "gl_core/shader.h"
 #include "gl_core/shape_man.h"
@@ -55,7 +54,7 @@ class Camera {
         
         double m_yaw = -(std::numbers::pi / 2);
         double m_pitch = 0.0;
-        double m_movement_speed = 6.0;
+        double m_movement_speed = 60.0;
         double m_mouse_sensitivity = 0.001;
         double m_zoom = 45.0;
 

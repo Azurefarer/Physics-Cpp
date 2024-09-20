@@ -28,6 +28,7 @@ class TextureMan {
         TextureMan(std::string key, std::string path);
         ~TextureMan();
 
+        void load_stock_textures();
         void add_texture(std::string key, std::string path, std::string style);
         void set_texture_params();
         void set_pixel_texture_params();
