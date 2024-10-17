@@ -106,10 +106,20 @@ add_library(gl_aux
   ${PROJECT_SOURCE_DIR}/src/gl_aux/cube.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_aux/vertex.h
 )
-target_include_directories(gl_core PUBLIC
+target_include_directories(gl_aux PUBLIC
   src
 )
 target_link_libraries(gl_aux PUBLIC gl_core)
+
+add_library(gui
+  ${PROJECT_SOURCE_DIR}/src/gui/gui.h
+  ${PROJECT_SOURCE_DIR}/src/gui/gui.cpp
+)
+target_include_directories(gui PUBLIC
+  src
+  ${PROJECT_SOURCE_DIR}/src/external_libs
+)
+target_link_libraries(gui PUBLIC imgui)
 
 add_executable(physics_simulation ${PROJECT_SOURCE_DIR}/src/apps/main/main.cpp)
 target_include_directories(physics_simulation PUBLIC src)

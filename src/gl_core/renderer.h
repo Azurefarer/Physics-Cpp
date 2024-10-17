@@ -19,7 +19,6 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
-
 #include "gl_core/batch_renderer.h"
 #include "gl_core/shader.h"
 #include "gl_core/shape_man.h"
@@ -67,12 +66,13 @@ class Camera {
         void update_camera_vectors();
 };
 
-class RenderPipelineContext {
+class Context {
     public:
-        RenderPipelineContext(int width, int height, std::string title);
-        ~RenderPipelineContext();
+        Context(int width, int height, std::string title);
+        ~Context();
 
-        void init_imgui();
+        bool is_live() { return !glfwWindowShouldClose(m_window); }
+        void sync_imgui_glfw_contexts();
         void run_imgui();
         void imgui_roll_cube();
         void imgui_tex_set();
@@ -85,6 +85,7 @@ class RenderPipelineContext {
         void set_shader_texture(std::string tex_name, std::string uniform);
         void set_transforms(glm::vec3 model_offset);
         void run();
+        void swap_buffers();
 
         glm::mat4 get_transform(std::string key) const { return m_transforms.at(key); };
         glm::mat4 get_view() const { return m_camera->get_view(); }
@@ -96,6 +97,8 @@ class RenderPipelineContext {
         int m_width;
         int m_height;
         float m_aspect_ratio = static_cast<float>(m_width)/static_cast<float>(m_height);
+
+        bool live = glfwWindowShouldClose(m_window);
 
         float m_delta = 0.0f;
         float m_last_frame = 0.0f;
@@ -128,6 +131,41 @@ class RenderPipelineContext {
         void cursor_pos_callback(GLFWwindow* window, double xposIn, double yposIn);
         void cursor_entered_callback(GLFWwindow* window, int entered);
         void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+};
+
+class Renderer {
+    public:
+        Renderer(Context context);
+        ~Renderer();
+
+        void run();
+        void set_transforms(glm::vec3 model_offset);
+        void set_shader_uniforms();
+        void set_shader2_uniforms();
+        void set_shader_texture(std::string tex_name, std::string uniform);
+        float get_delta();
+        void init_imgui();
+        void run_imgui();
+        void imgui_roll_cube();
+        void imgui_tex_set();
+
+        glm::mat4 get_transform(std::string key) const { return m_transforms.at(key); };
+        glm::mat4 get_view() const { return m_camera->get_view(); }
+
+    private:
+        float m_delta = 0.0f;
+        float m_last_frame = 0.0f;
+
+        std::map<std::string, glm::mat4> m_transforms;
+
+        std::unique_ptr<BatchRenderer> m_batch = nullptr;
+        std::unique_ptr<Camera> m_camera = std::make_unique<Camera>();
+        std::unique_ptr<Context> m_context =  nullptr;
+        std::unique_ptr<Shader> m_shader =  nullptr;
+        std::unique_ptr<Shader> m_shader2 =  nullptr;
+        std::unique_ptr<ShapeMan> m_shape_man = nullptr;
+        std::unique_ptr<TextureMan> m_texture_man = nullptr;
+
 };
 
 #endif
