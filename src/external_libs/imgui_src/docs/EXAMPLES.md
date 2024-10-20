@@ -140,7 +140,7 @@ Prefer using that if you are using modern GL or WebGL in your application.
 
 [example_sdl2_sdlrenderer2/](https://github.com/ocornut/imgui/blob/master/examples/example_sdl2_sdlrenderer2/) <BR>
 SDL2 (Win32, Mac, Linux, etc.) + SDL_Renderer for SDL2 (most graphics backends are supported underneath) <BR>
-= main.cpp + imgui_impl_sdl2.cpp + imgui_impl_sdlrenderer.cpp <BR>
+= main.cpp + imgui_impl_sdl2.cpp + imgui_impl_sdlpipeline.cpp <BR>
 This requires SDL 2.0.18+ (released November 2021) <BR>
 
 [example_sdl2_vulkan/](https://github.com/ocornut/imgui/blob/master/examples/example_sdl2_vulkan/) <BR>

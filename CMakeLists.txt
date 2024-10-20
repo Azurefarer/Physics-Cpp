@@ -75,8 +75,8 @@ target_link_libraries(glad PUBLIC KHR)
 
 # src libs
 add_library(gl_core
-  ${PROJECT_SOURCE_DIR}/src/gl_core/renderer.cpp
-  ${PROJECT_SOURCE_DIR}/src/gl_core/renderer.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/pipeline.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/pipeline.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/batch_renderer.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/batch_renderer.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/gpu_config.cpp
@@ -110,16 +110,6 @@ target_include_directories(gl_aux PUBLIC
   src
 )
 target_link_libraries(gl_aux PUBLIC gl_core)
-
-add_library(gui
-  ${PROJECT_SOURCE_DIR}/src/gui/gui.h
-  ${PROJECT_SOURCE_DIR}/src/gui/gui.cpp
-)
-target_include_directories(gui PUBLIC
-  src
-  ${PROJECT_SOURCE_DIR}/src/external_libs
-)
-target_link_libraries(gui PUBLIC imgui)
 
 add_executable(physics_simulation ${PROJECT_SOURCE_DIR}/src/apps/main/main.cpp)
 target_include_directories(physics_simulation PUBLIC src)

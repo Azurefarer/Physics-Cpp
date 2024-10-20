@@ -1,6 +1,4 @@
-#include <iostream>
-
-#include "gl_core/renderer.h"
+#include "gl_core/pipeline.h"
 
 int main() {
     Context context(1500, 975, "OpenGL Application");

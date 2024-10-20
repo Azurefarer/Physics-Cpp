@@ -1,5 +1,12 @@
-#ifndef GL_CORE_RENDERER_H_
-#define GL_CORE_RENDERER_H_
+/*
+This document contains the 4 core components of an OpenGL 3.0 render pipeline
+using GLFW, Glad, and ImGui.
+The Camera, Context, Gui, and Renderer.
+*/
+
+
+#ifndef GL_CORE_PIPELINE_H_
+#define GL_CORE_PIPELINE_H_
 
 #define GLM_ENABLE_EXPERIMENTAL
 
@@ -28,9 +35,35 @@ double radian(double degrees);
 
 enum CameraMovement {
     FORWARD = GLFW_KEY_W,
-    BACKWARD = GLFW_KEY_S,
     LEFT = GLFW_KEY_A,
+    BACKWARD = GLFW_KEY_S,
     RIGHT = GLFW_KEY_D
+};
+
+struct keys {
+    int W_key;
+    int A_key;
+    int S_key;
+    int D_key;
+    int Ltab_key;
+    int esc_key;
+};
+
+struct scene_data {
+    bool set_null = false;
+    bool set_king = false;
+    bool set_face = false;
+};
+
+struct batch_data {
+    float y_pos = 0.0f;
+    float width = 10.0f;
+    float length = 10.0f;
+    float subdivide_width = 0.1f;
+    float subdivide_length = 0.1f;
+
+    int draw_count = 0;
+    int quad_count = 0;
 };
 
 class Camera {
@@ -72,25 +105,22 @@ class Context {
         ~Context();
 
         bool is_live() { return !glfwWindowShouldClose(m_window); }
-        void sync_imgui_glfw_contexts();
-        void run_imgui();
-        void imgui_roll_cube();
-        void imgui_tex_set();
+        bool mouse_control() { return m_mouse_control; }
 
-        void process_input(GLFWwindow* window);
-        float get_delta();
+        GLFWwindow *get_window() { return m_window; }
+        float get_aspect_ratio() { return m_aspect_ratio; }
+        double get_scroll_x() { return m_scroll_x_offset; }
+        double get_scroll_y() { return m_scroll_y_offset; }
+        double get_arc_x() { return m_arc_x; }
+        double get_arc_y() { return m_arc_y; }
 
-        void set_shader_uniforms();
-        void set_shader2_uniforms();
-        void set_shader_texture(std::string tex_name, std::string uniform);
-        void set_transforms(glm::vec3 model_offset);
-        void run();
+        keys *get_keys_pressed() { return m_keys.get(); }
+
         void swap_buffers();
 
-        glm::mat4 get_transform(std::string key) const { return m_transforms.at(key); };
-        glm::mat4 get_view() const { return m_camera->get_view(); }
-
         std::vector<double> get_cursor_pos_ratio() const { return m_cursor_pos_ratio; }
+        
+        std::unique_ptr<Gui> gui = nullptr;
 
     private:
         GLFWwindow* m_window;
@@ -99,31 +129,17 @@ class Context {
         float m_aspect_ratio = static_cast<float>(m_width)/static_cast<float>(m_height);
 
         bool live = glfwWindowShouldClose(m_window);
+        bool m_mouse_control = true;
+        double m_scroll_x_offset = 0.0f;
+        double m_scroll_y_offset = 0.0f;
 
-        float m_delta = 0.0f;
-        float m_last_frame = 0.0f;
-
+        double m_arc_x = 0.0f;
+        double m_arc_y = 0.0f;
         double m_cursor_pos_x;
         double m_cursor_pos_y;
         std::vector<double> m_cursor_pos_ratio{0.5, 0.5};
 
-        std::map<std::string, glm::mat4> m_transforms;
-
-        std::unique_ptr<BatchRenderer> m_batch = nullptr;
-        std::unique_ptr<Camera> m_camera = std::make_unique<Camera>();
-        std::unique_ptr<Shader> m_shader =  nullptr;
-        std::unique_ptr<Shader> m_shader2 =  nullptr;
-        std::unique_ptr<ShapeMan> m_shape_man = nullptr;
-        std::unique_ptr<TextureMan> m_texture_man = nullptr;
-
-        bool m_set_null = false;
-        bool m_set_king = false;
-        bool m_set_face = false;
-        float m_imgui_y = 0;
-        float m_imgui_width = 10.0;
-        float m_imgui_length = 10.0;
-        float m_imgui_sub_width = 0.1;
-        float m_imgui_sub_length = 0.1;
+        std::unique_ptr<keys> m_keys = std::make_unique<keys>();
 
         void set_callbacks();
         void viewport_size_callback(GLFWwindow* window, int width, int height);
@@ -131,6 +147,24 @@ class Context {
         void cursor_pos_callback(GLFWwindow* window, double xposIn, double yposIn);
         void cursor_entered_callback(GLFWwindow* window, int entered);
         void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+};
+
+class Gui {
+    public:
+        Gui(GLFWwindow *context);
+        ~Gui();
+
+        void run();
+        void update_frame();
+
+        void set_scene_data(scene_data s) { m_sdata = s; }
+        void set_batch_data(batch_data b) { m_bdata = b; }
+        scene_data get_scene_data() { return m_sdata; }
+        batch_data get_batch_data() { return m_bdata; }
+
+    private:
+        scene_data m_sdata;
+        batch_data m_bdata;
 };
 
 class Renderer {
@@ -143,18 +177,21 @@ class Renderer {
         void set_shader_uniforms();
         void set_shader2_uniforms();
         void set_shader_texture(std::string tex_name, std::string uniform);
+        void update_for_gui();
+        void update_from_gui();
         float get_delta();
-        void init_imgui();
-        void run_imgui();
-        void imgui_roll_cube();
-        void imgui_tex_set();
 
         glm::mat4 get_transform(std::string key) const { return m_transforms.at(key); };
         glm::mat4 get_view() const { return m_camera->get_view(); }
 
+        void context_updates();
+
     private:
         float m_delta = 0.0f;
         float m_last_frame = 0.0f;
+
+        scene_data m_sdata;
+        batch_data m_bdata;
 
         std::map<std::string, glm::mat4> m_transforms;
 
@@ -165,7 +202,7 @@ class Renderer {
         std::unique_ptr<Shader> m_shader2 =  nullptr;
         std::unique_ptr<ShapeMan> m_shape_man = nullptr;
         std::unique_ptr<TextureMan> m_texture_man = nullptr;
-
+        std::unique_ptr<Gui> m_gui = nullptr;
 };
 
 #endif
