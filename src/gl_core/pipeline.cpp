@@ -56,8 +56,8 @@ void Camera::update_camera_vectors() {
     glm::vec3 front;
     front.x = cos(m_yaw) * cos(m_pitch);
     front.y = sin(m_pitch);
-    std::cout << front.y << std::endl;
-    std::cout << m_pitch << std::endl;
+    std::cout << front.y << "HI" << std::endl;
+    std::cout << m_pitch << "HI" << std::endl;
     front.z = sin(m_yaw) * cos(m_pitch);
     m_front = glm::normalize(front);
     m_right = glm::normalize(glm::cross(m_front, m_world_up));
@@ -71,8 +71,68 @@ void Camera::process_mouse_scroll(double y_offset) {
     }
 }
 
+Gui::Gui(GLFWwindow *context) { 
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(context, true);
+    ImGui_ImplOpenGL3_Init("#version 430 core");
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+}
+
+Gui::~Gui() {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+}
+
+void Gui::run() {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    ImGui::Begin("Scene Editor");
+    Gui::update_frame();
+    
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+    ImGui::End();
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+// void Gui::start_frame() {
+//     ImGui_ImplOpenGL3_NewFrame();
+//     ImGui_ImplGlfw_NewFrame();
+//     ImGui::NewFrame();
+// }
+
+void Gui::update_frame() {
+    // ImGui::Begin("Hello, world!");
+    ImGui::Text("Draw Calls/Frame: ", std::to_string(m_bdata.draw_count).c_str());
+    // ImGui::SameLine();
+    // ImGui::Text(std::to_string(m_bdata.draw_count).c_str());
+    ImGui::Text("Quad Count: ", std::to_string(m_bdata.quad_count).c_str());
+    // ImGui::SameLine();
+    // ImGui::Text(std::to_string(m_bdata.quad_count).c_str());
+
+    ImGui::SliderFloat("y pos of floor", &m_bdata.y_pos, -10.0, 10.0);
+    ImGui::SliderFloat("width", &m_bdata.width, 0.01, 100.0);
+    ImGui::SliderFloat("length", &m_bdata.length, 0.01, 100.0);
+    ImGui::SliderFloat("width sub divisions", &m_bdata.subdivide_width, 0.01, 1.0);
+    ImGui::SliderFloat("length sub divisions", &m_bdata.subdivide_length, 0.01, 1.0);
+
+    ImGui::Text("Set Different Textures Here :D");
+    ImGui::Checkbox("Blank", &m_sdata.set_null);
+    ImGui::Checkbox("King Canute", &m_sdata.set_king);
+    ImGui::Checkbox("Awesome Face", &m_sdata.set_face);
+}
+
 Context::Context(int width, int height, std::string title) 
     : m_width(width), m_height(height), m_cursor_pos_x(width/2), m_cursor_pos_y(height/2) {
+    
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -91,11 +151,10 @@ Context::Context(int width, int height, std::string title)
 	}
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
-    gui = std::make_unique<Gui>(m_window);
+    gui = std::make_shared<Gui>(m_window);
 
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    Context::set_transforms(glm::vec3(0.0f));
 }
 
 Context::~Context() {
@@ -171,13 +230,13 @@ void Context::keyboard_callback(GLFWwindow* window, int key, int scancode, int a
         }
     }
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        m_keys.W_key = GLFW_KEY_W; else { m_keys.W_key = false; }
+        (*m_keys).W_key = GLFW_KEY_W; else { (*m_keys).W_key = -1; }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        m_keys.A_key = GLFW_KEY_A; else { m_keys.A_key = false; }
+        (*m_keys).A_key = GLFW_KEY_A; else { (*m_keys).A_key = -1; }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        m_keys.S_key = GLFW_KEY_S; else { m_keys.S_key = false; }
+        (*m_keys).S_key = GLFW_KEY_S; else { (*m_keys).S_key = -1; }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        m_keys.D_key = GLFW_KEY_D; else { m_keys.D_key = false; }
+        (*m_keys).D_key = GLFW_KEY_D; else { (*m_keys).D_key = -1; }
 }
 
 void Context::cursor_pos_callback(GLFWwindow* window, double xposIn, double yposIn) {
@@ -186,7 +245,6 @@ void Context::cursor_pos_callback(GLFWwindow* window, double xposIn, double ypos
     m_cursor_pos_x = xposIn;
     m_cursor_pos_y = yposIn;
     m_cursor_pos_ratio = {m_cursor_pos_x/m_width, m_cursor_pos_y/m_height};
-    m_camera->process_mouse_movement(m_arc_x, m_arc_y);
 }
 
 void Context::cursor_entered_callback(GLFWwindow* window, int entered) {
@@ -198,72 +256,18 @@ void Context::scroll_callback(GLFWwindow* window, double xoffset, double yoffset
     m_scroll_y_offset = yoffset;
 }
 
-Gui::Gui(GLFWwindow *context) { 
-    // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(context, true);
-    ImGui_ImplOpenGL3_Init(nullptr);
-}
-
-Gui::~Gui() {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-}
-
-void Gui::run() {
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-    ImGui::Begin("Scene Editor");
-    Gui::update_frame();
-    
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-    ImGui::End();
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
-
-void Gui::update_frame() {
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-    ImGui::Begin("Hello, world!");
-    ImGui::Text("Draw Calls/Frame: ", std::to_string(m_bdata.draw_count).c_str());
-    // ImGui::SameLine();
-    // ImGui::Text(std::to_string(m_bdata.draw_count).c_str());
-    ImGui::Text("Quad Count: ", std::to_string(m_bdata.quad_count).c_str());
-    // ImGui::SameLine();
-    // ImGui::Text(std::to_string(m_bdata.quad_count).c_str());
-
-    ImGui::SliderFloat("y pos of floor", &m_bdata.y_pos, -10.0, 10.0);
-    ImGui::SliderFloat("width", &m_bdata.width, 0.01, 100.0);
-    ImGui::SliderFloat("length", &m_bdata.length, 0.01, 100.0);
-    ImGui::SliderFloat("width sub divisions", &m_bdata.subdivide_width, 0.01, 1.0);
-    ImGui::SliderFloat("length sub divisions", &m_bdata.subdivide_length, 0.01, 1.0);
-
-    ImGui::Text("Set Different Textures Here :D");
-    ImGui::Checkbox("Blank", &m_sdata.set_null);
-    ImGui::Checkbox("King Canute", &m_sdata.set_king);
-    ImGui::Checkbox("Awesome Face", &m_sdata.set_face);
-}
-
 Renderer::Renderer(Context context) {
     m_context = std::make_unique<Context>(context);
     m_batch = std::make_unique<BatchRenderer>();
     m_shader = std::make_unique<Shader>(
         "../src/shader_source/vertex_shader_practice.vs",
-        "../src/shader_source/fragment_shader_01_practice.fs");
+        "../src/shader_source/fragment_shader_practice.fs");
     m_shader2 = std::make_unique<Shader>(
         "../src/shader_source/vertex_lighting_shader.vs",
         "../src/shader_source/fragment_lighting_shader.fs");
     m_shape_man = std::make_unique<ShapeMan>();
     m_texture_man = std::make_unique<TextureMan>();
-    m_gui = std::move(m_context->gui);
-
+    m_gui = m_context->gui;
     Renderer::set_transforms(glm::vec3(0.0f));
     Renderer::set_shader_texture("NULL", "texture01");
 }
@@ -272,6 +276,11 @@ Renderer::~Renderer() {}
 
 void Renderer::run() {
     while(m_context->is_live()) {
+        glfwPollEvents();
+        Renderer::update_for_gui();
+        m_gui->run();
+        Renderer::update_from_gui();
+        // m_gui->start_frame();
         glClearColor(0.35f, 0.7f, 0.9f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         Renderer::set_transforms(glm::vec3(0.0f));
@@ -284,10 +293,6 @@ void Renderer::run() {
         Renderer::set_shader2_uniforms();
         m_shader2->use();
         m_shape_man->draw("CUBE");
-
-        Renderer::update_for_gui();
-        m_gui->run();
-        Renderer::update_from_gui();
         Renderer::context_updates();
     }
 }
@@ -363,12 +368,12 @@ void Renderer::update_from_gui() {
 void Renderer::context_updates() {
     m_camera->set_control(m_context->mouse_control());
     // Need an iterator
-    keys *iter = m_context->get_keys_pressed();
-    while (iter != nullptr) { 
-        if (iter) { m_camera->process_keyboard(key, m_delta)}
+    int *iter = &(m_context->get_keys_pressed()->W_key); // Memory Address Starts at the beginning of the keys struct.
+    for ( int i=0; i*4<sizeof(keys); i++) { 
+        int key = *(iter);
+        m_camera->process_keyboard(key, m_delta); 
+        iter++;
     }
-    
-    m_camera->process_keyboard();
     m_camera->process_mouse_movement(m_context->get_arc_x(), m_context->get_arc_y());
     m_camera->process_mouse_scroll(m_context->get_scroll_y());
     m_context->swap_buffers();

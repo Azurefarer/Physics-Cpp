@@ -41,12 +41,12 @@ enum CameraMovement {
 };
 
 struct keys {
-    int W_key;
-    int A_key;
-    int S_key;
-    int D_key;
-    int Ltab_key;
-    int esc_key;
+    int W_key = -1;
+    int A_key = -1;
+    int S_key = -1;
+    int D_key = -1;
+    int Ltab_key = -1;
+    int esc_key = -1;
 };
 
 struct scene_data {
@@ -99,6 +99,24 @@ class Camera {
         void update_camera_vectors();
 };
 
+class Gui {
+    public:
+        Gui(GLFWwindow *context);
+        ~Gui();
+
+        void run();
+        void update_frame();
+
+        void set_scene_data(scene_data s) { m_sdata = s; }
+        void set_batch_data(batch_data b) { m_bdata = b; }
+        scene_data get_scene_data() { return m_sdata; }
+        batch_data get_batch_data() { return m_bdata; }
+
+    private:
+        scene_data m_sdata;
+        batch_data m_bdata;
+};
+
 class Context {
     public:
         Context(int width, int height, std::string title);
@@ -120,7 +138,7 @@ class Context {
 
         std::vector<double> get_cursor_pos_ratio() const { return m_cursor_pos_ratio; }
         
-        std::unique_ptr<Gui> gui = nullptr;
+        std::shared_ptr<Gui> gui = nullptr;
 
     private:
         GLFWwindow* m_window;
@@ -128,7 +146,7 @@ class Context {
         int m_height;
         float m_aspect_ratio = static_cast<float>(m_width)/static_cast<float>(m_height);
 
-        bool live = glfwWindowShouldClose(m_window);
+        // bool live = glfwWindowShouldClose(m_window);
         bool m_mouse_control = true;
         double m_scroll_x_offset = 0.0f;
         double m_scroll_y_offset = 0.0f;
@@ -139,7 +157,7 @@ class Context {
         double m_cursor_pos_y;
         std::vector<double> m_cursor_pos_ratio{0.5, 0.5};
 
-        std::unique_ptr<keys> m_keys = std::make_unique<keys>();
+        std::shared_ptr<keys> m_keys = std::make_unique<keys>();
 
         void set_callbacks();
         void viewport_size_callback(GLFWwindow* window, int width, int height);
@@ -147,24 +165,6 @@ class Context {
         void cursor_pos_callback(GLFWwindow* window, double xposIn, double yposIn);
         void cursor_entered_callback(GLFWwindow* window, int entered);
         void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-};
-
-class Gui {
-    public:
-        Gui(GLFWwindow *context);
-        ~Gui();
-
-        void run();
-        void update_frame();
-
-        void set_scene_data(scene_data s) { m_sdata = s; }
-        void set_batch_data(batch_data b) { m_bdata = b; }
-        scene_data get_scene_data() { return m_sdata; }
-        batch_data get_batch_data() { return m_bdata; }
-
-    private:
-        scene_data m_sdata;
-        batch_data m_bdata;
 };
 
 class Renderer {
@@ -202,7 +202,7 @@ class Renderer {
         std::unique_ptr<Shader> m_shader2 =  nullptr;
         std::unique_ptr<ShapeMan> m_shape_man = nullptr;
         std::unique_ptr<TextureMan> m_texture_man = nullptr;
-        std::unique_ptr<Gui> m_gui = nullptr;
+        std::shared_ptr<Gui> m_gui = nullptr;
 };
 
 #endif
