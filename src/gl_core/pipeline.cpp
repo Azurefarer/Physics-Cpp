@@ -79,7 +79,7 @@ Gui::Gui(GLFWwindow *context) {
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(context, true);
-    ImGui_ImplOpenGL3_Init("#version 430 core");
+    ImGui_ImplOpenGL3_Init(nullptr);
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 }
 
@@ -90,6 +90,13 @@ Gui::~Gui() {
 }
 
 void Gui::run() {
+    GLuint temp = glCreateShader(GL_VERTEX_SHADER);
+    std::cout << temp << std::endl;
+    GLenum err = 0;
+    while(err = glGetError()!=GL_NO_ERROR) {
+		std::cout << err << std::endl;
+
+    }
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -138,23 +145,23 @@ Context::Context(int width, int height, std::string title)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     m_window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
-	if (m_window == NULL) {
+	if (m_window == NULL) { 
 		glfwTerminate();
         throw std::runtime_error("Failed to create GLFW window");
 	}
     glfwMakeContextCurrent(m_window);
-
     Context::set_callbacks();
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		throw std::runtime_error("Failed to initialize GLAD");
 	}
+    // glEnable              ( GL_DEBUG_OUTPUT );
+    // glDebugMessageCallback( MessageCallback, 0 );
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
     gui = std::make_shared<Gui>(m_window);
 
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
 }
 
 Context::~Context() {

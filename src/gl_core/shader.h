@@ -156,11 +156,12 @@ private:
     }
     
     unsigned int compile_shader(std::string shader_type, const std::string& src) {
-        unsigned int shader = 0;
+        GLuint shader = 0;
         int success = 0;
         const char* csrc = src.c_str();
         if (shader_type == "VERTEX") {
             shader = glCreateShader(GL_VERTEX_SHADER);
+            std::cout << shader << std::endl;
             glShaderSource(shader, 1, &csrc, NULL);
             glCompileShader(shader);
             success = checkCompileErrors(shader, "VERTEX");
