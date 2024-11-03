@@ -161,7 +161,6 @@ private:
         const char* csrc = src.c_str();
         if (shader_type == "VERTEX") {
             shader = glCreateShader(GL_VERTEX_SHADER);
-            std::cout << shader << std::endl;
             glShaderSource(shader, 1, &csrc, NULL);
             glCompileShader(shader);
             success = checkCompileErrors(shader, "VERTEX");

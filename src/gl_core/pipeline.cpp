@@ -1,5 +1,7 @@
 #include "gl_core/pipeline.h"
 #include <stdexcept>
+#include <utility>
+
 
 double radian(double degrees) {
     return degrees * std::numbers::pi / 180;
@@ -47,6 +49,7 @@ void Camera::process_mouse_movement(double x_offset, double y_offset, GLboolean 
             m_pitch = std::numbers::pi / 2;
         if (m_pitch < -std::numbers::pi / 2)
             m_pitch = -std::numbers::pi / 2;
+    // std::cout << m_pitch << "HI" << std::endl;
 
         Camera::update_camera_vectors();
     }
@@ -56,8 +59,7 @@ void Camera::update_camera_vectors() {
     glm::vec3 front;
     front.x = cos(m_yaw) * cos(m_pitch);
     front.y = sin(m_pitch);
-    std::cout << front.y << "HI" << std::endl;
-    std::cout << m_pitch << "HI" << std::endl;
+    // std::cout << front.y << "HI" << std::endl;
     front.z = sin(m_yaw) * cos(m_pitch);
     m_front = glm::normalize(front);
     m_right = glm::normalize(glm::cross(m_front, m_world_up));
@@ -81,6 +83,9 @@ Gui::Gui(GLFWwindow *context) {
     ImGui_ImplGlfw_InitForOpenGL(context, true);
     ImGui_ImplOpenGL3_Init(nullptr);
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    if (glfwGetCurrentContext()) {
+        std::cerr << "Active OpenGL context! : GUI init" << std::endl;
+    }
 }
 
 Gui::~Gui() {
@@ -90,13 +95,6 @@ Gui::~Gui() {
 }
 
 void Gui::run() {
-    GLuint temp = glCreateShader(GL_VERTEX_SHADER);
-    std::cout << temp << std::endl;
-    GLenum err = 0;
-    while(err = glGetError()!=GL_NO_ERROR) {
-		std::cout << err << std::endl;
-
-    }
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -144,23 +142,22 @@ Context::Context(int width, int height, std::string title)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
     m_window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
 	if (m_window == NULL) { 
 		glfwTerminate();
         throw std::runtime_error("Failed to create GLFW window");
 	}
     glfwMakeContextCurrent(m_window);
-    Context::set_callbacks();
+    set_GLFWcallbacks();
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		throw std::runtime_error("Failed to initialize GLAD");
 	}
-    // glEnable              ( GL_DEBUG_OUTPUT );
-    // glDebugMessageCallback( MessageCallback, 0 );
+    glEnable(GL_DEBUG_OUTPUT);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
-    gui = std::make_shared<Gui>(m_window);
-
+    set_GLcallbacks();
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
@@ -168,11 +165,35 @@ Context::~Context() {
     glfwTerminate();
 }
 
+void Context::set_cursor_activity(bool active) {
+    m_cursor_activity = active;
+}
+
 void Context::swap_buffers() {
     glfwSwapBuffers(m_window);
 }
 
-void Context::set_callbacks() {   
+void Context::set_GLcallbacks() {
+    static auto message_callback_static = [this](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
+        Context::message_callback(source, type, id, severity, length, message, userParam);
+    };
+    glDebugMessageCallback(
+        [](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
+            message_callback_static(source, type, id, severity, length, message, userParam);},
+        0
+    );
+}
+
+void Context::message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) { 
+    if (type == GL_DEBUG_TYPE_OTHER) {
+            return;
+    }
+    fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+        ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ), type, severity, message
+    );
+};
+
+void Context::set_GLFWcallbacks() {   
     static auto viewport_callback_static = [this](GLFWwindow* window, int width, int height) {
         Context::viewport_size_callback(window, width, height);
     };
@@ -252,6 +273,8 @@ void Context::cursor_pos_callback(GLFWwindow* window, double xposIn, double ypos
     m_cursor_pos_x = xposIn;
     m_cursor_pos_y = yposIn;
     m_cursor_pos_ratio = {m_cursor_pos_x/m_width, m_cursor_pos_y/m_height};
+
+    m_cursor_activity = true;
 }
 
 void Context::cursor_entered_callback(GLFWwindow* window, int entered) {
@@ -263,8 +286,7 @@ void Context::scroll_callback(GLFWwindow* window, double xoffset, double yoffset
     m_scroll_y_offset = yoffset;
 }
 
-Renderer::Renderer(Context context) {
-    m_context = std::make_unique<Context>(context);
+Renderer::Renderer(std::unique_ptr<Context> pcontext) : m_context(std::move(pcontext)) {
     m_batch = std::make_unique<BatchRenderer>();
     m_shader = std::make_unique<Shader>(
         "../src/shader_source/vertex_shader_practice.vs",
@@ -274,16 +296,18 @@ Renderer::Renderer(Context context) {
         "../src/shader_source/fragment_lighting_shader.fs");
     m_shape_man = std::make_unique<ShapeMan>();
     m_texture_man = std::make_unique<TextureMan>();
-    m_gui = m_context->gui;
+    m_gui = std::make_unique<Gui>(m_context->get_window());
     Renderer::set_transforms(glm::vec3(0.0f));
     Renderer::set_shader_texture("NULL", "texture01");
 }
 
-Renderer::~Renderer() {}
-
 void Renderer::run() {
     while(m_context->is_live()) {
         glfwPollEvents();
+
+        // std::cout << m_context->get_arc_x() << std::endl;
+        // std::cout << m_context->get_arc_y() << std::endl;
+
         Renderer::update_for_gui();
         m_gui->run();
         Renderer::update_from_gui();
@@ -381,7 +405,10 @@ void Renderer::context_updates() {
         m_camera->process_keyboard(key, m_delta); 
         iter++;
     }
-    m_camera->process_mouse_movement(m_context->get_arc_x(), m_context->get_arc_y());
+    if ( m_context->get_cursor_activity() ) {
+        m_camera->process_mouse_movement(m_context->get_arc_x(), m_context->get_arc_y());
+        m_context->set_cursor_activity(false);
+    }
     m_camera->process_mouse_scroll(m_context->get_scroll_y());
     m_context->swap_buffers();
 }

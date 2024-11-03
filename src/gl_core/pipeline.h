@@ -87,7 +87,7 @@ class Camera {
         double m_yaw = -(std::numbers::pi / 2);
         double m_pitch = 0.0;
         double m_movement_speed = 60.0;
-        double m_mouse_sensitivity = 0.001;
+        double m_mouse_sensitivity = 100;
         double m_zoom = 45.0;
 
         glm::vec3 m_pos;
@@ -132,13 +132,14 @@ class Context {
         double get_arc_x() { return m_arc_x; }
         double get_arc_y() { return m_arc_y; }
 
-        keys *get_keys_pressed() { return m_keys.get(); }
+        bool get_cursor_activity() { return m_cursor_activity; }
+        void set_cursor_activity(bool active);
 
         void swap_buffers();
 
+        keys *get_keys_pressed() { return m_keys.get(); }
+
         std::vector<double> get_cursor_pos_ratio() const { return m_cursor_pos_ratio; }
-        
-        std::shared_ptr<Gui> gui = nullptr;
 
     private:
         GLFWwindow* m_window;
@@ -153,13 +154,22 @@ class Context {
 
         double m_arc_x = 0.0f;
         double m_arc_y = 0.0f;
+        bool m_cursor_activity = false;
         double m_cursor_pos_x;
         double m_cursor_pos_y;
         std::vector<double> m_cursor_pos_ratio{0.5, 0.5};
 
         std::shared_ptr<keys> m_keys = std::make_unique<keys>();
 
-        void set_callbacks();
+        void set_GLcallbacks();
+        void APIENTRY message_callback(GLenum source,
+                 GLenum type,
+                 GLuint id,
+                 GLenum severity,
+                 GLsizei length,
+                 const GLchar* message,
+                 const void* userParam);
+        void set_GLFWcallbacks();
         void viewport_size_callback(GLFWwindow* window, int width, int height);
         void keyboard_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
         void cursor_pos_callback(GLFWwindow* window, double xposIn, double yposIn);
@@ -169,8 +179,8 @@ class Context {
 
 class Renderer {
     public:
-        Renderer(Context context);
-        ~Renderer();
+        Renderer(std::unique_ptr<Context> pcontext);
+        ~Renderer() = default;
 
         void run();
         void set_transforms(glm::vec3 model_offset);
@@ -202,7 +212,7 @@ class Renderer {
         std::unique_ptr<Shader> m_shader2 =  nullptr;
         std::unique_ptr<ShapeMan> m_shape_man = nullptr;
         std::unique_ptr<TextureMan> m_texture_man = nullptr;
-        std::shared_ptr<Gui> m_gui = nullptr;
+        std::unique_ptr<Gui> m_gui = nullptr;
 };
 
 #endif
