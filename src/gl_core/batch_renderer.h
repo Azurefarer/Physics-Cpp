@@ -22,6 +22,8 @@ class BatchRenderer {
 
         void flush();
 
+        void reset();
+
         void draw_quad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
 
         void set_config_param_ypos(float y_pos) { m_params.y_pos = y_pos; }
@@ -30,8 +32,8 @@ class BatchRenderer {
         void set_config_param_subdivide_width(float subdivide) { m_params.subdivide_width = subdivide; }
         void set_config_param_subdivide_length(float subdivide) { m_params.subdivide_length = subdivide; }
         
-        int m_quad_count = 0;
-        int m_draw_count = 0;
+        int m_quad_count = 0; // # of Quads per render
+        int m_draw_count = 0; // # of Batches per render
 
     private:
 

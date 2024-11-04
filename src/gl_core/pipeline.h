@@ -105,7 +105,6 @@ class Gui {
         ~Gui();
 
         void run();
-        void update_frame();
 
         void set_scene_data(scene_data s) { m_sdata = s; }
         void set_batch_data(batch_data b) { m_bdata = b; }
@@ -115,6 +114,12 @@ class Gui {
     private:
         scene_data m_sdata;
         batch_data m_bdata;
+
+        void start_frame();
+        void show_diagnostics();
+        void set_batch();
+        void set_texture();
+        void end_frame();
 };
 
 class Context {
@@ -123,7 +128,8 @@ class Context {
         ~Context();
 
         bool is_live() { return !glfwWindowShouldClose(m_window); }
-        bool mouse_control() { return m_mouse_control; }
+        bool get_gui_focus() { return m_gui_focus; }
+        void set_gui_focus(bool focus) { m_gui_focus = focus; }
 
         GLFWwindow *get_window() { return m_window; }
         float get_aspect_ratio() { return m_aspect_ratio; }
@@ -131,9 +137,17 @@ class Context {
         double get_scroll_y() { return m_scroll_y_offset; }
         double get_arc_x() { return m_arc_x; }
         double get_arc_y() { return m_arc_y; }
+        void set_arc_x(double x) { m_arc_x = x; }
+        void set_arc_y(double y) { m_arc_y = y; }
 
         bool get_cursor_activity() { return m_cursor_activity; }
-        void set_cursor_activity(bool active);
+        void set_cursor_activity(bool activity) { m_cursor_activity = activity; };
+        
+        bool get_scroll_activity() { return m_scroll_activity; }
+        void set_scroll_activity(bool activity) { m_scroll_activity = activity; };
+        
+        bool get_keyboard_activity() { return m_keyboard_activity; } // may remove
+        void set_keyboard_activity(bool activity) { m_keyboard_activity = activity; }; // may remove
 
         void swap_buffers();
 
@@ -147,17 +161,20 @@ class Context {
         int m_height;
         float m_aspect_ratio = static_cast<float>(m_width)/static_cast<float>(m_height);
 
-        // bool live = glfwWindowShouldClose(m_window);
-        bool m_mouse_control = true;
-        double m_scroll_x_offset = 0.0f;
-        double m_scroll_y_offset = 0.0f;
+        bool m_gui_focus = false;
+        
+        bool m_cursor_activity = false;
+        bool m_scroll_activity = false;
+        bool m_keyboard_activity = false; // may remove
 
         double m_arc_x = 0.0f;
         double m_arc_y = 0.0f;
-        bool m_cursor_activity = false;
         double m_cursor_pos_x;
         double m_cursor_pos_y;
         std::vector<double> m_cursor_pos_ratio{0.5, 0.5};
+        
+        double m_scroll_x_offset = 0.0f;
+        double m_scroll_y_offset = 0.0f;
 
         std::shared_ptr<keys> m_keys = std::make_unique<keys>();
 
@@ -183,17 +200,19 @@ class Renderer {
         ~Renderer() = default;
 
         void run();
-        void set_transforms(glm::vec3 model_offset);
-        void set_shader_uniforms();
-        void set_shader2_uniforms();
+
+        void set_MVP(glm::vec3 model_offset); // Model-View-Projection Matrix
+        void set_shader(int shader_id);
+        void draw_batch();
         void set_shader_texture(std::string tex_name, std::string uniform);
-        void update_for_gui();
-        void update_from_gui();
+        void updates_for_gui();
+        void updates_from_gui();
         float get_delta();
 
         glm::mat4 get_transform(std::string key) const { return m_transforms.at(key); };
         glm::mat4 get_view() const { return m_camera->get_view(); }
 
+        void gui_updates();
         void context_updates();
 
     private:
@@ -208,8 +227,7 @@ class Renderer {
         std::unique_ptr<BatchRenderer> m_batch = nullptr;
         std::unique_ptr<Camera> m_camera = std::make_unique<Camera>();
         std::unique_ptr<Context> m_context =  nullptr;
-        std::unique_ptr<Shader> m_shader =  nullptr;
-        std::unique_ptr<Shader> m_shader2 =  nullptr;
+        std::vector<std::unique_ptr<Shader>> m_shaders;
         std::unique_ptr<ShapeMan> m_shape_man = nullptr;
         std::unique_ptr<TextureMan> m_texture_man = nullptr;
         std::unique_ptr<Gui> m_gui = nullptr;

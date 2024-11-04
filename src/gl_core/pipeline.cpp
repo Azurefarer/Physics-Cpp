@@ -2,7 +2,6 @@
 #include <stdexcept>
 #include <utility>
 
-
 double radian(double degrees) {
     return degrees * std::numbers::pi / 180;
 }
@@ -23,8 +22,7 @@ void Camera::process_keyboard(int key, float delta_time) {
     if (!m_active) { return; }
     else {
         float velocity = m_movement_speed * delta_time;
-        if (key == GLFW_KEY_W)
-            m_pos += m_front * velocity;
+        if (key == GLFW_KEY_W) { m_pos += m_front * velocity; }
         if (key == GLFW_KEY_S)
             m_pos -= m_front * velocity;
         if (key == GLFW_KEY_A)
@@ -37,7 +35,7 @@ void Camera::process_keyboard(int key, float delta_time) {
 void Camera::process_mouse_movement(double x_offset, double y_offset, GLboolean constrain_pitch) {
     // Can change this so the math makes more sense
     // instead of adding linear offset to an angular total value
-    // convert the liinear offset into an angle measurement with arc length.
+    // convert the linear offset into an angle measurement with arc length.
     
     if (!m_active) { return; }
     else {
@@ -49,7 +47,6 @@ void Camera::process_mouse_movement(double x_offset, double y_offset, GLboolean 
             m_pitch = std::numbers::pi / 2;
         if (m_pitch < -std::numbers::pi / 2)
             m_pitch = -std::numbers::pi / 2;
-    // std::cout << m_pitch << "HI" << std::endl;
 
         Camera::update_camera_vectors();
     }
@@ -83,9 +80,6 @@ Gui::Gui(GLFWwindow *context) {
     ImGui_ImplGlfw_InitForOpenGL(context, true);
     ImGui_ImplOpenGL3_Init(nullptr);
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-    if (glfwGetCurrentContext()) {
-        std::cerr << "Active OpenGL context! : GUI init" << std::endl;
-    }
 }
 
 Gui::~Gui() {
@@ -95,44 +89,50 @@ Gui::~Gui() {
 }
 
 void Gui::run() {
+    start_frame();
+    show_diagnostics();
+    set_batch();
+    set_texture();
+    end_frame();
+}
+
+void Gui::start_frame() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     ImGui::Begin("Scene Editor");
-    Gui::update_frame();
-    
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-    ImGui::End();
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-// void Gui::start_frame() {
-//     ImGui_ImplOpenGL3_NewFrame();
-//     ImGui_ImplGlfw_NewFrame();
-//     ImGui::NewFrame();
-// }
+void Gui::show_diagnostics() {
+    ImGui::Text("Draw Calls/Frame: ");
+    ImGui::SameLine();
+    ImGui::Text(std::to_string(m_bdata.draw_count).c_str());
+    ImGui::Text("Quad Count: ");
+    ImGui::SameLine();
+    ImGui::Text(std::to_string(m_bdata.quad_count).c_str());
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+}
 
-void Gui::update_frame() {
-    // ImGui::Begin("Hello, world!");
-    ImGui::Text("Draw Calls/Frame: ", std::to_string(m_bdata.draw_count).c_str());
-    // ImGui::SameLine();
-    // ImGui::Text(std::to_string(m_bdata.draw_count).c_str());
-    ImGui::Text("Quad Count: ", std::to_string(m_bdata.quad_count).c_str());
-    // ImGui::SameLine();
-    // ImGui::Text(std::to_string(m_bdata.quad_count).c_str());
-
+void Gui::set_batch() {
     ImGui::SliderFloat("y pos of floor", &m_bdata.y_pos, -10.0, 10.0);
     ImGui::SliderFloat("width", &m_bdata.width, 0.01, 100.0);
     ImGui::SliderFloat("length", &m_bdata.length, 0.01, 100.0);
     ImGui::SliderFloat("width sub divisions", &m_bdata.subdivide_width, 0.01, 1.0);
     ImGui::SliderFloat("length sub divisions", &m_bdata.subdivide_length, 0.01, 1.0);
+}
 
+void Gui::set_texture() {
     ImGui::Text("Set Different Textures Here :D");
     ImGui::Checkbox("Blank", &m_sdata.set_null);
     ImGui::Checkbox("King Canute", &m_sdata.set_king);
     ImGui::Checkbox("Awesome Face", &m_sdata.set_face);
+}
+
+void Gui::end_frame() {
+    ImGui::End();
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 Context::Context(int width, int height, std::string title) 
@@ -163,10 +163,6 @@ Context::Context(int width, int height, std::string title)
 
 Context::~Context() {
     glfwTerminate();
-}
-
-void Context::set_cursor_activity(bool active) {
-    m_cursor_activity = active;
 }
 
 void Context::swap_buffers() {
@@ -243,33 +239,61 @@ void Context::viewport_size_callback(GLFWwindow* window, int width, int height) 
 }
 
 void Context::keyboard_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    static int k = 0;
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
-        if (k%2 == 0) {
-            glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            m_mouse_control = false;
-            k++;
-        } else {
-            glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            m_mouse_control = true;
-            k++;
+    if ( action == GLFW_REPEAT ) {
+        return;
+    }
+    // std::cout << "KEY : " << key << " W : " << (*m_keys).W_key << std::endl;
+    // std::cout << "KEY : " << key << " A : " << (*m_keys).A_key << std::endl;
+    // std::cout << "KEY : " << key << " S : " << (*m_keys).S_key << std::endl;
+    // std::cout << "KEY : " << key << " D : " << (*m_keys).D_key << std::endl;
+    // std::cout << "ACTION : " << action << std::endl;
+    if ( action == GLFW_PRESS ) {
+        if ( key == GLFW_KEY_ESCAPE ) {
+            glfwSetWindowShouldClose(window, true);
+        }
+        if ( key == GLFW_KEY_TAB ) {
+            if ( m_gui_focus == false ) {
+                (*m_keys).Ltab_key = key;
+                glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                set_gui_focus(true);
+            } else {
+                (*m_keys).Ltab_key = -1;
+                glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                set_gui_focus(false); 
+            }
+        }
+        if ( key == GLFW_KEY_W ) {
+            (*m_keys).W_key = key;
+        }
+        if ( key == GLFW_KEY_A ) {
+            (*m_keys).A_key = key;
+        }
+        if ( key == GLFW_KEY_S ) {
+            (*m_keys).S_key = key;
+        }
+        if ( key == GLFW_KEY_D ) {
+            (*m_keys).D_key = key;
         }
     }
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        (*m_keys).W_key = GLFW_KEY_W; else { (*m_keys).W_key = -1; }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        (*m_keys).A_key = GLFW_KEY_A; else { (*m_keys).A_key = -1; }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        (*m_keys).S_key = GLFW_KEY_S; else { (*m_keys).S_key = -1; }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        (*m_keys).D_key = GLFW_KEY_D; else { (*m_keys).D_key = -1; }
+    if ( action == GLFW_RELEASE ) {
+        if ( key == GLFW_KEY_W ) {
+            (*m_keys).W_key = -1;
+        }
+        if ( key == GLFW_KEY_A ) {
+            (*m_keys).A_key = -1;
+        }
+        if ( key == GLFW_KEY_S ) {
+            (*m_keys).S_key = -1;
+        }
+        if ( key == GLFW_KEY_D ) {
+            (*m_keys).D_key = -1;
+        }
+    }
 }
 
 void Context::cursor_pos_callback(GLFWwindow* window, double xposIn, double yposIn) {
-    m_arc_x = xposIn - m_cursor_pos_x;
-    m_arc_y = m_cursor_pos_y - yposIn;
+    m_arc_x += xposIn - m_cursor_pos_x;
+    m_arc_y += m_cursor_pos_y - yposIn;
     m_cursor_pos_x = xposIn;
     m_cursor_pos_y = yposIn;
     m_cursor_pos_ratio = {m_cursor_pos_x/m_width, m_cursor_pos_y/m_height};
@@ -284,51 +308,47 @@ void Context::cursor_entered_callback(GLFWwindow* window, int entered) {
 void Context::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     m_scroll_x_offset = xoffset;
     m_scroll_y_offset = yoffset;
+    
+    m_scroll_activity = true;
 }
 
 Renderer::Renderer(std::unique_ptr<Context> pcontext) : m_context(std::move(pcontext)) {
     m_batch = std::make_unique<BatchRenderer>();
-    m_shader = std::make_unique<Shader>(
+    m_shaders.push_back(std::make_unique<Shader>(
         "../src/shader_source/vertex_shader_practice.vs",
-        "../src/shader_source/fragment_shader_practice.fs");
-    m_shader2 = std::make_unique<Shader>(
+        "../src/shader_source/fragment_shader_practice.fs"));
+    m_shaders.push_back(std::make_unique<Shader>(
         "../src/shader_source/vertex_lighting_shader.vs",
-        "../src/shader_source/fragment_lighting_shader.fs");
+        "../src/shader_source/fragment_lighting_shader.fs"));
     m_shape_man = std::make_unique<ShapeMan>();
     m_texture_man = std::make_unique<TextureMan>();
     m_gui = std::make_unique<Gui>(m_context->get_window());
-    Renderer::set_transforms(glm::vec3(0.0f));
-    Renderer::set_shader_texture("NULL", "texture01");
+    set_MVP(glm::vec3(0.0f));
+    set_shader_texture("NULL", "texture01");
 }
 
 void Renderer::run() {
     while(m_context->is_live()) {
-        glfwPollEvents();
-
-        // std::cout << m_context->get_arc_x() << std::endl;
-        // std::cout << m_context->get_arc_y() << std::endl;
-
-        Renderer::update_for_gui();
-        m_gui->run();
-        Renderer::update_from_gui();
-        // m_gui->start_frame();
         glClearColor(0.35f, 0.7f, 0.9f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        Renderer::set_transforms(glm::vec3(0.0f));
-        m_shader->use();
-        m_batch->run_batch();
-        Renderer::set_shader_uniforms();
+        get_delta();
 
+        set_MVP(glm::vec3(0.0f));
+        set_shader(0);
+        draw_batch();
         m_shape_man->draw("CUBE");
-        Renderer::set_transforms(glm::vec3(10.0f, 7.0f, -3.0f));
-        Renderer::set_shader2_uniforms();
-        m_shader2->use();
+
+        set_MVP(glm::vec3(10.0f, 7.0f, -3.0f));
+        set_shader(1);
         m_shape_man->draw("CUBE");
-        Renderer::context_updates();
+
+        gui_updates();
+        context_updates();
+        glfwPollEvents();
     }
 }
 
-void Renderer::set_transforms(glm::vec3 model_offset) {
+void Renderer::set_MVP(glm::vec3 model_offset) {
     glm::mat4 model(1.0f);
     model = glm::translate(model, model_offset);
     glm::mat4 view(m_camera->get_view());
@@ -339,27 +359,27 @@ void Renderer::set_transforms(glm::vec3 model_offset) {
     m_transforms["PROJECTION"] = projection;
 }
 
-void Renderer::set_shader_uniforms() {
-    m_shader->use();
-    m_shader->set_mat4("model", m_transforms.at("MODEL"));
-    m_shader->set_mat4("view", m_transforms.at("VIEW"));
-    m_shader->set_mat4("projection", m_transforms.at("PROJECTION"));
+void Renderer::set_shader(int shader_id) {
+        m_shaders[shader_id]->use();
+        m_shaders[shader_id]->set_mat4("model", m_transforms.at("MODEL"));
+        m_shaders[shader_id]->set_mat4("view", m_transforms.at("VIEW"));
+        m_shaders[shader_id]->set_mat4("projection", m_transforms.at("PROJECTION"));
 }
 
-void Renderer::set_shader2_uniforms() {
-    m_shader2->use();
-    m_shader2->set_mat4("model", m_transforms.at("MODEL"));
-    m_shader2->set_mat4("view", m_transforms.at("VIEW"));
-    m_shader2->set_mat4("projection", m_transforms.at("PROJECTION"));
+void Renderer::draw_batch() {
+    m_batch->run_batch();
+    m_bdata.draw_count = m_batch->m_draw_count;
+    m_bdata.quad_count = m_batch->m_quad_count;
+    m_batch->reset();
 }
 
 float Renderer::get_delta() {
     float current_frame = glfwGetTime();
     m_delta = current_frame - m_last_frame;
     m_last_frame = current_frame;
-
-    m_shader->set_float("time", current_frame);
-
+    for (int i=0; i<m_shaders.size(); i++) {
+        m_shaders[i]->set_float("time", current_frame);
+    }
     return m_delta;
 }
 
@@ -368,24 +388,26 @@ void Renderer::set_shader_texture(std::string tex_name, std::string uniform) {
     if (!tex_int.has_value()) {
         throw std::runtime_error("invalid tex");
     }
-    m_shader->use();
-    m_shader->set_int(uniform, tex_int.value());
+    for (int i=0; i<m_shaders.size(); i++) {
+        m_shaders[i]->use();
+        m_shaders[i]->set_int(uniform, tex_int.value());
+
+    }
 }
 
-void Renderer::update_for_gui() {
-    m_bdata.draw_count = m_batch->m_draw_count;
-    m_bdata.quad_count = m_batch->m_quad_count;
-    
+// void Renderer::add_object() {}
+
+void Renderer::updates_for_gui() {    
     m_gui->set_scene_data(m_sdata);
     m_gui->set_batch_data(m_bdata);
 }
 
-void Renderer::update_from_gui() {
+void Renderer::updates_from_gui() {
     m_sdata = m_gui->get_scene_data();
 
-    if (m_sdata.set_null) { Renderer::set_shader_texture("NULL", "texture01"); }
-    if (m_sdata.set_king) { Renderer::set_shader_texture("king_canute", "texture01"); }
-    if (m_sdata.set_face) { Renderer::set_shader_texture("awesome_face", "texture01"); }
+    if (m_sdata.set_null) { set_shader_texture("NULL", "texture01"); }
+    if (m_sdata.set_king) { set_shader_texture("king_canute", "texture01"); }
+    if (m_sdata.set_face) { set_shader_texture("awesome_face", "texture01"); }
 
     m_bdata = m_gui->get_batch_data();
 
@@ -396,19 +418,29 @@ void Renderer::update_from_gui() {
     m_batch->set_config_param_subdivide_length(m_bdata.subdivide_length);
 }
 
+void Renderer::gui_updates() {
+        updates_for_gui();
+        if ( m_context->get_gui_focus() ) { m_gui->run(); }
+        updates_from_gui();
+}
+
 void Renderer::context_updates() {
-    m_camera->set_control(m_context->mouse_control());
-    // Need an iterator
+    m_camera->set_control(!m_context->get_gui_focus());
     int *iter = &(m_context->get_keys_pressed()->W_key); // Memory Address Starts at the beginning of the keys struct.
-    for ( int i=0; i*4<sizeof(keys); i++) { 
+    for ( int i=0; i*4<sizeof(keys); i++ ) { 
         int key = *(iter);
-        m_camera->process_keyboard(key, m_delta); 
+        m_camera->process_keyboard(key, m_delta);
         iter++;
     }
     if ( m_context->get_cursor_activity() ) {
         m_camera->process_mouse_movement(m_context->get_arc_x(), m_context->get_arc_y());
         m_context->set_cursor_activity(false);
-    }
-    m_camera->process_mouse_scroll(m_context->get_scroll_y());
+        m_context->set_arc_x(0);
+        m_context->set_arc_y(0);
+    } else {}
+    if ( m_context->get_scroll_activity() ) {
+        m_camera->process_mouse_scroll(m_context->get_scroll_y());
+        m_context->set_scroll_activity(false);
+    } else {}
     m_context->swap_buffers();
 }
