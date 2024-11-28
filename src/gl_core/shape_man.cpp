@@ -7,6 +7,7 @@ Shape::Shape(std::vector<Vertex> vertex_data, std::vector<unsigned int> index_da
     m_layout_ptr.get()->push_float(3);
     m_layout_ptr.get()->push_float(4);
     m_layout_ptr.get()->push_float(2);
+    m_layout_ptr.get()->push_float(3);
     m_layout_ptr.get()->push_float(1);
     m_va_ptr.get()->add_buffer((*m_vb_ptr.get()), (*m_layout_ptr.get()));
     m_ib_ptr.reset(new IndexBuffer(index_data));

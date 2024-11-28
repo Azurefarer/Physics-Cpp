@@ -6,17 +6,19 @@
 #include <sstream>
 #include <string>
 #include "glm/glm.hpp"
+#include "glad/glad.h"
 
 class Shader
 {
 public:
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
-    Shader(const char* vertexPath, const char* fragmentPath) {
+    Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr) {
         // 1. retrieve the vertex/fragment source code from filePath
         // and open them with ifstream constructor
         std::ifstream vShaderFile(vertexPath);
         std::ifstream fShaderFile(fragmentPath);
+        std::ifstream gShaderFile(geometryPath);
 
         // Doesn't catch an empty or null path
         if (!vShaderFile || !fShaderFile) {
@@ -32,9 +34,25 @@ public:
                 fShaderFile.close();
                 std::string vertex_code = vShaderStream.str();
                 std::string fragment_code = fShaderStream.str();
+                std::string geometry_code;
+                if ( geometryPath != nullptr ) {
+                    gShaderFile.open(geometryPath);
+                    std::stringstream gShaderStream;
+                    gShaderStream << gShaderFile.rdbuf();
+                    gShaderFile.close();
+                    geometry_code = gShaderStream.str();
+                }
                 // 2. compile shaders
                 unsigned int vertex = compile_shader("VERTEX", vertex_code);
                 unsigned int fragment = compile_shader("FRAGMENT", fragment_code);
+                unsigned int geometry = compile_shader("GEOMETRY", geometry_code);
+                if (geometryPath != nullptr) {
+                    const char * gShaderCode = geometry_code.c_str();
+                    geometry = glCreateShader(GL_GEOMETRY_SHADER);
+                    glShaderSource(geometry, 1, &gShaderCode, NULL);
+                    glCompileShader(geometry);
+                    checkCompileErrors(geometry, "GEOMETRY");
+                }
                 if (!vertex || !fragment) {
                     std::cout << "bad vert or frag" << std::endl;
                 } else {
@@ -52,6 +70,7 @@ public:
                             // delete the shaders as they're linked into our program now and no longer necessary
                             glDeleteShader(vertex);
                             glDeleteShader(fragment);
+                            if (geometryPath != nullptr) { glDeleteShader(geometry); }
                             m_ready = true;
                         }
                     }
@@ -64,6 +83,13 @@ public:
     }
     }
     // activate the shader
+
+    void program_number() {
+        glValidateProgram(m_ID);
+        int param;
+        glGetProgramiv(m_ID, GL_VALIDATE_STATUS, &param);
+        std::cout << param << std::endl;
+    }
 
     void use() {
         glUseProgram(m_ID);
@@ -170,6 +196,12 @@ private:
             glShaderSource(shader, 1, &csrc, NULL);
             glCompileShader(shader);
             success = checkCompileErrors(shader, "FRAGMENT");
+        }
+        else if (shader_type == "GEOMETRY") {
+            shader = glCreateShader(GL_GEOMETRY_SHADER);
+            glShaderSource(shader, 1, &csrc, NULL);
+            glCompileShader(shader);
+            success = checkCompileErrors(shader, "GEOMETRY");
         } else {
             std::cout << "ERROR: unhandled shader type, " << shader_type << std::endl;
         }

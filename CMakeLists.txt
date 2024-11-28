@@ -77,6 +77,8 @@ target_link_libraries(glad PUBLIC KHR)
 add_library(gl_core
   ${PROJECT_SOURCE_DIR}/src/gl_core/pipeline.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/pipeline.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/rigidbody.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/rigidbody.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/batch_renderer.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/batch_renderer.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/gpu_config.cpp

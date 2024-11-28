@@ -34,6 +34,7 @@ void TextureMan::load_stock_textures() {
 	TextureMan::add_texture("NULL", "", "");
     TextureMan::add_texture("king_canute", "../src/king_canute.png", "PIXEL");
     TextureMan::add_texture("awesome_face", "../src/awesomeface.png", "REALISTIC");
+    TextureMan::add_texture("tiled_back", "../src/tiled_background.png", "PIXEL");
 }
 
 void TextureMan::add_texture(std::string key, std::string path, std::string style) {

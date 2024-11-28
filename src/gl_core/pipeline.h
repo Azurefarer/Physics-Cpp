@@ -28,6 +28,7 @@ The Camera, Context, Gui, and Renderer.
 
 #include "gl_core/batch_renderer.h"
 #include "gl_core/shader.h"
+#include "gl_core/rigidbody.h"
 #include "gl_core/shape_man.h"
 #include "gl_core/texture_man.h"
 
@@ -53,6 +54,21 @@ struct scene_data {
     bool set_null = false;
     bool set_king = false;
     bool set_face = false;
+    bool set_back = false;
+
+    float v_amplitude_mult = 0.875;
+    float v_amplitude = 3.0;
+    float v_omega_mult = 1.037;
+    float v_omega = 0.3;
+    float v_lambda_mult = 0.885;
+    float v_lambda = 319.249;
+    float v_peak_width = 0.435;
+    float fresnel_coeff = 10.0;
+    float spec_coeff = 7.0;
+
+    float ambient_strength = 0.1;
+    glm::vec4 light_color = glm::vec4{1.0};
+    glm::vec4 light_pos = glm::vec4{2.0, 2.0, 2.0, 0.0};
 };
 
 struct batch_data {
@@ -119,6 +135,8 @@ class Gui {
         void show_diagnostics();
         void set_batch();
         void set_texture();
+        void set_light();
+        void set_wave();
         void end_frame();
 };
 
@@ -200,34 +218,51 @@ class Renderer {
         ~Renderer() = default;
 
         void run();
+    private:
+        void draw();
 
-        void set_MVP(glm::vec3 model_offset); // Model-View-Projection Matrix
+        void set_MVP(glm::vec3 model_offset, glm::vec3 scale = glm::vec3(1.0)); // Model-View-Projection Matrix
         void set_shader(int shader_id);
         void draw_batch();
-        void set_shader_texture(std::string tex_name, std::string uniform);
         void updates_for_gui();
         void updates_from_gui();
-        float get_delta();
+        void process_delta();
 
-        glm::mat4 get_transform(std::string key) const { return m_transforms.at(key); };
         glm::mat4 get_view() const { return m_camera->get_view(); }
 
         void gui_updates();
         void context_updates();
 
-    private:
+        void set_shader_uniform_texture(std::string tex_name, std::string uniform);
+        void set_shader_uniform_float(std::string uniform, float value);
+        void set_shader_uniform_vec4(std::string uniform, glm::vec4 vec4);
+
+        void update_core_uniforms(int shader_id);
+        void update_gui_uniforms();
+
+        void set_batch_config_params();
+
+        void set_batch_uniforms();
+        void set_phong_uniforms();
+        void set_light_uniforms();
+        void set_shader_uniforms();
+
+        void rigidbody_push_back(MVP mvp);
+
         float m_delta = 0.0f;
         float m_last_frame = 0.0f;
+        float m_current_frame = 0.0f;
 
         scene_data m_sdata;
         batch_data m_bdata;
 
-        std::map<std::string, glm::mat4> m_transforms;
+        MVP m_transforms;
+        std::vector<std::unique_ptr<RigidBody>> m_assets;
 
         std::unique_ptr<BatchRenderer> m_batch = nullptr;
         std::unique_ptr<Camera> m_camera = std::make_unique<Camera>();
-        std::unique_ptr<Context> m_context =  nullptr;
-        std::vector<std::unique_ptr<Shader>> m_shaders;
+        std::unique_ptr<Context> m_context = nullptr;
+        std::vector<std::shared_ptr<Shader>> m_shaders;
         std::unique_ptr<ShapeMan> m_shape_man = nullptr;
         std::unique_ptr<TextureMan> m_texture_man = nullptr;
         std::unique_ptr<Gui> m_gui = nullptr;

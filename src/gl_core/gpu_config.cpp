@@ -45,6 +45,7 @@ VertexArray::VertexArray() {
     glGenVertexArrays(1, &m_renderer_ID);
     glBindVertexArray(m_renderer_ID);
 }
+
 VertexArray::~VertexArray() {
     glDeleteVertexArrays(1, &m_renderer_ID);
 }

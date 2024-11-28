@@ -93,6 +93,8 @@ void Gui::run() {
     show_diagnostics();
     set_batch();
     set_texture();
+    set_light();
+    set_wave();
     end_frame();
 }
 
@@ -116,10 +118,10 @@ void Gui::show_diagnostics() {
 
 void Gui::set_batch() {
     ImGui::SliderFloat("y pos of floor", &m_bdata.y_pos, -10.0, 10.0);
-    ImGui::SliderFloat("width", &m_bdata.width, 0.01, 100.0);
-    ImGui::SliderFloat("length", &m_bdata.length, 0.01, 100.0);
-    ImGui::SliderFloat("width sub divisions", &m_bdata.subdivide_width, 0.01, 1.0);
-    ImGui::SliderFloat("length sub divisions", &m_bdata.subdivide_length, 0.01, 1.0);
+    ImGui::SliderFloat("width", &m_bdata.width, 0.01, 1000.0);
+    ImGui::SliderFloat("length", &m_bdata.length, 0.01, 1000.0);
+    ImGui::SliderFloat("width sub divisions", &m_bdata.subdivide_width, 0.01, 10.0);
+    ImGui::SliderFloat("length sub divisions", &m_bdata.subdivide_length, 0.01, 10.0);
 }
 
 void Gui::set_texture() {
@@ -127,6 +129,26 @@ void Gui::set_texture() {
     ImGui::Checkbox("Blank", &m_sdata.set_null);
     ImGui::Checkbox("King Canute", &m_sdata.set_king);
     ImGui::Checkbox("Awesome Face", &m_sdata.set_face);
+    ImGui::Checkbox("Tiled Background", &m_sdata.set_back);
+
+}
+
+void Gui::set_light() {
+    ImGui::SliderFloat("Ambient Strength", &m_sdata.ambient_strength, 0.0, 1.0);
+    ImGui::DragFloat4("Light Position", &m_sdata.light_pos.x, 0.5f, -150.0, 150.0);
+    ImGui::ColorPicker4("Light_Color", &m_sdata.light_color.x);
+}
+
+void Gui::set_wave() {
+    ImGui::SliderFloat("v_amplitude_mult", &m_sdata.v_amplitude_mult, 0.0, 2.0);
+    ImGui::SliderFloat("v_amplitude", &m_sdata.v_amplitude, 0.0, 6.0);
+    ImGui::SliderFloat("v_omega_mult", &m_sdata.v_omega_mult, 0.0, 2.0);
+    ImGui::SliderFloat("v_omega", &m_sdata.v_omega, 0.0, 2.0);
+    ImGui::SliderFloat("v_lambda_mult", &m_sdata.v_lambda_mult, 0.0, 2.0);
+    ImGui::SliderFloat("v_lambda", &m_sdata.v_lambda, 0.0, 1000.0);
+    ImGui::SliderFloat("v_peak_width", &m_sdata.v_peak_width, 0.0, 1.0);
+    ImGui::SliderFloat("fresnel_coeff", &m_sdata.fresnel_coeff, 0.0, 100.0);
+    ImGui::SliderFloat("spec_coeff", &m_sdata.spec_coeff, 0.0, 10.0);
 }
 
 void Gui::end_frame() {
@@ -242,11 +264,6 @@ void Context::keyboard_callback(GLFWwindow* window, int key, int scancode, int a
     if ( action == GLFW_REPEAT ) {
         return;
     }
-    // std::cout << "KEY : " << key << " W : " << (*m_keys).W_key << std::endl;
-    // std::cout << "KEY : " << key << " A : " << (*m_keys).A_key << std::endl;
-    // std::cout << "KEY : " << key << " S : " << (*m_keys).S_key << std::endl;
-    // std::cout << "KEY : " << key << " D : " << (*m_keys).D_key << std::endl;
-    // std::cout << "ACTION : " << action << std::endl;
     if ( action == GLFW_PRESS ) {
         if ( key == GLFW_KEY_ESCAPE ) {
             glfwSetWindowShouldClose(window, true);
@@ -314,32 +331,40 @@ void Context::scroll_callback(GLFWwindow* window, double xoffset, double yoffset
 
 Renderer::Renderer(std::unique_ptr<Context> pcontext) : m_context(std::move(pcontext)) {
     m_batch = std::make_unique<BatchRenderer>();
-    m_shaders.push_back(std::make_unique<Shader>(
-        "../src/shader_source/vertex_shader_practice.vs",
-        "../src/shader_source/fragment_shader_practice.fs"));
-    m_shaders.push_back(std::make_unique<Shader>(
-        "../src/shader_source/vertex_lighting_shader.vs",
-        "../src/shader_source/fragment_lighting_shader.fs"));
+    m_shaders.push_back(std::make_shared<Shader>(
+        "../src/shader_source/phong_lighting_model.vs",
+        "../src/shader_source/phong_lighting_model.fs"));
+    m_shaders.push_back(std::make_shared<Shader>(
+        "../src/shader_source/light_box.vs",
+        "../src/shader_source/light_box.fs"));
+    m_shaders.push_back(std::make_shared<Shader>(
+        "../src/shader_source/batch_render.vs",
+        "../src/shader_source/batch_render.fs"));
     m_shape_man = std::make_unique<ShapeMan>();
     m_texture_man = std::make_unique<TextureMan>();
     m_gui = std::make_unique<Gui>(m_context->get_window());
-    set_MVP(glm::vec3(0.0f));
-    set_shader_texture("NULL", "texture01");
+    set_MVP(glm::vec3(0.0f), glm::vec3(1.0f));
+    set_shader_uniform_texture("NULL", "texture01");
+    set_batch_uniforms();
 }
 
 void Renderer::run() {
     while(m_context->is_live()) {
         glClearColor(0.35f, 0.7f, 0.9f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        get_delta();
+        process_delta();
 
-        set_MVP(glm::vec3(0.0f));
-        set_shader(0);
+        // TODO: Generalize a draw FCT to include MVP, coree_unis, gui_uniis, and draw
+
+        // draw();
+        set_MVP(glm::vec3(-1.0f));
+        update_core_uniforms(2);
         draw_batch();
+        update_core_uniforms(0);
         m_shape_man->draw("CUBE");
 
-        set_MVP(glm::vec3(10.0f, 7.0f, -3.0f));
-        set_shader(1);
+        set_MVP(glm::vec3(m_sdata.light_pos), glm::vec3(5.0));
+        update_core_uniforms(1);
         m_shape_man->draw("CUBE");
 
         gui_updates();
@@ -348,51 +373,124 @@ void Renderer::run() {
     }
 }
 
-void Renderer::set_MVP(glm::vec3 model_offset) {
-    glm::mat4 model(1.0f);
-    model = glm::translate(model, model_offset);
-    glm::mat4 view(m_camera->get_view());
-    glm::mat4 projection(1.0f);
-    projection = glm::perspective(glm::radians(m_camera->get_zoom()), m_context->get_aspect_ratio(), 0.1f, 500.0f);
-    m_transforms["MODEL"] = model;
-    m_transforms["VIEW"] = view;
-    m_transforms["PROJECTION"] = projection;
+void Renderer::draw() {
+    for (int i=0; i<m_assets.size(); i++) {
+        m_assets[i]->run_shader();
+        m_shape_man->draw(m_assets[i]->get_shape());
+    }
 }
 
-void Renderer::set_shader(int shader_id) {
-        m_shaders[shader_id]->use();
-        m_shaders[shader_id]->set_mat4("model", m_transforms.at("MODEL"));
-        m_shaders[shader_id]->set_mat4("view", m_transforms.at("VIEW"));
-        m_shaders[shader_id]->set_mat4("projection", m_transforms.at("PROJECTION"));
+void Renderer::rigidbody_push_back(MVP mvp) {
+    m_assets.push_back(std::make_unique<RigidBody>(mvp));
+}
+
+void Renderer::set_MVP(glm::vec3 model_offset, glm::vec3 scale) {
+    glm::mat4 model(1.0f);
+    model = glm::translate(model, model_offset);
+    model = glm::scale(model, scale);
+    glm::mat4 view(m_camera->get_view());
+    glm::mat4 projection(1.0f);
+    projection = glm::perspective(glm::radians(m_camera->get_zoom()), m_context->get_aspect_ratio(), 0.1f, 1000.0f);
+    m_transforms.model = model;
+    m_transforms.view = view;
+    m_transforms.projection = projection;
+}
+
+void Renderer::update_core_uniforms(int shader_id) {
+    m_shaders[shader_id]->use();
+    m_shaders[shader_id]->set_mat4("model", m_transforms.model);
+    m_shaders[shader_id]->set_mat4("view", m_transforms.view);
+    m_shaders[shader_id]->set_mat4("projection", m_transforms.projection);
+    m_shaders[shader_id]->set_mat3("normal_matrix", glm::mat3(glm::transpose(glm::inverse(m_transforms.model))));
+    m_shaders[shader_id]->set_float("time", m_current_frame);
+}
+
+void Renderer::update_gui_uniforms() {
+    m_sdata = m_gui->get_scene_data();
+    m_bdata = m_gui->get_batch_data();
+    set_light_uniforms();
+    set_phong_uniforms();
+    set_batch_uniforms();
 }
 
 void Renderer::draw_batch() {
+    set_batch_config_params();
     m_batch->run_batch();
     m_bdata.draw_count = m_batch->m_draw_count;
     m_bdata.quad_count = m_batch->m_quad_count;
     m_batch->reset();
 }
 
-float Renderer::get_delta() {
-    float current_frame = glfwGetTime();
-    m_delta = current_frame - m_last_frame;
-    m_last_frame = current_frame;
-    for (int i=0; i<m_shaders.size(); i++) {
-        m_shaders[i]->set_float("time", current_frame);
-    }
-    return m_delta;
+void Renderer::set_batch_config_params() {
+    m_batch->set_config_param_ypos(m_bdata.y_pos);
+    m_batch->set_config_param_width(m_bdata.width);
+    m_batch->set_config_param_length(m_bdata.length);
+    m_batch->set_config_param_subdivide_width(m_bdata.subdivide_width);
+    m_batch->set_config_param_subdivide_length(m_bdata.subdivide_length);
 }
 
-void Renderer::set_shader_texture(std::string tex_name, std::string uniform) {
+void Renderer::process_delta() {
+    m_current_frame = glfwGetTime();
+    m_delta = m_current_frame - m_last_frame;
+    m_last_frame = m_current_frame;
+    for (int i=0; i<m_shaders.size(); i++) {
+        m_shaders[i]->use();
+        m_shaders[i]->set_float("time", m_current_frame);
+    }
+}
+
+void Renderer::set_shader_uniform_texture(std::string tex_name, std::string uniform) {
     auto tex_int = m_texture_man->get_tex_int(tex_name.c_str());
+    std::cout << tex_name.c_str() << std::endl;
     if (!tex_int.has_value()) {
         throw std::runtime_error("invalid tex");
     }
     for (int i=0; i<m_shaders.size(); i++) {
         m_shaders[i]->use();
         m_shaders[i]->set_int(uniform, tex_int.value());
-
     }
+}
+
+void Renderer::set_shader_uniform_float(std::string uniform, float value) {
+    for (int i=0; i<m_shaders.size(); i++) {
+        m_shaders[i]->use();
+        m_shaders[i]->set_float(uniform, value);
+        if (uniform == "v_amplitude") {
+            std::cout << "amp changed" << std::endl;
+        }
+    }
+}
+
+void Renderer::set_shader_uniform_vec4(std::string uniform, glm::vec4 vec4) {
+    for (int i=0; i<m_shaders.size(); i++) {
+        m_shaders[i]->use();
+        m_shaders[i]->set_vec4(uniform, vec4);
+    }
+}
+
+void Renderer::set_batch_uniforms() {
+    set_shader_uniform_float("v_amplitude_mult", m_sdata.v_amplitude_mult);
+    set_shader_uniform_float("v_amplitude", m_sdata.v_amplitude);
+    set_shader_uniform_float("v_omega_mult", m_sdata.v_omega_mult);
+    set_shader_uniform_float("v_omega", m_sdata.v_omega);
+    set_shader_uniform_float("v_lambda_mult", m_sdata.v_lambda_mult);
+    set_shader_uniform_float("v_lambda", m_sdata.v_lambda);
+    set_shader_uniform_float("v_peak_width", m_sdata.v_peak_width);
+    set_shader_uniform_float("fresnel_coeff", m_sdata.fresnel_coeff);
+    set_shader_uniform_float("spec_coeff", m_sdata.spec_coeff);
+}
+
+void Renderer::set_phong_uniforms() {
+    if (m_sdata.set_null) { set_shader_uniform_texture("NULL", "texture01"); }
+    if (m_sdata.set_king) { set_shader_uniform_texture("king_canute", "texture01"); }
+    if (m_sdata.set_face) { set_shader_uniform_texture("awesome_face", "texture01"); }
+    if (m_sdata.set_back) { set_shader_uniform_texture("tiled_back", "texture01"); }
+}
+
+void Renderer::set_light_uniforms() {
+    set_shader_uniform_float("ambient_strength", m_sdata.ambient_strength);
+    set_shader_uniform_vec4("light_color", m_sdata.light_color);
+    set_shader_uniform_vec4("light_pos", m_sdata.light_pos);
 }
 
 // void Renderer::add_object() {}
@@ -402,26 +500,12 @@ void Renderer::updates_for_gui() {
     m_gui->set_batch_data(m_bdata);
 }
 
-void Renderer::updates_from_gui() {
-    m_sdata = m_gui->get_scene_data();
-
-    if (m_sdata.set_null) { set_shader_texture("NULL", "texture01"); }
-    if (m_sdata.set_king) { set_shader_texture("king_canute", "texture01"); }
-    if (m_sdata.set_face) { set_shader_texture("awesome_face", "texture01"); }
-
-    m_bdata = m_gui->get_batch_data();
-
-    m_batch->set_config_param_ypos(m_bdata.y_pos);
-    m_batch->set_config_param_width(m_bdata.width);
-    m_batch->set_config_param_length(m_bdata.length);
-    m_batch->set_config_param_subdivide_width(m_bdata.subdivide_width);
-    m_batch->set_config_param_subdivide_length(m_bdata.subdivide_length);
-}
-
 void Renderer::gui_updates() {
-        updates_for_gui();
-        if ( m_context->get_gui_focus() ) { m_gui->run(); }
-        updates_from_gui();
+    updates_for_gui();
+    if ( m_context->get_gui_focus() ) { 
+        m_gui->run();
+        update_gui_uniforms();
+    }
 }
 
 void Renderer::context_updates() {

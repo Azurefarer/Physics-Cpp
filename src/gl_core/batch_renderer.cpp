@@ -20,9 +20,12 @@ BatchRenderer::BatchRenderer() {
 
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, uv));
-
+    
     glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, tex_index));
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, normal));
+    
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, tex_index));
     
     uint32_t indices[m_max_index];
     uint32_t offset = 0;
@@ -112,29 +115,61 @@ void BatchRenderer::draw_quad(const glm::vec3& position, const glm::vec2& size, 
 
     float texture_index = 0.0f;
 
-    m_data.quad_buffer_ptr->position = { position.x, position.y - cos(position.x) + sin(position.z), position.z };
+    m_data.quad_buffer_ptr->position = { position.x, position.y, position.z };
     m_data.quad_buffer_ptr->color = color;
     m_data.quad_buffer_ptr->uv = { 0.0f, 0.0f };
     m_data.quad_buffer_ptr->tex_index = texture_index;
+    m_data.quad_buffer_ptr->normal = { 0.0f, 1.0f, 0.0f };
     m_data.quad_buffer_ptr++;
 
-    m_data.quad_buffer_ptr->position = { position.x + size.x, position.y - cos(position.x+size.x) + sin(position.z), position.z };
+    m_data.quad_buffer_ptr->position = { position.x + size.x, position.y, position.z };
     m_data.quad_buffer_ptr->color = color;
     m_data.quad_buffer_ptr->uv = { 1.0f, 0.0f };
     m_data.quad_buffer_ptr->tex_index = texture_index;
+    m_data.quad_buffer_ptr->normal = { 0.0f, 1.0f, 0.0f };
     m_data.quad_buffer_ptr++;
     
-    m_data.quad_buffer_ptr->position = { position.x + size.x, position.y - cos(position.x+size.x) + sin(position.z+size.y), position.z + size.y };
+    m_data.quad_buffer_ptr->position = { position.x + size.x, position.y, position.z + size.y };
     m_data.quad_buffer_ptr->color = color;
     m_data.quad_buffer_ptr->uv = { 1.0f, 1.0f };
     m_data.quad_buffer_ptr->tex_index = texture_index;
+    m_data.quad_buffer_ptr->normal = { 0.0f, 1.0f, 0.0f };
     m_data.quad_buffer_ptr++;
 
-    m_data.quad_buffer_ptr->position = { position.x, position.y - cos(position.x) + sin(position.z+size.y), position.z + size.y };
+    m_data.quad_buffer_ptr->position = { position.x, position.y, position.z + size.y };
     m_data.quad_buffer_ptr->color = color;
     m_data.quad_buffer_ptr->uv = { 0.0f, 1.0f };
     m_data.quad_buffer_ptr->tex_index = texture_index;
+    m_data.quad_buffer_ptr->normal = { 0.0f, 1.0f, 0.0f };
     m_data.quad_buffer_ptr++;
+
+    // m_data.quad_buffer_ptr->position = { position.x, position.y - cos(position.x) + sin(position.z), position.z };
+    // m_data.quad_buffer_ptr->color = color;
+    // m_data.quad_buffer_ptr->uv = { 0.0f, 0.0f };
+    // m_data.quad_buffer_ptr->tex_index = texture_index;
+    // m_data.quad_buffer_ptr->normal = { 0.0f, 0.0f, 0.0f };
+    // m_data.quad_buffer_ptr++;
+
+    // m_data.quad_buffer_ptr->position = { position.x + size.x, position.y - cos(position.x+size.x) + sin(position.z), position.z };
+    // m_data.quad_buffer_ptr->color = color;
+    // m_data.quad_buffer_ptr->uv = { 1.0f, 0.0f };
+    // m_data.quad_buffer_ptr->tex_index = texture_index;
+    // m_data.quad_buffer_ptr->normal = { 0.0f, 0.0f, 0.0f };
+    // m_data.quad_buffer_ptr++;
+    
+    // m_data.quad_buffer_ptr->position = { position.x + size.x, position.y - cos(position.x+size.x) + sin(position.z+size.y), position.z + size.y };
+    // m_data.quad_buffer_ptr->color = color;
+    // m_data.quad_buffer_ptr->uv = { 1.0f, 1.0f };
+    // m_data.quad_buffer_ptr->tex_index = texture_index;
+    // m_data.quad_buffer_ptr->normal = { 0.0f, 0.0f, 0.0f };
+    // m_data.quad_buffer_ptr++;
+
+    // m_data.quad_buffer_ptr->position = { position.x, position.y - cos(position.x) + sin(position.z+size.y), position.z + size.y };
+    // m_data.quad_buffer_ptr->color = color;
+    // m_data.quad_buffer_ptr->uv = { 0.0f, 1.0f };
+    // m_data.quad_buffer_ptr->tex_index = texture_index;
+    // m_data.quad_buffer_ptr->normal = { 0.0f, 0.0f, 0.0f };
+    // m_data.quad_buffer_ptr++;
 
 
     m_data.index_count += 6;
