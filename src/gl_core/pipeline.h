@@ -219,6 +219,7 @@ class Renderer {
 
         void run();
     private:
+        void update_transforms();
         void draw();
 
         void set_MVP(glm::vec3 model_offset, glm::vec3 scale = glm::vec3(1.0)); // Model-View-Projection Matrix
@@ -247,7 +248,7 @@ class Renderer {
         void set_light_uniforms();
         void set_shader_uniforms();
 
-        void rigidbody_push_back(MVP mvp);
+        void rigidbody_push_back(MVP mvp, int shader, std::string shape);
 
         float m_delta = 0.0f;
         float m_last_frame = 0.0f;

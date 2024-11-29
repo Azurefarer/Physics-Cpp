@@ -340,10 +340,14 @@ Renderer::Renderer(std::unique_ptr<Context> pcontext) : m_context(std::move(pcon
     m_shaders.push_back(std::make_shared<Shader>(
         "../src/shader_source/batch_render.vs",
         "../src/shader_source/batch_render.fs"));
+    m_shaders.push_back(std::make_shared<Shader>(
+        "../src/shader_source/post_process.vs",
+        "../src/shader_source/post_process.fs"));
     m_shape_man = std::make_unique<ShapeMan>();
     m_texture_man = std::make_unique<TextureMan>();
     m_gui = std::make_unique<Gui>(m_context->get_window());
     set_MVP(glm::vec3(0.0f), glm::vec3(1.0f));
+    rigidbody_push_back(m_transforms, 3, "CUBE");
     set_shader_uniform_texture("NULL", "texture01");
     set_batch_uniforms();
 }
@@ -355,17 +359,17 @@ void Renderer::run() {
         process_delta();
 
         // TODO: Generalize a draw FCT to include MVP, coree_unis, gui_uniis, and draw
-
-        // draw();
-        set_MVP(glm::vec3(-1.0f));
+        update_transforms();
+        draw();
+        // set_MVP(glm::vec3(-1.0f));
         update_core_uniforms(2);
         draw_batch();
-        update_core_uniforms(0);
-        m_shape_man->draw("CUBE");
+        // update_core_uniforms(0);
+        // m_shape_man->draw("CUBE");
 
-        set_MVP(glm::vec3(m_sdata.light_pos), glm::vec3(5.0));
-        update_core_uniforms(1);
-        m_shape_man->draw("CUBE");
+        // set_MVP(glm::vec3(m_sdata.light_pos), glm::vec3(5.0));
+        // update_core_uniforms(1);
+        // m_shape_man->draw("CUBE");
 
         gui_updates();
         context_updates();
@@ -373,15 +377,24 @@ void Renderer::run() {
     }
 }
 
+void Renderer::update_transforms() {
+    glm::mat4 view(m_camera->get_view());
+    glm::mat4 projection(1.0f);
+    projection = glm::perspective(glm::radians(m_camera->get_zoom()), m_context->get_aspect_ratio(), 0.1f, 1000.0f);
+    m_transforms.view = view;
+    m_transforms.projection = projection;
+}
+
 void Renderer::draw() {
     for (int i=0; i<m_assets.size(); i++) {
+        m_assets[i]->update_view_and_perspective(m_transforms.view, m_transforms.projection);
         m_assets[i]->run_shader();
         m_shape_man->draw(m_assets[i]->get_shape());
     }
 }
 
-void Renderer::rigidbody_push_back(MVP mvp) {
-    m_assets.push_back(std::make_unique<RigidBody>(mvp));
+void Renderer::rigidbody_push_back(MVP mvp, int shader, std::string shape) {
+    m_assets.push_back(std::make_unique<RigidBody>(mvp, m_shaders[shader], shape));
 }
 
 void Renderer::set_MVP(glm::vec3 model_offset, glm::vec3 scale) {
