@@ -51,6 +51,8 @@ struct keys {
 };
 
 struct scene_data {
+    int rigidbodies = 0;
+
     bool set_null = false;
     bool set_king = false;
     bool set_face = false;
@@ -131,7 +133,12 @@ class Gui {
         scene_data m_sdata;
         batch_data m_bdata;
 
-        void start_frame();
+        GLFWwindow *m_context;
+
+        bool m_rigidbody_editor = false;
+
+        void init(GLFWwindow *context);
+        void start_frame(const char* title);
         void show_diagnostics();
         void set_batch();
         void set_texture();

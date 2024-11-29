@@ -14,6 +14,7 @@ void RigidBody::run_shader() {
     m_shader->set_mat4("view", m_transforms.view);
     m_shader->set_mat4("projection", m_transforms.projection);
     m_shader->set_mat3("normal_matrix", glm::mat3(glm::transpose(glm::inverse(m_transforms.model))));
+    m_shader->set_float("time", m_time);
 }
 
 void RigidBody::set_model_matrix(glm::vec3 model_offset_from_world, glm::vec3 scale) {

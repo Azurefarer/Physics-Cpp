@@ -72,13 +72,15 @@ void Camera::process_mouse_scroll(double y_offset) {
 
 Gui::Gui(GLFWwindow *context) { 
     // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(context, true);
-    ImGui_ImplOpenGL3_Init(nullptr);
+    m_context = context;
+    init(m_context);
+    // IMGUI_CHECKVERSION();
+    // ImGui::CreateContext();
+    // ImGuiIO& io = ImGui::GetIO(); (void)io;
+    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    // ImGui::StyleColorsDark();
+    // ImGui_ImplGlfw_InitForOpenGL(context, true);
+    // ImGui_ImplOpenGL3_Init(nullptr);
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 }
 
@@ -88,21 +90,41 @@ Gui::~Gui() {
     ImGui::DestroyContext();
 }
 
+void Gui::init(GLFWwindow *context) {
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(context, true);
+    ImGui_ImplOpenGL3_Init(nullptr);
+}
+
 void Gui::run() {
-    start_frame();
+    if (m_sdata.rigidbodies > 0 && !m_rigidbody_editor) {
+        // init(m_context);
+        m_rigidbody_editor = true;
+    }
+    start_frame("Scene Editor");
     show_diagnostics();
     set_batch();
     set_texture();
     set_light();
     set_wave();
     end_frame();
+
+    // if (m_sdata.rigidbodies > 0) {
+    //     start_frame("RigidBody");
+    //     end_frame();
+    // }
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void Gui::start_frame() {
+void Gui::start_frame(const char* title) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-    ImGui::Begin("Scene Editor");
+    ImGui::Begin(title);
 }
 
 void Gui::show_diagnostics() {
@@ -154,7 +176,6 @@ void Gui::set_wave() {
 void Gui::end_frame() {
     ImGui::End();
     ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 Context::Context(int width, int height, std::string title) 
@@ -347,6 +368,7 @@ Renderer::Renderer(std::unique_ptr<Context> pcontext) : m_context(std::move(pcon
     m_texture_man = std::make_unique<TextureMan>();
     m_gui = std::make_unique<Gui>(m_context->get_window());
     set_MVP(glm::vec3(0.0f), glm::vec3(1.0f));
+    rigidbody_push_back(m_transforms, 2, "BATCH");
     rigidbody_push_back(m_transforms, 3, "CUBE");
     set_shader_uniform_texture("NULL", "texture01");
     set_batch_uniforms();
@@ -361,15 +383,6 @@ void Renderer::run() {
         // TODO: Generalize a draw FCT to include MVP, coree_unis, gui_uniis, and draw
         update_transforms();
         draw();
-        // set_MVP(glm::vec3(-1.0f));
-        update_core_uniforms(2);
-        draw_batch();
-        // update_core_uniforms(0);
-        // m_shape_man->draw("CUBE");
-
-        // set_MVP(glm::vec3(m_sdata.light_pos), glm::vec3(5.0));
-        // update_core_uniforms(1);
-        // m_shape_man->draw("CUBE");
 
         gui_updates();
         context_updates();
@@ -388,13 +401,19 @@ void Renderer::update_transforms() {
 void Renderer::draw() {
     for (int i=0; i<m_assets.size(); i++) {
         m_assets[i]->update_view_and_perspective(m_transforms.view, m_transforms.projection);
+        m_assets[i]->set_time(m_current_frame);
         m_assets[i]->run_shader();
-        m_shape_man->draw(m_assets[i]->get_shape());
+        if (m_assets[i]->get_shape() == "BATCH") {
+            draw_batch();
+        } else {
+            m_shape_man->draw(m_assets[i]->get_shape());
+        }
     }
 }
 
 void Renderer::rigidbody_push_back(MVP mvp, int shader, std::string shape) {
     m_assets.push_back(std::make_unique<RigidBody>(mvp, m_shaders[shader], shape));
+    m_sdata.rigidbodies += 1;
 }
 
 void Renderer::set_MVP(glm::vec3 model_offset, glm::vec3 scale) {
@@ -468,9 +487,6 @@ void Renderer::set_shader_uniform_float(std::string uniform, float value) {
     for (int i=0; i<m_shaders.size(); i++) {
         m_shaders[i]->use();
         m_shaders[i]->set_float(uniform, value);
-        if (uniform == "v_amplitude") {
-            std::cout << "amp changed" << std::endl;
-        }
     }
 }
 

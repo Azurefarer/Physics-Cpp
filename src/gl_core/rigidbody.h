@@ -20,6 +20,8 @@ class RigidBody {
 
         void update_view_and_perspective(glm::mat4 view, glm::mat4 projection);
 
+        void set_time(float time) { m_time = time; }
+
         std::string get_shape() { return m_shape; }
 
     private:
@@ -27,7 +29,7 @@ class RigidBody {
         std::shared_ptr<Shader> m_shader = nullptr;
 
         glm::mat4 m_model = glm::mat4(1.0f);
-
+        glm::mat3 m_normal = glm::mat3(1.0f);
         float m_time;
 
         std::string m_shape = "QUAD";
