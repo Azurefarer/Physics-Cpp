@@ -255,7 +255,7 @@ class Renderer {
         void set_light_uniforms();
         void set_shader_uniforms();
 
-        void rigidbody_push_back(MVP mvp, int shader, std::string shape);
+        void rigidbody_push_back(MVP mvp, std::string shaderhandle, std::string shape);
 
         float m_delta = 0.0f;
         float m_last_frame = 0.0f;
@@ -270,7 +270,7 @@ class Renderer {
         std::unique_ptr<BatchRenderer> m_batch = nullptr;
         std::unique_ptr<Camera> m_camera = std::make_unique<Camera>();
         std::unique_ptr<Context> m_context = nullptr;
-        std::vector<std::shared_ptr<Shader>> m_shaders;
+        std::map<std::string, std::shared_ptr<Shader>> m_shaders;
         std::unique_ptr<ShapeMan> m_shape_man = nullptr;
         std::unique_ptr<TextureMan> m_texture_man = nullptr;
         std::unique_ptr<Gui> m_gui = nullptr;

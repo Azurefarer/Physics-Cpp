@@ -95,10 +95,10 @@ void BatchRenderer::flush() {
     }
     glBindVertexArray(m_data.quad_va);
     glDrawElements(GL_TRIANGLES, m_data.index_count, GL_UNSIGNED_INT, nullptr);
-    m_draw_count++;
-
     m_data.index_count = 0;
     m_data.tex_slot_index = 1;
+
+    m_draw_count++;
 }
 
 void BatchRenderer::reset() {

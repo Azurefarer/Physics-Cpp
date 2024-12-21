@@ -352,24 +352,24 @@ void Context::scroll_callback(GLFWwindow* window, double xoffset, double yoffset
 
 Renderer::Renderer(std::unique_ptr<Context> pcontext) : m_context(std::move(pcontext)) {
     m_batch = std::make_unique<BatchRenderer>();
-    m_shaders.push_back(std::make_shared<Shader>(
+    m_shaders.insert({"phong_lighting_model", std::make_shared<Shader>(
         "../src/shader_source/phong_lighting_model.vs",
-        "../src/shader_source/phong_lighting_model.fs"));
-    m_shaders.push_back(std::make_shared<Shader>(
+        "../src/shader_source/phong_lighting_model.fs")});
+    m_shaders.insert({"light_box", std::make_shared<Shader>(
         "../src/shader_source/light_box.vs",
-        "../src/shader_source/light_box.fs"));
-    m_shaders.push_back(std::make_shared<Shader>(
+        "../src/shader_source/light_box.fs")});
+    m_shaders.insert({"batch_renderer", std::make_shared<Shader>(
         "../src/shader_source/batch_render.vs",
-        "../src/shader_source/batch_render.fs"));
-    m_shaders.push_back(std::make_shared<Shader>(
+        "../src/shader_source/batch_render.fs")});
+    m_shaders.insert({"post_process", std::make_shared<Shader>(
         "../src/shader_source/post_process.vs",
-        "../src/shader_source/post_process.fs"));
+        "../src/shader_source/post_process.fs")});
     m_shape_man = std::make_unique<ShapeMan>();
     m_texture_man = std::make_unique<TextureMan>();
     m_gui = std::make_unique<Gui>(m_context->get_window());
     set_MVP(glm::vec3(0.0f), glm::vec3(1.0f));
-    rigidbody_push_back(m_transforms, 2, "BATCH");
-    rigidbody_push_back(m_transforms, 3, "CUBE");
+    rigidbody_push_back(m_transforms, "batch_renderer", "BATCH");
+    rigidbody_push_back(m_transforms, "phong_lighting_model", "CUBE");
     set_shader_uniform_texture("NULL", "texture01");
     set_batch_uniforms();
 }
@@ -411,8 +411,8 @@ void Renderer::draw() {
     }
 }
 
-void Renderer::rigidbody_push_back(MVP mvp, int shader, std::string shape) {
-    m_assets.push_back(std::make_unique<RigidBody>(mvp, m_shaders[shader], shape));
+void Renderer::rigidbody_push_back(MVP mvp, std::string shaderhandle, std::string shape) {
+    m_assets.push_back(std::make_unique<RigidBody>(mvp, m_shaders[shaderhandle], shape));
     m_sdata.rigidbodies += 1;
 }
 
@@ -428,14 +428,14 @@ void Renderer::set_MVP(glm::vec3 model_offset, glm::vec3 scale) {
     m_transforms.projection = projection;
 }
 
-void Renderer::update_core_uniforms(int shader_id) {
-    m_shaders[shader_id]->use();
-    m_shaders[shader_id]->set_mat4("model", m_transforms.model);
-    m_shaders[shader_id]->set_mat4("view", m_transforms.view);
-    m_shaders[shader_id]->set_mat4("projection", m_transforms.projection);
-    m_shaders[shader_id]->set_mat3("normal_matrix", glm::mat3(glm::transpose(glm::inverse(m_transforms.model))));
-    m_shaders[shader_id]->set_float("time", m_current_frame);
-}
+// void Renderer::update_core_uniforms(int shader_id) {
+//     m_shaders[shader_id]->use();
+//     m_shaders[shader_id]->set_mat4("model", m_transforms.model);
+//     m_shaders[shader_id]->set_mat4("view", m_transforms.view);
+//     m_shaders[shader_id]->set_mat4("projection", m_transforms.projection);
+//     m_shaders[shader_id]->set_mat3("normal_matrix", glm::mat3(glm::transpose(glm::inverse(m_transforms.model))));
+//     m_shaders[shader_id]->set_float("time", m_current_frame);
+// }
 
 void Renderer::update_gui_uniforms() {
     m_sdata = m_gui->get_scene_data();
@@ -465,9 +465,10 @@ void Renderer::process_delta() {
     m_current_frame = glfwGetTime();
     m_delta = m_current_frame - m_last_frame;
     m_last_frame = m_current_frame;
-    for (int i=0; i<m_shaders.size(); i++) {
-        m_shaders[i]->use();
-        m_shaders[i]->set_float("time", m_current_frame);
+    for (auto it = m_shaders.begin(); it != m_shaders.end(); it++) {
+        auto shader = it->second;
+        shader->use();
+        shader->set_float("time", m_current_frame);
     }
 }
 
@@ -477,23 +478,26 @@ void Renderer::set_shader_uniform_texture(std::string tex_name, std::string unif
     if (!tex_int.has_value()) {
         throw std::runtime_error("invalid tex");
     }
-    for (int i=0; i<m_shaders.size(); i++) {
-        m_shaders[i]->use();
-        m_shaders[i]->set_int(uniform, tex_int.value());
+    for (auto it = m_shaders.begin(); it != m_shaders.end(); it++) {
+        auto shader = it->second;
+        shader->use();
+        shader->set_int(uniform, tex_int.value());
     }
 }
 
 void Renderer::set_shader_uniform_float(std::string uniform, float value) {
-    for (int i=0; i<m_shaders.size(); i++) {
-        m_shaders[i]->use();
-        m_shaders[i]->set_float(uniform, value);
+    for (auto it = m_shaders.begin(); it != m_shaders.end(); it++) {
+        auto shader = it->second;
+        shader->use();
+        shader->set_float(uniform, value);
     }
 }
 
 void Renderer::set_shader_uniform_vec4(std::string uniform, glm::vec4 vec4) {
-    for (int i=0; i<m_shaders.size(); i++) {
-        m_shaders[i]->use();
-        m_shaders[i]->set_vec4(uniform, vec4);
+    for (auto it = m_shaders.begin(); it != m_shaders.end(); it++) {
+        auto shader = it->second;
+        shader->use();
+        shader->set_vec4(uniform, vec4);
     }
 }
 
@@ -556,4 +560,8 @@ void Renderer::context_updates() {
         m_context->set_scroll_activity(false);
     } else {}
     m_context->swap_buffers();
+}
+
+void Diag_print() {
+    
 }
