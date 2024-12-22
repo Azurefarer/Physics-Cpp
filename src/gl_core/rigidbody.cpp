@@ -1,11 +1,14 @@
 #include "gl_core/rigidbody.h"
 
+int RigidBody::instance_count = 0;
+
 RigidBody::RigidBody(MVP mvp, std::shared_ptr<Shader> shader, std::string shape) {
     m_transforms.model = mvp.model;
     m_transforms.view = mvp.view;
     m_transforms.projection = mvp.projection;
     m_shader = shader;
     m_shape = shape;
+    m_name = shape + std::to_string(++instance_count);
 };
 
 void RigidBody::run_shader() {
@@ -18,6 +21,7 @@ void RigidBody::run_shader() {
 }
 
 void RigidBody::set_model_matrix(glm::vec3 model_offset_from_world, glm::vec3 scale) {
+    m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, model_offset_from_world);
     m_model = glm::scale(m_model, scale);
     m_transforms.model = m_model;

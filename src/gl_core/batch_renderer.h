@@ -26,7 +26,7 @@ class BatchRenderer {
 
         void draw_quad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
 
-        void set_config_param_ypos(float y_pos) { m_params.y_pos = y_pos; }
+        void set_config_param_pos(glm::vec3 pos) { m_params.pos = pos; }
         void set_config_param_width(float width) { m_params.width = width; }
         void set_config_param_length(float length) { m_params.length = length; }
         void set_config_param_subdivide_width(float subdivide) { m_params.subdivide_width = subdivide; }
@@ -60,7 +60,7 @@ class BatchRenderer {
         };
 
         struct config_params {
-            float y_pos = 0;
+            glm::vec3 pos = glm::vec3(0.0);
             float width = 10.0;
             float length = 10.0;
             float subdivide_width = 0.2;

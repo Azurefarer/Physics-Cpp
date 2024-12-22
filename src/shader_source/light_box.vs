@@ -13,10 +13,12 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+uniform vec4 light_pos;
+
 void main()
 {
     UV = aPos.rgb;
     TexCoord = aTexCoord;
     color = aColor;
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
+    gl_Position = projection * view * model * vec4(aPos, 1.0) + light_pos;
 }

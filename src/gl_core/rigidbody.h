@@ -11,7 +11,7 @@
 class RigidBody {
     public:
         RigidBody(MVP mvp, std::shared_ptr<Shader> shader, std::string shape);
-        ~RigidBody() = default;
+        ~RigidBody() { --instance_count; };
 
         void run_shader();
 
@@ -21,10 +21,17 @@ class RigidBody {
         void update_view_and_perspective(glm::mat4 view, glm::mat4 projection);
 
         void set_time(float time) { m_time = time; }
+        int get_instance_count() const { return instance_count; }
 
+        std::string get_name() { return m_name; }
         std::string get_shape() { return m_shape; }
 
+        bool gui_bool = false;
+
     private:
+        static int instance_count;
+        
+        std::string m_name;
         MVP m_transforms;
         std::shared_ptr<Shader> m_shader = nullptr;
 

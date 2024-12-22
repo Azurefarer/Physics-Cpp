@@ -12,7 +12,7 @@ The Camera, Context, Gui, and Renderer.
 
 #include <iostream>
 #include <numbers>
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include <vector>
 
@@ -29,6 +29,7 @@ The Camera, Context, Gui, and Renderer.
 #include "gl_core/batch_renderer.h"
 #include "gl_core/shader.h"
 #include "gl_core/rigidbody.h"
+#include "gl_core/shader_parser.h"
 #include "gl_core/shape_man.h"
 #include "gl_core/texture_man.h"
 
@@ -70,11 +71,11 @@ struct scene_data {
 
     float ambient_strength = 0.1;
     glm::vec4 light_color = glm::vec4{1.0};
-    glm::vec4 light_pos = glm::vec4{2.0, 2.0, 2.0, 0.0};
+    glm::vec4 light_pos = glm::vec4{0.0};
 };
 
 struct batch_data {
-    float y_pos = 0.0f;
+    glm::vec3 pos = glm::vec3(0.0);
     float width = 10.0f;
     float length = 10.0f;
     float subdivide_width = 0.1f;
@@ -129,21 +130,31 @@ class Gui {
         scene_data get_scene_data() { return m_sdata; }
         batch_data get_batch_data() { return m_bdata; }
 
+        void set_rigidbodies(std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<RigidBody>>> assets);
+        void sleep();
+        void wake_up();
+        bool status_report() { return m_status; }
+
     private:
+        bool m_status = false; // True means run() is being called by Renderer.
         scene_data m_sdata;
         batch_data m_bdata;
 
         GLFWwindow *m_context;
 
-        bool m_rigidbody_editor = false;
+        std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<RigidBody>>> m_assets;
+        bool add_button_bool();
+        std::vector<bool> m_rigidbody_shader_param_references;
+        std::vector<bool>::iterator m_rigidbody_shader_param_references_iterator;
 
         void init(GLFWwindow *context);
         void start_frame(const char* title);
         void show_diagnostics();
-        void set_batch();
+        void set_batch(std::string asset_name);
+        void set_batch_shader();
         void set_texture();
-        void set_light();
-        void set_wave();
+        void set_light(std::string asset_name);
+        void set_light_shader();
         void end_frame();
 };
 
@@ -255,7 +266,7 @@ class Renderer {
         void set_light_uniforms();
         void set_shader_uniforms();
 
-        void rigidbody_push_back(MVP mvp, std::string shaderhandle, std::string shape);
+        void rigidbody_push_back(const MVP& mvp, std::string shaderhandle, std::string shape);
 
         float m_delta = 0.0f;
         float m_last_frame = 0.0f;
@@ -265,12 +276,12 @@ class Renderer {
         batch_data m_bdata;
 
         MVP m_transforms;
-        std::vector<std::unique_ptr<RigidBody>> m_assets;
+        std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<RigidBody>>> m_assets;
 
         std::unique_ptr<BatchRenderer> m_batch = nullptr;
         std::unique_ptr<Camera> m_camera = std::make_unique<Camera>();
         std::unique_ptr<Context> m_context = nullptr;
-        std::map<std::string, std::shared_ptr<Shader>> m_shaders;
+        std::unordered_map<std::string, std::shared_ptr<Shader>> m_shaders;
         std::unique_ptr<ShapeMan> m_shape_man = nullptr;
         std::unique_ptr<TextureMan> m_texture_man = nullptr;
         std::unique_ptr<Gui> m_gui = nullptr;

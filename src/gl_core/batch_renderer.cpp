@@ -71,7 +71,7 @@ void BatchRenderer::run_batch() {
     for (float z = -m_params.length; z < m_params.length; z += m_params.subdivide_length) {
         for (float x = -m_params.width; x < m_params.width; x += m_params.subdivide_width) {
             glm::vec4 color = { (x + 10) / 20.0f, 0.2f, (z + 10) /20.0f, 1.0f };
-            draw_quad(glm::vec3(x, m_params.y_pos, z), glm::vec2(m_params.subdivide_width, m_params.subdivide_length), color);
+            draw_quad(glm::vec3(x, 0.0, z) + m_params.pos, glm::vec2(m_params.subdivide_width, m_params.subdivide_length), color);
         }
     }
     end_batch();
@@ -142,35 +142,6 @@ void BatchRenderer::draw_quad(const glm::vec3& position, const glm::vec2& size, 
     m_data.quad_buffer_ptr->tex_index = texture_index;
     m_data.quad_buffer_ptr->normal = { 0.0f, 1.0f, 0.0f };
     m_data.quad_buffer_ptr++;
-
-    // m_data.quad_buffer_ptr->position = { position.x, position.y - cos(position.x) + sin(position.z), position.z };
-    // m_data.quad_buffer_ptr->color = color;
-    // m_data.quad_buffer_ptr->uv = { 0.0f, 0.0f };
-    // m_data.quad_buffer_ptr->tex_index = texture_index;
-    // m_data.quad_buffer_ptr->normal = { 0.0f, 0.0f, 0.0f };
-    // m_data.quad_buffer_ptr++;
-
-    // m_data.quad_buffer_ptr->position = { position.x + size.x, position.y - cos(position.x+size.x) + sin(position.z), position.z };
-    // m_data.quad_buffer_ptr->color = color;
-    // m_data.quad_buffer_ptr->uv = { 1.0f, 0.0f };
-    // m_data.quad_buffer_ptr->tex_index = texture_index;
-    // m_data.quad_buffer_ptr->normal = { 0.0f, 0.0f, 0.0f };
-    // m_data.quad_buffer_ptr++;
-    
-    // m_data.quad_buffer_ptr->position = { position.x + size.x, position.y - cos(position.x+size.x) + sin(position.z+size.y), position.z + size.y };
-    // m_data.quad_buffer_ptr->color = color;
-    // m_data.quad_buffer_ptr->uv = { 1.0f, 1.0f };
-    // m_data.quad_buffer_ptr->tex_index = texture_index;
-    // m_data.quad_buffer_ptr->normal = { 0.0f, 0.0f, 0.0f };
-    // m_data.quad_buffer_ptr++;
-
-    // m_data.quad_buffer_ptr->position = { position.x, position.y - cos(position.x) + sin(position.z+size.y), position.z + size.y };
-    // m_data.quad_buffer_ptr->color = color;
-    // m_data.quad_buffer_ptr->uv = { 0.0f, 1.0f };
-    // m_data.quad_buffer_ptr->tex_index = texture_index;
-    // m_data.quad_buffer_ptr->normal = { 0.0f, 0.0f, 0.0f };
-    // m_data.quad_buffer_ptr++;
-
 
     m_data.index_count += 6;
     m_quad_count++;

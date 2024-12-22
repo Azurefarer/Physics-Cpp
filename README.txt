@@ -1,12 +1,22 @@
 ===========
 
+# Shader Sandbox
 
-**Collisions : **
-* Optimization.  Only activate collisions on verticies that are within a certain radius of the player.
+## Build :
 
-**Player : **
-* 
 
-------
-#### Repository (for paper-api)
-##### Maven
+## FrameWorks/Backends :
+- OpenGL
+- GLFW3
+- Dear ImGui
+
+## Feautres :
+- 3D rendering + Camera Controls
+- Batch rendering @TheCherno
+- Ocean Shader @Acerola
+- RunTime Accessible Shader Parameters
+
+
+# Coming Soon :
+- [STL 3D Model Import](https://github.com/baskiton/Img2STL)
+- Collisions

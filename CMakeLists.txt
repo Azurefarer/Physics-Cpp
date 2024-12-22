@@ -85,6 +85,8 @@ add_library(gl_core
   ${PROJECT_SOURCE_DIR}/src/gl_core/gpu_config.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/shader.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/shader.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/shader_parser.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/shader_parser.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/shape_man.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/shape_man.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/texture_man.cpp

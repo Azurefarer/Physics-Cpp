@@ -139,7 +139,7 @@ void vertex() {
 	vec3 tangent = normalize(vec3(1.0, wave_data.y, 0.0));
 	vec3 binormal = normalize(vec3(0.0, wave_data.z, 1.0));
 	normal = cross(tangent, binormal);
-	gl_Position = projection * view * model * vec4(aPos.x, wave_height, aPos.z, 1.0);
+	gl_Position = projection * view * model * vec4(aPos.x, wave_height + aPos.y, aPos.z, 1.0);
 	normal = normal_matrix * normal;	
 //	NORMAL = MODEL_NORMAL_MATRIX * NORMAL;
 }
