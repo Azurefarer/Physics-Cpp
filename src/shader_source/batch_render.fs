@@ -57,6 +57,6 @@ vec4 texture_color() {
 
 void main() {
     vec4 norm = normalize(vec4( normalize(normal), 0.0));
-    FragColor = vec4(normal.x, -normal.y, normal.z,0.0);
-    // FragColor = texture_color() * ambient() * diffuse(norm);
+    FragColor = vec4(normal.x, normal.y, normal.z,1.0);
+    FragColor = texture_color() * ambient() * diffuse(norm);
 }

@@ -7,8 +7,8 @@ double radian(double degrees) {
 }
 
 Camera::Camera() : 
-    m_pos(glm::vec3(0.0f, 3.0f, 10.0f)),
-    m_front(glm::vec3(0.0f, 0.0f, -1.0f)),
+    m_pos(glm::vec3(0.0f, 30.0f, 50.0f)),
+    m_front(glm::vec3(0.0f, -0.7f, -1.0f)),
     m_up(glm::vec3(0.0f, 1.0f, 0.0f)),
     m_world_up(glm::vec3(0.0f, 1.0f, 0.0f)),
     m_right(glm::vec3(1.0f, 0.0f, 0.0f))
@@ -169,6 +169,9 @@ void Gui::set_batch(std::string asset_name) {
         set_batch_shader();
         ImGui::End();
     }
+
+    // Next Up :
+    // Fix normals on the wave...
 }
 
 void Gui::set_batch_shader() {
@@ -189,13 +192,10 @@ void Gui::set_texture() {
     ImGui::Checkbox("King Canute", &m_sdata.set_king);
     ImGui::Checkbox("Awesome Face", &m_sdata.set_face);
     ImGui::Checkbox("Tiled Background", &m_sdata.set_back);
-
+    ImGui::Checkbox("Minecraft Sand", &m_sdata.set_sand);
 }
 
 void Gui::set_light(std::string asset_name) {
-
-    // Next up,
-    // Give the Gui access to the Model Matrix for RigidBodies.
 
     ImGui::DragFloat3("Light Box Position", &m_sdata.light_pos.x, 0.5f, -150.0, 150.0);
     (*m_assets)["CUBE"]->set_model_matrix(m_sdata.light_pos);
@@ -454,7 +454,7 @@ void Renderer::run() {
 void Renderer::update_transforms() {
     glm::mat4 view(m_camera->get_view());
     glm::mat4 projection(1.0f);
-    projection = glm::perspective(glm::radians(m_camera->get_zoom()), m_context->get_aspect_ratio(), 0.1f, 1000.0f);
+    projection = glm::perspective(glm::radians(m_camera->get_zoom()), m_context->get_aspect_ratio(), 0.1f, 2000.0f);
     m_transforms.view = view;
     m_transforms.projection = projection;
 }
@@ -571,6 +571,7 @@ void Renderer::set_phong_uniforms() {
     if (m_sdata.set_king) { set_shader_uniform_texture("king_canute", "texture01"); }
     if (m_sdata.set_face) { set_shader_uniform_texture("awesome_face", "texture01"); }
     if (m_sdata.set_back) { set_shader_uniform_texture("tiled_back", "texture01"); }
+    if (m_sdata.set_sand) { set_shader_uniform_texture("minecraft_sand", "texture01"); }
 }
 
 void Renderer::set_light_uniforms() {
@@ -622,6 +623,6 @@ void Renderer::context_updates() {
     m_context->swap_buffers();
 }
 
-void Diag_print() {
+void Diagnostics_print() {
     
 }

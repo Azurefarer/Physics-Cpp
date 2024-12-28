@@ -58,13 +58,14 @@ struct scene_data {
     bool set_king = false;
     bool set_face = false;
     bool set_back = false;
+    bool set_sand = false;
 
     float v_amplitude_mult = 0.875;
-    float v_amplitude = 3.0;
+    float v_amplitude = 1.0;
     float v_omega_mult = 1.037;
     float v_omega = 0.3;
     float v_lambda_mult = 0.885;
-    float v_lambda = 319.249;
+    float v_lambda = 100.249; // 320
     float v_peak_width = 0.435;
     float fresnel_coeff = 10.0;
     float spec_coeff = 7.0;
@@ -76,10 +77,10 @@ struct scene_data {
 
 struct batch_data {
     glm::vec3 pos = glm::vec3(0.0);
-    float width = 10.0f;
-    float length = 10.0f;
-    float subdivide_width = 0.1f;
-    float subdivide_length = 0.1f;
+    float width = 30.0f;
+    float length = 30.0f;
+    float subdivide_width = 0.3f;
+    float subdivide_length = 0.3f;
 
     int draw_count = 0;
     int quad_count = 0;

@@ -68,17 +68,17 @@ vec3 sum_of_sines_gauss_adjacent(float time, Wave w) {
         vec2 RotPos = rot * w.pos;
         float x = RotPos.x * w.k[i].x - time * w.w[i].x;
         float z = RotPos.y * w.k[i].y - time * w.w[i].y;
-        float s = v_peak_width;
+        float s = v_peak_width; // Gaussian Width
         float b = pow(sin(x)*cos(z)/s, 2.0);
-        // height += amp * exp(1.0-b);
-        height += exp(1.0-b);
+        height += amp * exp(1.0-b); // This is the curve
         
+        //Gradient Calcualtion
         // Normals rotate opposite to the geometry so we need to negate the rotation here
         float _dxdx = w.k[i].x*cos(-j);
         float _dzdx = w.k[i].y*sin(-j);
         float _dxdz = -w.k[i].x*sin(-j);
         float _dzdz = w.k[i].y*cos(-j);
-        mat2 _Differentials = mat2(vec2(_dxdx, _dxdz), vec2(_dzdx, _dzdz));
+        mat2 _Differentials = mat2(vec2(_dxdx, _dxdz), vec2(_dzdx, _dzdz)); // THE JACOBIAN (never forget)
 
         float _Constants = 2.0 * amp / pow(s, 2.0);
         vec2 _TrigFcts = vec2(sin(x) * cos(x) * pow(cos(z), 2.0), -sin(z) * cos(z) * pow(sin(x), 2.0));
@@ -136,9 +136,10 @@ void vertex() {
     vec4 wave_vertex = vec4(aPos, 1.0);
 	wave_vertex.y = wave_height;
 
-	vec3 tangent = normalize(vec3(1.0, wave_data.y, 0.0));
-	vec3 binormal = normalize(vec3(0.0, wave_data.z, 1.0));
-	normal = cross(tangent, binormal);
+	// vec3 tangent = normalize(vec3(1.0, wave_data.y, 0.0));
+	// vec3 binormal = normalize(vec3(0.0, wave_data.z, 1.0));
+	// normal = cross(tangent, binormal);
+    normal = normalize(vec3(-wave_data.y, 1.0, -wave_data.z));
 	gl_Position = projection * view * model * vec4(aPos.x, wave_height + aPos.y, aPos.z, 1.0);
 	normal = normal_matrix * normal;	
 //	NORMAL = MODEL_NORMAL_MATRIX * NORMAL;
