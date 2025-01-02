@@ -7,7 +7,7 @@ double radian(double degrees) {
 }
 
 Camera::Camera() : 
-    m_pos(glm::vec3(0.0f, 30.0f, 50.0f)),
+    m_pos(glm::vec3(0.0f, 30.0f, 100.0f)),
     m_front(glm::vec3(0.0f, -0.7f, -1.0f)),
     m_up(glm::vec3(0.0f, 1.0f, 0.0f)),
     m_world_up(glm::vec3(0.0f, 1.0f, 0.0f)),
@@ -104,9 +104,9 @@ bool Gui::add_button_bool() {
     if (m_rigidbody_shader_param_references_iterator != m_rigidbody_shader_param_references.end()) {
         bool temp = *m_rigidbody_shader_param_references_iterator;
         m_rigidbody_shader_param_references_iterator++;
+        button_bool_counter++;
         return temp;
     } else {
-        button_bool_counter++;
         return false;
     }
 }
@@ -114,6 +114,10 @@ bool Gui::add_button_bool() {
 void Gui::run() {
     start_frame("Scene Editor");
     show_diagnostics();
+    set_resolution();
+    if (m_sdata.toon) {
+        set_toon();
+    }
     set_texture();
     for (auto& [key, asset] : *m_assets) {
         if (ImGui::Button(asset->gui_bool ? (asset->get_name() + " | ON").c_str() : (asset->get_name() + " | OFF").c_str())) {
@@ -145,6 +149,29 @@ void Gui::start_frame(const char* title) {
 void Gui::show_diagnostics() {
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+}
+
+void Gui::set_resolution() {
+    if (ImGui::RadioButton("2560 x 1440 : 2K", m_res_id == 0)) {
+        m_sdata.res.WIDTH = 2560;
+        m_sdata.res.HEIGHT = 1440;
+        m_res_id = 0;
+    }
+    if (ImGui::RadioButton("1920 x 1080 : 1080p", m_res_id == 1)) {
+        m_sdata.res.WIDTH = 1920;
+        m_sdata.res.HEIGHT = 1080;
+        m_res_id = 1;
+    }
+    if (ImGui::RadioButton("1366 x 768", m_res_id == 2)) {
+        m_sdata.res.WIDTH = 1366;
+        m_sdata.res.HEIGHT = 768;
+        m_res_id = 2;
+    }
+    if (ImGui::RadioButton("1280 x 720 : 720p", m_res_id == 3)) {
+        m_sdata.res.WIDTH = 1280;
+        m_sdata.res.HEIGHT = 720;
+        m_res_id = 3;
+    }
 }
 
 void Gui::set_batch(std::string asset_name) {
@@ -188,16 +215,47 @@ void Gui::set_batch_shader() {
 
 void Gui::set_texture() {
     ImGui::Text("Set Different Textures Here :D");
-    ImGui::Checkbox("Blank", &m_sdata.set_null);
-    ImGui::Checkbox("King Canute", &m_sdata.set_king);
-    ImGui::Checkbox("Awesome Face", &m_sdata.set_face);
-    ImGui::Checkbox("Tiled Background", &m_sdata.set_back);
-    ImGui::Checkbox("Minecraft Sand", &m_sdata.set_sand);
+    if (ImGui::RadioButton("Blank", m_tex_id == 0)) {
+        reset_texture_options();
+        m_sdata.set_null = true;
+        m_tex_id = 0;
+    }
+    if (ImGui::RadioButton("King Canute", m_tex_id == 1)) {
+        reset_texture_options();
+        m_sdata.set_king = true;
+        m_tex_id = 1;
+    }
+    if (ImGui::RadioButton("Awesome Face", m_tex_id == 2)) {
+        reset_texture_options();
+        m_sdata.set_face = true;
+        m_tex_id = 2;
+    }
+    if (ImGui::RadioButton("Tiled Background", m_tex_id == 3)) {
+        reset_texture_options();
+        m_sdata.set_back = true;
+        m_tex_id = 3;
+    }
+    if (ImGui::RadioButton("Minecraft Sand", m_tex_id == 4)) {
+        reset_texture_options();
+        m_sdata.set_sand = true;
+        m_tex_id = 4;
+    }
+}
+
+void Gui::reset_texture_options() {
+    m_sdata.set_back = false;
+    m_sdata.set_face = false;
+    m_sdata.set_king = false;
+    m_sdata.set_null = false;
+    m_sdata.set_sand = false;
+}
+
+void Gui::set_toon() {
+    ImGui::DragInt("buckets", &m_sdata.toon_buckets, 1, 2, 100);
 }
 
 void Gui::set_light(std::string asset_name) {
-
-    ImGui::DragFloat3("Light Box Position", &m_sdata.light_pos.x, 0.5f, -150.0, 150.0);
+    ImGui::DragFloat3("Light Box Position", &m_sdata.light_pos.x, 1.0f, -1000.0, 1000.0);
     (*m_assets)["CUBE"]->set_model_matrix(m_sdata.light_pos);
     static bool show_shader_params = add_button_bool();
     if (ImGui::Button(show_shader_params ? "ON" : "OFF")) {
@@ -225,6 +283,7 @@ void Gui::set_rigidbodies(std::shared_ptr<std::unordered_map<std::string, std::s
     m_assets = assets;
 }
 
+// Sleep and Wake Up are probably not needed
 void Gui::sleep() {
     m_rigidbody_shader_param_references.clear();
 }
@@ -251,6 +310,7 @@ Context::Context(int width, int height, std::string title)
         throw std::runtime_error("Failed to create GLFW window");
 	}
     glfwMakeContextCurrent(m_window);
+    glfwSetWindowPos(m_window, 0, 10); // Make this flush with OS taskbar or fullscreen it.
     set_GLFWcallbacks();
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -265,6 +325,10 @@ Context::Context(int width, int height, std::string title)
 
 Context::~Context() {
     glfwTerminate();
+}
+
+void Context::set_resolution(int width, int height) {
+    glfwSetWindowSize(m_window, width, height);
 }
 
 void Context::swap_buffers() {
@@ -432,7 +496,8 @@ Renderer::Renderer(std::unique_ptr<Context> pcontext) : m_context(std::move(pcon
     rigidbody_push_back(m_transforms, "phong_lighting_model", "CUBE");
     rigidbody_push_back(m_transforms, "light_box", "CUBE");
     set_shader_uniform_texture("NULL", "texture01");
-    set_batch_uniforms();
+    update_gui_uniforms();
+    (*m_assets)["CUBE"]->set_model_matrix(m_sdata.light_pos);
 }
 
 void Renderer::run() {
@@ -497,6 +562,7 @@ void Renderer::update_gui_uniforms() {
     set_light_uniforms();
     set_phong_uniforms();
     set_batch_uniforms();
+    set_toon_uniforms();
 }
 
 void Renderer::draw_batch() {
@@ -546,6 +612,14 @@ void Renderer::set_shader_uniform_float(std::string uniform, float value) {
     }
 }
 
+void Renderer::set_shader_uniform_int(std::string uniform, int value) {
+    for (auto it = m_shaders.begin(); it != m_shaders.end(); it++) {
+        auto shader = it->second;
+        shader->use();
+        shader->set_int(uniform, value);
+    }
+}
+
 void Renderer::set_shader_uniform_vec4(std::string uniform, glm::vec4 vec4) {
     for (auto it = m_shaders.begin(); it != m_shaders.end(); it++) {
         auto shader = it->second;
@@ -554,6 +628,7 @@ void Renderer::set_shader_uniform_vec4(std::string uniform, glm::vec4 vec4) {
     }
 }
 
+// writing a shader parser so uniforms can be set on the fly.
 void Renderer::set_batch_uniforms() {
     set_shader_uniform_float("v_amplitude_mult", m_sdata.v_amplitude_mult);
     set_shader_uniform_float("v_amplitude", m_sdata.v_amplitude);
@@ -574,6 +649,10 @@ void Renderer::set_phong_uniforms() {
     if (m_sdata.set_sand) { set_shader_uniform_texture("minecraft_sand", "texture01"); }
 }
 
+void Renderer::set_toon_uniforms() {
+    set_shader_uniform_int("buckets", m_sdata.toon_buckets);
+}
+
 void Renderer::set_light_uniforms() {
     set_shader_uniform_float("ambient_strength", m_sdata.ambient_strength);
     set_shader_uniform_vec4("light_color", m_sdata.light_color);
@@ -589,6 +668,7 @@ void Renderer::updates_for_gui() {
 
 void Renderer::gui_updates() {
     updates_for_gui();
+        update_gui_uniforms();
     if ( m_context->get_gui_focus() ) { 
         if (!m_gui->status_report()) {
             m_gui->wake_up();
@@ -620,6 +700,7 @@ void Renderer::context_updates() {
         m_camera->process_mouse_scroll(m_context->get_scroll_y());
         m_context->set_scroll_activity(false);
     } else {}
+    m_context->set_resolution(m_sdata.res.WIDTH, m_sdata.res.HEIGHT); // This is data from the Gui
     m_context->swap_buffers();
 }
 

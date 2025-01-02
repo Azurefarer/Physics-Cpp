@@ -1,11 +1,13 @@
 #version 430 core
 out vec4 FragColor;
 
+in vec4 frag_pos;
+in vec4 color;
 in vec2 TexCoord;
 in vec3 normal;
-in vec4 frag_pos;
 
-uniform vec3 view;
+uniform int buckets;
+uniform vec3 view3;  // Supposed to be the view vector, where the camera is pointing. I can get this from the Camera OBJ.
 uniform sampler2D texture01;
 uniform float time;
 uniform vec4 light_color;
@@ -18,7 +20,7 @@ uniform float fresnel_coeff = 10.0;
 uniform float spec_coeff = 7.014;
 
 void fragment() {
-	float alpha = 1.0 - pow(abs(dot(normalize(normal), -view)), fresnel_coeff);
+	float alpha = 1.0 - pow(abs(dot(normalize(normal), -view3)), fresnel_coeff);
 	FragColor = vec4(0.1, 0.3, 0.8, alpha);
 }
 
@@ -55,8 +57,19 @@ vec4 texture_color() {
     return tex;
 }
 
+float toon(vec4 n) {
+    vec4 light_dir = normalize(light_pos-frag_pos);
+    float toon_coeff = max(dot(n, light_dir), 0.0);
+    toon_coeff = floor(buckets*toon_coeff)/buckets;
+    // toon_coeff = smoothstep(0.5, 0.85, toon_coeff);
+
+    return toon_coeff;
+}
+
 void main() {
     vec4 norm = normalize(vec4( normalize(normal), 0.0));
+	vec4 light_dir = normalize(light_pos-frag_pos);
     FragColor = vec4(normal.x, normal.y, normal.z,1.0);
-    FragColor = texture_color() * ambient() * diffuse(norm);
+    FragColor = texture_color() * ambient() * toon(norm);
+	FragColor *= dot(norm, light_dir);
 }

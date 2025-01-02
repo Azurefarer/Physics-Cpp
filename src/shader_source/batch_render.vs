@@ -4,9 +4,10 @@ layout (location = 1) in vec4 aColor;
 layout (location = 2) in vec2 aTexCoord;
 layout (location = 3) in vec3 aNormal;
 
-out vec3 normal;
 out vec4 frag_pos;
+out vec4 color;
 out vec2 TexCoord;
+out vec3 normal;
 
 uniform float time;
 uniform mat4 rot;
@@ -147,6 +148,7 @@ void vertex() {
 
 void main() {
     TexCoord = aTexCoord;
+    color = aColor;
     frag_pos = model * vec4(aPos, 0.0);
     vertex();
 }

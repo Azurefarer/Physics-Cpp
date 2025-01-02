@@ -11,6 +11,6 @@ int main() {
 }
 
 // Make a framebuffer shader for advanced post processing like
-// Shadow Mapping, Deferred Shading, Using colors as a compass. 
+// Shadow Mapping, Deferred Shading, Using colors as a compass.                                     
 
 // Prompt GPT with this

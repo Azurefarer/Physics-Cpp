@@ -45,8 +45,9 @@ public:
                 // 2. compile shaders
                 unsigned int vertex = compile_shader("VERTEX", vertex_code);
                 unsigned int fragment = compile_shader("FRAGMENT", fragment_code);
-                unsigned int geometry = compile_shader("GEOMETRY", geometry_code);
-                if (geometryPath != nullptr) {
+                unsigned int geometry;
+                if ( geometryPath != nullptr ) {
+                    geometry = compile_shader("GEOMETRY", geometry_code);
                     const char * gShaderCode = geometry_code.c_str();
                     geometry = glCreateShader(GL_GEOMETRY_SHADER);
                     glShaderSource(geometry, 1, &gShaderCode, NULL);

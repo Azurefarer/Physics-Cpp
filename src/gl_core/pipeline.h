@@ -52,6 +52,12 @@ struct keys {
 };
 
 struct scene_data {
+    struct Resolution {
+        int WIDTH = 2560;
+        int HEIGHT = 1440;
+    };
+    Resolution res;
+
     int rigidbodies = 0;
 
     bool set_null = false;
@@ -70,17 +76,20 @@ struct scene_data {
     float fresnel_coeff = 10.0;
     float spec_coeff = 7.0;
 
-    float ambient_strength = 0.1;
+    bool toon = true;
+    int toon_buckets = 8;
+
+    float ambient_strength = 1.0;
     glm::vec4 light_color = glm::vec4{1.0};
-    glm::vec4 light_pos = glm::vec4{0.0};
+    glm::vec4 light_pos = glm::vec4{0.0, 25.0, 0.0, 0.0};
 };
 
 struct batch_data {
     glm::vec3 pos = glm::vec3(0.0);
-    float width = 30.0f;
-    float length = 30.0f;
-    float subdivide_width = 0.3f;
-    float subdivide_length = 0.3f;
+    float width = 100.0f;
+    float length = 100.0f;
+    float subdivide_width = 0.6f;
+    float subdivide_length = 0.6f;
 
     int draw_count = 0;
     int quad_count = 0;
@@ -135,6 +144,7 @@ class Gui {
         void sleep();
         void wake_up();
         bool status_report() { return m_status; }
+        int get_res_id() { return m_res_id; }
 
     private:
         bool m_status = false; // True means run() is being called by Renderer.
@@ -142,6 +152,9 @@ class Gui {
         batch_data m_bdata;
 
         GLFWwindow *m_context;
+
+        int m_res_id = 0;
+        int m_tex_id = 0;
 
         std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<RigidBody>>> m_assets;
         bool add_button_bool();
@@ -151,9 +164,12 @@ class Gui {
         void init(GLFWwindow *context);
         void start_frame(const char* title);
         void show_diagnostics();
+        void set_resolution();
         void set_batch(std::string asset_name);
         void set_batch_shader();
+        void reset_texture_options();
         void set_texture();
+        void set_toon();
         void set_light(std::string asset_name);
         void set_light_shader();
         void end_frame();
@@ -185,6 +201,8 @@ class Context {
         
         bool get_keyboard_activity() { return m_keyboard_activity; } // may remove
         void set_keyboard_activity(bool activity) { m_keyboard_activity = activity; }; // may remove
+
+        void set_resolution(int width, int height);
 
         void swap_buffers();
 
@@ -255,6 +273,7 @@ class Renderer {
 
         void set_shader_uniform_texture(std::string tex_name, std::string uniform);
         void set_shader_uniform_float(std::string uniform, float value);
+        void set_shader_uniform_int(std::string uniform, int value);
         void set_shader_uniform_vec4(std::string uniform, glm::vec4 vec4);
 
         void update_core_uniforms(int shader_id);
@@ -265,6 +284,7 @@ class Renderer {
         void set_batch_uniforms();
         void set_phong_uniforms();
         void set_light_uniforms();
+        void set_toon_uniforms();
         void set_shader_uniforms();
 
         void rigidbody_push_back(const MVP& mvp, std::string shaderhandle, std::string shape);
