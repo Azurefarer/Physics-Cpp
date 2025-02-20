@@ -7,6 +7,7 @@ RigidBody::RigidBody(MVP mvp, std::shared_ptr<Shader> shader, std::string shape)
     m_transforms.view = mvp.view;
     m_transforms.projection = mvp.projection;
     m_shader = shader;
+    m_shaders.push_back(shader);
     m_shape = shape;
     m_name = shape + std::to_string(++instance_count);
 };
@@ -16,7 +17,7 @@ void RigidBody::run_shader() {
     m_shader->set_mat4("model", m_transforms.model);
     m_shader->set_mat4("view", m_transforms.view);
     m_shader->set_mat4("projection", m_transforms.projection);
-    m_shader->set_mat3("normal_matrix", glm::mat3(glm::transpose(glm::inverse(m_transforms.model))));
+    m_shader->set_mat3("normal_matrix", glm::inverseTranspose(glm::mat3(m_transforms.model)));
     m_shader->set_float("time", m_time);
 }
 

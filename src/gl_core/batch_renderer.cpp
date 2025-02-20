@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+// Refactor so instead of using params to increase the width we use Model Matrix
+
 BatchRenderer::BatchRenderer() {
     m_data.quad_buffer = new Vertex[m_max_vertex];
 
@@ -67,11 +69,11 @@ BatchRenderer::~BatchRenderer() {
 }
 
 void BatchRenderer::run_batch() {
+    glm::vec4 color(1.0);
     begin_batch();
-    for (float z = -m_params.length; z < m_params.length; z += m_params.subdivide_length) {
+    for (float z = m_params.length; z > -m_params.length; z -= m_params.subdivide_length) {
         for (float x = -m_params.width; x < m_params.width; x += m_params.subdivide_width) {
-            glm::vec4 color = { (x + 10) / 20.0f, 0.2f, (z + 10) /20.0f, 1.0f };
-            draw_quad(glm::vec3(x, 0.0, z) + m_params.pos, glm::vec2(m_params.subdivide_width, m_params.subdivide_length), color);
+            draw_quad(glm::vec3(x, 0.0, z), m_params.subdivide_width, m_params.subdivide_length, color);
         }
     }
     end_batch();
@@ -106,13 +108,12 @@ void BatchRenderer::reset() {
     m_draw_count = 0;
 }
 
-void BatchRenderer::draw_quad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color) {
+void BatchRenderer::draw_quad(const glm::vec3& position, const float& xsize, const float& zsize, const glm::vec4& color) {
     if (m_data.index_count >= m_max_index) {
         BatchRenderer::end_batch();
         BatchRenderer::flush();
         BatchRenderer::begin_batch();
     }
-
     float texture_index = 0.0f;
 
     m_data.quad_buffer_ptr->position = { position.x, position.y, position.z };
@@ -122,23 +123,23 @@ void BatchRenderer::draw_quad(const glm::vec3& position, const glm::vec2& size, 
     m_data.quad_buffer_ptr->normal = { 0.0f, 1.0f, 0.0f };
     m_data.quad_buffer_ptr++;
 
-    m_data.quad_buffer_ptr->position = { position.x + size.x, position.y, position.z };
+    m_data.quad_buffer_ptr->position = { position.x, position.y, position.z + zsize };
     m_data.quad_buffer_ptr->color = color;
-    m_data.quad_buffer_ptr->uv = { 1.0f, 0.0f };
+    m_data.quad_buffer_ptr->uv = { 0.0f, 1.0f };
     m_data.quad_buffer_ptr->tex_index = texture_index;
     m_data.quad_buffer_ptr->normal = { 0.0f, 1.0f, 0.0f };
     m_data.quad_buffer_ptr++;
     
-    m_data.quad_buffer_ptr->position = { position.x + size.x, position.y, position.z + size.y };
+    m_data.quad_buffer_ptr->position = { position.x + xsize, position.y, position.z + zsize };
     m_data.quad_buffer_ptr->color = color;
     m_data.quad_buffer_ptr->uv = { 1.0f, 1.0f };
     m_data.quad_buffer_ptr->tex_index = texture_index;
     m_data.quad_buffer_ptr->normal = { 0.0f, 1.0f, 0.0f };
     m_data.quad_buffer_ptr++;
 
-    m_data.quad_buffer_ptr->position = { position.x, position.y, position.z + size.y };
+    m_data.quad_buffer_ptr->position = { position.x + xsize, position.y, position.z };
     m_data.quad_buffer_ptr->color = color;
-    m_data.quad_buffer_ptr->uv = { 0.0f, 1.0f };
+    m_data.quad_buffer_ptr->uv = { 1.0f, 0.0f };
     m_data.quad_buffer_ptr->tex_index = texture_index;
     m_data.quad_buffer_ptr->normal = { 0.0f, 1.0f, 0.0f };
     m_data.quad_buffer_ptr++;

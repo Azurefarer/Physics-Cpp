@@ -10,6 +10,7 @@ The Camera, Context, Gui, and Renderer.
 
 #define GLM_ENABLE_EXPERIMENTAL
 
+#include <cmath>
 #include <iostream>
 #include <numbers>
 #include <unordered_map>
@@ -52,27 +53,34 @@ struct keys {
 };
 
 struct scene_data {
+
+    // Everything in this struct should be able to be categorized as a System
+
+    // *Sys* Resolution tracking
     struct Resolution {
         int WIDTH = 2560;
         int HEIGHT = 1440;
     };
     Resolution res;
 
+    // int counting system
     int rigidbodies = 0;
 
+    // Shader Texture System
     bool set_null = false;
     bool set_king = false;
     bool set_face = false;
     bool set_back = false;
     bool set_sand = false;
 
-    float v_amplitude_mult = 0.875;
-    float v_amplitude = 1.0;
-    float v_omega_mult = 1.037;
-    float v_omega = 0.3;
-    float v_lambda_mult = 0.885;
-    float v_lambda = 100.249; // 320
-    float v_peak_width = 0.435;
+    // Shader uniform system
+    float v_amplitude_mult = 1.050;
+    float v_amplitude = 2.150;
+    float v_omega_mult = 0.440;
+    float v_omega = 0.02;
+    float v_lambda_mult = 1.500;
+    float v_lambda = 326.000; // 320
+    float v_peak_width = 0.430;
     float fresnel_coeff = 10.0;
     float spec_coeff = 7.0;
 
@@ -85,47 +93,17 @@ struct scene_data {
 };
 
 struct batch_data {
-    glm::vec3 pos = glm::vec3(0.0);
-    float width = 100.0f;
-    float length = 100.0f;
-    float subdivide_width = 0.6f;
-    float subdivide_length = 0.6f;
+
+    // Same with the Batch data, everything should be a part of a system.
+
+    glm::vec3 pos = glm::vec3(0.0, -100.0, 0.0);
+    float width = 500.0f;
+    float length = 500.0f;
+    float subdivide_width = 5.0f;
+    float subdivide_length = 5.0f;
 
     int draw_count = 0;
     int quad_count = 0;
-};
-
-class Camera {
-    public:
-        Camera();
-
-        void set_control(bool activity);
-
-        void process_keyboard(int key, float delta_time);
-        void process_mouse_movement(double x_offset, double y_offset, GLboolean constrain_pitch = true);
-        void process_mouse_scroll(double y_offset);
-
-        float get_pos() const { return m_pos.x; }
-        float get_zoom() const { return m_zoom; }
-
-        glm::mat4 get_view() const { return glm::lookAt(m_pos, m_pos + m_front, m_up); }
-    
-    private:
-        bool m_active = true;
-        
-        double m_yaw = -(std::numbers::pi / 2);
-        double m_pitch = 0.0;
-        double m_movement_speed = 60.0;
-        double m_mouse_sensitivity = 100;
-        double m_zoom = 45.0;
-
-        glm::vec3 m_pos;
-        glm::vec3 m_front;
-        glm::vec3 m_up;
-        glm::vec3 m_world_up;
-        glm::vec3 m_right;
-
-        void update_camera_vectors();
 };
 
 class Gui {
@@ -165,6 +143,8 @@ class Gui {
         void start_frame(const char* title);
         void show_diagnostics();
         void set_resolution();
+        void show_asset_data();
+        void set_shader_uniforms(RigidBody asset);
         void set_batch(std::string asset_name);
         void set_batch_shader();
         void reset_texture_options();
@@ -180,11 +160,18 @@ class Context {
         Context(int width, int height, std::string title);
         ~Context();
 
+        void run();
+
         bool is_live() { return !glfwWindowShouldClose(m_window); }
         bool get_gui_focus() { return m_gui_focus; }
         void set_gui_focus(bool focus) { m_gui_focus = focus; }
 
         GLFWwindow *get_window() { return m_window; }
+        float get_delta_time() { return m_delta; }
+
+        void set_MVP(glm::mat4 view, double zoom);
+        MVP get_MVP() const { return m_mvp; }
+
         float get_aspect_ratio() { return m_aspect_ratio; }
         double get_scroll_x() { return m_scroll_x_offset; }
         double get_scroll_y() { return m_scroll_y_offset; }
@@ -212,6 +199,10 @@ class Context {
 
     private:
         GLFWwindow* m_window;
+        float m_delta;
+        float m_current_frame;
+        float m_last_frame;
+
         int m_width;
         int m_height;
         float m_aspect_ratio = static_cast<float>(m_width)/static_cast<float>(m_height);
@@ -233,6 +224,8 @@ class Context {
 
         std::shared_ptr<keys> m_keys = std::make_unique<keys>();
 
+        MVP m_mvp;
+
         void set_GLcallbacks();
         void APIENTRY message_callback(GLenum source,
                  GLenum type,
@@ -249,24 +242,69 @@ class Context {
         void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 };
 
+class Camera {
+    public:
+        Camera(std::shared_ptr<Context> pcontext);
+        void point_at(glm::vec3 front);
+        void run();
+
+        void set_control(bool activity);
+
+        void process_keyboard(int key, float delta_time);
+        void process_mouse_movement(double x_offset, double y_offset, GLboolean constrain_pitch = true);
+        void process_mouse_scroll(double y_offset);
+
+        float get_pos() const { return m_pos.x; }
+        float get_zoom() const { return m_zoom; }
+
+        glm::mat4 get_view() const { return m_view; }
+    
+    private:
+        std::shared_ptr<Context> m_context;
+        bool m_active = true;
+        
+        double m_yaw;
+        double m_pitch; // for (m_yaw, m_pitch) = (0, 0) m_front, m_right, and m_up are the xyz basis vectors.
+        double m_movement_speed = 600.0;
+        double m_mouse_sensitivity = 100;
+        double m_zoom = 45.0;
+
+        glm::mat4 m_view;
+        void set_view();
+
+        glm::vec3 m_pos;
+        glm::vec3 m_front;
+        glm::vec3 m_up;
+        glm::vec3 m_world_up;
+        glm::vec3 m_right;
+
+        void update_camera_vectors();
+};
+
+class IO {
+    public:
+        IO(std::shared_ptr<Context> pcontext);
+        ~IO();
+
+        void run();
+
+    private:
+        std::shared_ptr<Context> m_context;
+};
+
 class Renderer {
     public:
-        Renderer(std::unique_ptr<Context> pcontext);
+        Renderer(std::shared_ptr<Context> pcontext);
         ~Renderer() = default;
 
         void run();
     private:
-        void update_transforms();
         void draw();
 
         void set_MVP(glm::vec3 model_offset, glm::vec3 scale = glm::vec3(1.0)); // Model-View-Projection Matrix
-        void set_shader(int shader_id);
         void draw_batch();
         void updates_for_gui();
-        void updates_from_gui();
         void process_delta();
-
-        glm::mat4 get_view() const { return m_camera->get_view(); }
 
         void gui_updates();
         void context_updates();
@@ -276,7 +314,6 @@ class Renderer {
         void set_shader_uniform_int(std::string uniform, int value);
         void set_shader_uniform_vec4(std::string uniform, glm::vec4 vec4);
 
-        void update_core_uniforms(int shader_id);
         void update_gui_uniforms();
 
         void set_batch_config_params();
@@ -285,7 +322,6 @@ class Renderer {
         void set_phong_uniforms();
         void set_light_uniforms();
         void set_toon_uniforms();
-        void set_shader_uniforms();
 
         void rigidbody_push_back(const MVP& mvp, std::string shaderhandle, std::string shape);
 
@@ -300,8 +336,7 @@ class Renderer {
         std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<RigidBody>>> m_assets;
 
         std::unique_ptr<BatchRenderer> m_batch = nullptr;
-        std::unique_ptr<Camera> m_camera = std::make_unique<Camera>();
-        std::unique_ptr<Context> m_context = nullptr;
+        std::shared_ptr<Context> m_context = nullptr;
         std::unordered_map<std::string, std::shared_ptr<Shader>> m_shaders;
         std::unique_ptr<ShapeMan> m_shape_man = nullptr;
         std::unique_ptr<TextureMan> m_texture_man = nullptr;

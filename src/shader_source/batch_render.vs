@@ -132,16 +132,16 @@ void vertex() {
     water_wave.pos = vec2(aPos.x, aPos.z);
 
 	vec3 wave_data = sum_of_sines_gauss_adjacent(time, water_wave);
-	float wave_height = wave_data.x;
+	// float wave_height = wave_data.x;
 
     vec4 wave_vertex = vec4(aPos, 1.0);
-	wave_vertex.y = wave_height;
+	wave_vertex.y = wave_data.x;
 
 	// vec3 tangent = normalize(vec3(1.0, wave_data.y, 0.0));
 	// vec3 binormal = normalize(vec3(0.0, wave_data.z, 1.0));
 	// normal = cross(tangent, binormal);
     normal = normalize(vec3(-wave_data.y, 1.0, -wave_data.z));
-	gl_Position = projection * view * model * vec4(aPos.x, wave_height + aPos.y, aPos.z, 1.0);
+	gl_Position = projection * view * model * vec4(aPos.x, wave_vertex.y + aPos.y, aPos.z, 1.0);
 	normal = normal_matrix * normal;	
 //	NORMAL = MODEL_NORMAL_MATRIX * NORMAL;
 }

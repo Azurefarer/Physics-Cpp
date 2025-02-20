@@ -1,12 +1,31 @@
 #ifndef GL_CORE_RIGIDBODY_H_
 #define GL_CORE_RIGIDBODY_H_
 
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include <memory>
 
+#include "glm/gtc/matrix_inverse.hpp"
+#include "glm/gtx/string_cast.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "gl_aux/vertex.h"
 #include "gl_core/shader.h"
+
+
+template<typename T>
+class System {
+    public:
+        System();
+        ~System() = default;
+
+        virtual void process();
+
+        
+
+};
+
+
 
 class RigidBody {
     public:
@@ -25,6 +44,7 @@ class RigidBody {
 
         std::string get_name() { return m_name; }
         std::string get_shape() { return m_shape; }
+        std::vector<std::shared_ptr<Shader>> get_shaders() { return m_shaders; }
 
         bool gui_bool = false;
 
@@ -34,7 +54,7 @@ class RigidBody {
         std::string m_name;
         MVP m_transforms;
         std::shared_ptr<Shader> m_shader = nullptr;
-
+        std::vector<std::shared_ptr<Shader>> m_shaders;
         glm::mat4 m_model = glm::mat4(1.0f);
         glm::mat3 m_normal = glm::mat3(1.0f);
         float m_time;

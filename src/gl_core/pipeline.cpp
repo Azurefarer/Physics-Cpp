@@ -6,77 +6,33 @@ double radian(double degrees) {
     return degrees * std::numbers::pi / 180;
 }
 
-Camera::Camera() : 
-    m_pos(glm::vec3(0.0f, 30.0f, 100.0f)),
-    m_front(glm::vec3(0.0f, -0.7f, -1.0f)),
-    m_up(glm::vec3(0.0f, 1.0f, 0.0f)),
-    m_world_up(glm::vec3(0.0f, 1.0f, 0.0f)),
-    m_right(glm::vec3(1.0f, 0.0f, 0.0f))
-{}
-
-void Camera::set_control(bool activity) {
-    m_active = activity;
+float frac(float x) {
+    float intPart;
+    return std::modf(x, &intPart); // Returns the fractional part
 }
 
-void Camera::process_keyboard(int key, float delta_time) {
-    if (!m_active) { return; }
-    else {
-        float velocity = m_movement_speed * delta_time;
-        if (key == GLFW_KEY_W) { m_pos += m_front * velocity; }
-        if (key == GLFW_KEY_S)
-            m_pos -= m_front * velocity;
-        if (key == GLFW_KEY_A)
-            m_pos -= m_right * velocity;
-        if (key == GLFW_KEY_D)
-            m_pos += m_right * velocity;
-    }
+// though this is not random at all, it does a good job at hiding it
+// it is not often that you'd be looking in the same direction twice
+// in 3d.  Maybe this is considered random because the mapping has no
+// Physical meaning/Logic.  e.g. why choose 512 instead of 256, or any
+// of these hard-coded numbers for that matter.
+glm::vec3 random3(glm::vec3 c) { 
+	float j = 4096.0*sin(glm::dot(c,glm::vec3(17.0, 59.4, 15.0)));
+	glm::vec3 r;
+	r.z = frac(512.0*j);
+	j *= .125;
+	r.x = frac(512.0*j);
+	j *= .125;
+	r.y = frac(512.0*j);
+	return r + r - glm::vec3(1.0);
 }
 
-void Camera::process_mouse_movement(double x_offset, double y_offset, GLboolean constrain_pitch) {
-    // Can change this so the math makes more sense
-    // instead of adding linear offset to an angular total value
-    // convert the linear offset into an angle measurement with arc length.
-    
-    if (!m_active) { return; }
-    else {
-        x_offset /= m_mouse_sensitivity; // This acts as the radius of
-        y_offset /= m_mouse_sensitivity; // the circle the camera looks within.
-        m_yaw += x_offset;
-        m_pitch += y_offset;
-        if (m_pitch > std::numbers::pi / 2)
-            m_pitch = std::numbers::pi / 2;
-        if (m_pitch < -std::numbers::pi / 2)
-            m_pitch = -std::numbers::pi / 2;
-
-        Camera::update_camera_vectors();
-    }
-}
-
-void Camera::update_camera_vectors() {
-    glm::vec3 front;
-    front.x = cos(m_yaw) * cos(m_pitch);
-    front.y = sin(m_pitch);
-    // std::cout << front.y << "HI" << std::endl;
-    front.z = sin(m_yaw) * cos(m_pitch);
-    m_front = glm::normalize(front);
-    m_right = glm::normalize(glm::cross(m_front, m_world_up));
-    m_up = glm::normalize(glm::cross(m_right, m_front));
-}
-
-void Camera::process_mouse_scroll(double y_offset) {
-    if (!m_active) { return; }
-    else {
-        m_zoom -= y_offset;
-    }
-}
-
-Gui::Gui(GLFWwindow *context) { 
+Gui::Gui(GLFWwindow *context) {
     m_context = context;
     init(m_context);
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     for (int i=0; i<m_sdata.rigidbodies; i++) {
-        bool temp = false;
         m_rigidbody_shader_param_references.push_back(false);
     }
     m_rigidbody_shader_param_references_iterator = m_rigidbody_shader_param_references.begin();
@@ -119,21 +75,23 @@ void Gui::run() {
         set_toon();
     }
     set_texture();
-    for (auto& [key, asset] : *m_assets) {
-        if (ImGui::Button(asset->gui_bool ? (asset->get_name() + " | ON").c_str() : (asset->get_name() + " | OFF").c_str())) {
-            asset->gui_bool = !asset->gui_bool; // Toggle the state
-        }
-        if (asset->gui_bool) {
-            ImGui::Begin((asset->get_name() + " Shader Params").c_str(), &asset->gui_bool);
-            if (asset->get_shape() == "BATCH") {
-                set_batch(asset->get_name());
-            }
-            if (asset->get_shape() == "CUBE") {
-                set_light(asset->get_name());
-            }
-            ImGui::End();
-        }
-    }
+    show_asset_data();
+    // for (auto& [key, asset] : *m_assets) {
+    //     if (ImGui::Button(asset->gui_bool ? (asset->get_name() + " | ON").c_str() : (asset->get_name() + " | OFF").c_str())) {
+    //         asset->gui_bool = !asset->gui_bool; // Toggle the state
+    //     }
+    //     if (asset->gui_bool) {
+    //         ImGui::Begin((asset->get_name() + " Shader Params").c_str(), &asset->gui_bool);
+    //         set_shader_uniforms(*asset);
+    //         // if (asset->get_shape() == "BATCH") {
+    //         //     set_batch(asset->get_name());
+    //         // }
+    //         // if (asset->get_shape() == "CUBE") {
+    //         //     set_light(asset->get_name());
+    //         // }
+    //         ImGui::End();
+    //     }
+    // }
     end_frame();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -174,6 +132,19 @@ void Gui::set_resolution() {
     }
 }
 
+void Gui::show_asset_data() {
+    for (auto& [key, asset] : *m_assets) {
+        if (ImGui::Button(asset->gui_bool ? (asset->get_name() + " | ON").c_str() : (asset->get_name() + " | OFF").c_str())) {
+            asset->gui_bool = !asset->gui_bool; // Toggle the state
+        }
+        if (asset->gui_bool) {
+            ImGui::Begin((asset->get_name() + " Shader Params").c_str(), &asset->gui_bool);
+            set_shader_uniforms(*asset);
+            ImGui::End();
+        }
+    }
+}
+
 void Gui::set_batch(std::string asset_name) {
     ImGui::Text("Draw Calls/Frame: ");
     ImGui::SameLine();
@@ -183,6 +154,7 @@ void Gui::set_batch(std::string asset_name) {
     ImGui::Text(std::to_string(m_bdata.quad_count).c_str());
     ImGui::NewLine();
     ImGui::DragFloat3("position", &m_bdata.pos.x, 1.0f, -100.0, 100.0);
+    (*m_assets)["BATCH"]->set_model_matrix(m_bdata.pos);
     ImGui::SliderFloat("width", &m_bdata.width, 0.01, 1000.0);
     ImGui::SliderFloat("length", &m_bdata.length, 0.01, 1000.0);
     ImGui::SliderFloat("width sub divisions", &m_bdata.subdivide_width, 0.01, 10.0);
@@ -196,9 +168,6 @@ void Gui::set_batch(std::string asset_name) {
         set_batch_shader();
         ImGui::End();
     }
-
-    // Next Up :
-    // Fix normals on the wave...
 }
 
 void Gui::set_batch_shader() {
@@ -211,6 +180,50 @@ void Gui::set_batch_shader() {
     ImGui::SliderFloat("v_peak_width", &m_sdata.v_peak_width, 0.0, 1.0);
     ImGui::SliderFloat("fresnel_coeff", &m_sdata.fresnel_coeff, 0.0, 100.0);
     ImGui::SliderFloat("spec_coeff", &m_sdata.spec_coeff, 0.0, 10.0);
+}
+
+void Gui::set_shader_uniforms(RigidBody asset) {
+    for (std::shared_ptr<Shader> shader : asset.get_shaders()) {
+        auto uniforms = shader->get_uniform_names();
+        for (const auto& [name, type] : uniforms) {
+            std::cout << "Type : " << type << std::endl;
+            std::cout << "Name : " << name << std::endl;
+            if (type == "float") {
+                float temp = 1;
+                ImGui::SliderFloat(name.c_str(), &temp, 0.0, 1000.0);
+                shader->use();
+                shader->set_float(name, temp);
+            } else if (type == "int")  {
+                int temp = 1;
+                ImGui::SliderInt(name.c_str(), &temp, 0, 1000);
+                shader->use();
+                shader->set_int(name, temp);
+            } else if (type == "bool")  {
+                bool temp = 0;
+                ImGui::Checkbox(name.c_str(), &temp);
+                shader->use();
+                shader->set_bool(name, temp);
+            } else if (type == "vec2")  {
+                glm::vec2 temp(1.0);
+                ImGui::SliderFloat2(name.c_str(), &temp.x, 0.0, 1000.0);
+                shader->use();
+                shader->set_vec2(name, temp);
+            } else if (type == "vec3")  {
+                glm::vec3 temp(1.0);
+                ImGui::SliderFloat3(name.c_str(), &temp.x, 0.0, 1000.0);
+                shader->use();
+                shader->set_vec3(name, temp);
+            } else if (type == "vec4")  {
+                glm::vec4 temp(1.0);
+                ImGui::SliderFloat4(name.c_str(), &temp.x, 0.0, 1000.0);
+                shader->use();
+                shader->set_vec4(name, temp);
+            } else {
+                continue;
+            }
+        };
+    };
+
 }
 
 void Gui::set_texture() {
@@ -251,7 +264,7 @@ void Gui::reset_texture_options() {
 }
 
 void Gui::set_toon() {
-    ImGui::DragInt("buckets", &m_sdata.toon_buckets, 1, 2, 100);
+    ImGui::DragInt("buckets", &m_sdata.toon_buckets, .01, 2, 25);
 }
 
 void Gui::set_light(std::string asset_name) {
@@ -317,6 +330,8 @@ Context::Context(int width, int height, std::string title)
 		throw std::runtime_error("Failed to initialize GLAD");
 	}
     glEnable(GL_DEBUG_OUTPUT);
+    // glEnable(GL_CULL_FACE);
+    // glCullFace(GL_FRONT);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
     set_GLcallbacks();
@@ -325,6 +340,23 @@ Context::Context(int width, int height, std::string title)
 
 Context::~Context() {
     glfwTerminate();
+}
+
+void Context::run() {
+    glfwPollEvents();
+
+    m_current_frame = glfwGetTime();
+    m_delta = m_current_frame - m_last_frame;
+    m_last_frame = m_current_frame;
+}
+
+void Context::set_MVP(glm::mat4 view, double zoom) {
+    // m_mvp.model = glm::mat4(1.0f);
+    m_mvp.view = view;
+
+    glm::mat4 projection(1.0f);
+    projection = glm::perspective(glm::radians(static_cast<float>(zoom)), get_aspect_ratio(), 0.1f, 4000.0f);
+    m_mvp.projection = projection;
 }
 
 void Context::set_resolution(int width, int height) {
@@ -459,7 +491,7 @@ void Context::cursor_pos_callback(GLFWwindow* window, double xposIn, double ypos
     m_cursor_pos_y = yposIn;
     m_cursor_pos_ratio = {m_cursor_pos_x/m_width, m_cursor_pos_y/m_height};
 
-    m_cursor_activity = true;
+    set_cursor_activity(true);
 }
 
 void Context::cursor_entered_callback(GLFWwindow* window, int entered) {
@@ -473,7 +505,105 @@ void Context::scroll_callback(GLFWwindow* window, double xoffset, double yoffset
     m_scroll_activity = true;
 }
 
-Renderer::Renderer(std::unique_ptr<Context> pcontext) : m_context(std::move(pcontext)) {
+Camera::Camera(std::shared_ptr<Context> pcontext) : 
+    m_context(pcontext),
+    m_pos(glm::vec3(0.0f, 0.0f, 1000.0f)),
+    m_world_up(glm::vec3(0.0f, 1.0f, 0.0f))
+{
+    m_yaw = 0;
+    m_pitch = 0.0;
+    update_camera_vectors();
+    set_view();
+    m_context->set_MVP(m_view, m_zoom);
+}
+
+void Camera::run() {
+    set_control(!m_context->get_gui_focus());
+    int *iter = &(m_context->get_keys_pressed()->W_key); // Memory Address Starts at the beginning of the keys struct.
+    for ( int i=0; i*4<sizeof(keys); i++ ) { 
+        int key = *(iter);
+        process_keyboard(key, m_context->get_delta_time());
+        iter++;
+    }
+    if ( m_context->get_cursor_activity() ) {
+        process_mouse_movement(m_context->get_arc_x(), m_context->get_arc_y());
+        m_context->set_cursor_activity(false);
+        m_context->set_arc_x(0);
+        m_context->set_arc_y(0);
+    } else {}
+    if ( m_context->get_scroll_activity() ) {
+        process_mouse_scroll(m_context->get_scroll_y());
+        m_context->set_scroll_activity(false);
+    } else {}
+    set_view();
+    m_context->set_MVP(m_view, m_zoom);
+}
+
+void Camera::set_view() {
+    glm::vec3 target = m_pos + m_front;
+    m_view = glm::lookAt(m_pos, target, m_up); 
+}
+
+void Camera::set_control(bool activity) {
+    m_active = activity;
+}
+
+void Camera::process_keyboard(int key, float delta_time) {
+    if (m_active) {
+        // std::cout << key << std::endl;
+        float velocity = m_movement_speed * delta_time;
+        if (key == GLFW_KEY_W) 
+            m_pos += m_front * velocity; 
+        if (key == GLFW_KEY_A)
+            m_pos -= m_right * velocity;
+        if (key == GLFW_KEY_S)
+            m_pos -= m_front * velocity;
+        if (key == GLFW_KEY_D)
+            m_pos += m_right * velocity;
+            // std::cout << glm::to_string(m_right) << std::endl;
+    } else { return; }
+}
+
+void Camera::process_mouse_movement(double x_offset, double y_offset, GLboolean constrain_pitch) {
+    if (m_active) { 
+        x_offset /= m_mouse_sensitivity; // This acts as the radius of
+        y_offset /= m_mouse_sensitivity; // the circle the camera looks within.
+        m_yaw += x_offset; // negative because z-axis is flipped
+        m_pitch += y_offset;
+        if (m_pitch >= std::numbers::pi / 2)
+            m_pitch = std::numbers::pi / 2;
+        if (m_pitch <= -std::numbers::pi / 2)
+            m_pitch = -std::numbers::pi / 2;
+        Camera::update_camera_vectors(); 
+    } else { 
+        return; 
+    }
+}
+
+void Camera::update_camera_vectors() {
+    m_front.x = sin(m_yaw) *    cos(m_pitch);
+    m_front.y =                 sin(m_pitch);
+    m_front.z = -cos(m_yaw) *   cos(m_pitch);
+    m_right =   glm::normalize(glm::cross(m_front, m_world_up)); // Have to normalize otherwise looking down restricts left and right movement
+    m_up =      glm::cross(m_right, m_front);
+}
+
+void Camera::process_mouse_scroll(double y_offset) {
+    if (!m_active) { return; }
+    else {
+        m_zoom -= y_offset; // Scroll down will zoom out, that is, increase the fovy
+    }
+}
+
+IO::IO(std::shared_ptr<Context> pcontext) : m_context(pcontext) {}
+
+IO::~IO() {}
+
+void IO::run() {
+    
+}
+
+Renderer::Renderer(std::shared_ptr<Context> pcontext) : m_context(pcontext) {
     m_assets = std::make_shared<std::unordered_map<std::string, std::shared_ptr<RigidBody>>>();
     m_batch = std::make_unique<BatchRenderer>();
     m_shaders.insert({"phong_lighting_model", std::make_shared<Shader>(
@@ -488,11 +618,14 @@ Renderer::Renderer(std::unique_ptr<Context> pcontext) : m_context(std::move(pcon
     m_shaders.insert({"post_process", std::make_shared<Shader>(
         "../src/shader_source/post_process.vs",
         "../src/shader_source/post_process.fs")});
+    m_shaders.insert({"directionally_challenged", std::make_shared<Shader>(
+        "../src/shader_source/directionally_challenged.vs",
+        "../src/shader_source/directionally_challenged.fs")});
     m_shape_man = std::make_unique<ShapeMan>();
     m_texture_man = std::make_unique<TextureMan>();
     m_gui = std::make_unique<Gui>(m_context->get_window());
-    set_MVP(glm::vec3(0.0f), glm::vec3(1.0f));
-    rigidbody_push_back(m_transforms, "batch_renderer", "BATCH");
+    set_MVP(glm::vec3(0.0), glm::vec3(1.0f));
+    rigidbody_push_back(m_transforms, "directionally_challenged", "BATCH");
     rigidbody_push_back(m_transforms, "phong_lighting_model", "CUBE");
     rigidbody_push_back(m_transforms, "light_box", "CUBE");
     set_shader_uniform_texture("NULL", "texture01");
@@ -501,32 +634,17 @@ Renderer::Renderer(std::unique_ptr<Context> pcontext) : m_context(std::move(pcon
 }
 
 void Renderer::run() {
-    while(m_context->is_live()) {
-        glClearColor(0.35f, 0.7f, 0.9f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        process_delta();
+    process_delta();
+    draw();
 
-        // TODO: Generalize a draw FCT to include MVP, coree_unis, gui_uniis, and draw
-        update_transforms();
-        draw();
-
-        gui_updates();
-        context_updates();
-        glfwPollEvents();
-    }
-}
-
-void Renderer::update_transforms() {
-    glm::mat4 view(m_camera->get_view());
-    glm::mat4 projection(1.0f);
-    projection = glm::perspective(glm::radians(m_camera->get_zoom()), m_context->get_aspect_ratio(), 0.1f, 2000.0f);
-    m_transforms.view = view;
-    m_transforms.projection = projection;
+    gui_updates();
+    context_updates();
 }
 
 void Renderer::draw() {
+    MVP temp = m_context->get_MVP();
     for (auto& [_, asset] : *m_assets) {
-        asset->update_view_and_perspective(m_transforms.view, m_transforms.projection);
+        asset->update_view_and_perspective(temp.view, temp.projection);
         asset->set_time(m_current_frame);
         asset->run_shader();
         if (asset->get_shape() == "BATCH") {
@@ -545,24 +663,20 @@ void Renderer::rigidbody_push_back(const MVP& mvp, std::string shaderhandle, std
 }
 
 void Renderer::set_MVP(glm::vec3 model_offset, glm::vec3 scale) {
+    m_transforms = m_context->get_MVP();
     glm::mat4 model(1.0f);
     model = glm::translate(model, model_offset);
     model = glm::scale(model, scale);
-    glm::mat4 view(m_camera->get_view());
-    glm::mat4 projection(1.0f);
-    projection = glm::perspective(glm::radians(m_camera->get_zoom()), m_context->get_aspect_ratio(), 0.1f, 1000.0f);
     m_transforms.model = model;
-    m_transforms.view = view;
-    m_transforms.projection = projection;
 }
 
 void Renderer::update_gui_uniforms() {
     m_sdata = m_gui->get_scene_data();
     m_bdata = m_gui->get_batch_data();
-    set_light_uniforms();
-    set_phong_uniforms();
-    set_batch_uniforms();
-    set_toon_uniforms();
+    // set_light_uniforms();
+    // set_phong_uniforms();
+    // set_batch_uniforms();
+    // set_toon_uniforms();
 }
 
 void Renderer::draw_batch() {
@@ -581,6 +695,8 @@ void Renderer::set_batch_config_params() {
     m_batch->set_config_param_subdivide_length(m_bdata.subdivide_length);
 }
 
+// Gotta have a shader uniform manager
+
 void Renderer::process_delta() {
     m_current_frame = glfwGetTime();
     m_delta = m_current_frame - m_last_frame;
@@ -592,6 +708,8 @@ void Renderer::process_delta() {
     }
 }
 
+
+// These should be in the Shader Class as Public methods.
 void Renderer::set_shader_uniform_texture(std::string tex_name, std::string uniform) {
     auto tex_int = m_texture_man->get_tex_int(tex_name.c_str());
     if (!tex_int.has_value()) {
@@ -683,25 +801,7 @@ void Renderer::gui_updates() {
 }
 
 void Renderer::context_updates() {
-    m_camera->set_control(!m_context->get_gui_focus());
-    int *iter = &(m_context->get_keys_pressed()->W_key); // Memory Address Starts at the beginning of the keys struct.
-    for ( int i=0; i*4<sizeof(keys); i++ ) { 
-        int key = *(iter);
-        m_camera->process_keyboard(key, m_delta);
-        iter++;
-    }
-    if ( m_context->get_cursor_activity() ) {
-        m_camera->process_mouse_movement(m_context->get_arc_x(), m_context->get_arc_y());
-        m_context->set_cursor_activity(false);
-        m_context->set_arc_x(0);
-        m_context->set_arc_y(0);
-    } else {}
-    if ( m_context->get_scroll_activity() ) {
-        m_camera->process_mouse_scroll(m_context->get_scroll_y());
-        m_context->set_scroll_activity(false);
-    } else {}
     m_context->set_resolution(m_sdata.res.WIDTH, m_sdata.res.HEIGHT); // This is data from the Gui
-    m_context->swap_buffers();
 }
 
 void Diagnostics_print() {

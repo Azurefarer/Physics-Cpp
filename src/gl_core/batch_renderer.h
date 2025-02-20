@@ -24,7 +24,7 @@ class BatchRenderer {
 
         void reset();
 
-        void draw_quad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
+        void draw_quad(const glm::vec3& position, const float& xsize, const float& zsize, const glm::vec4& color);
 
         void set_config_param_pos(glm::vec3 pos) { m_params.pos = pos; }
         void set_config_param_width(float width) { m_params.width = width; }
