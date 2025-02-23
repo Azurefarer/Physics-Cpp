@@ -186,44 +186,99 @@ void Gui::set_shader_uniforms(RigidBody asset) {
     for (std::shared_ptr<Shader> shader : asset.get_shaders()) {
         auto uniforms = shader->get_uniform_names();
         for (const auto& [name, type] : uniforms) {
-            std::cout << "Type : " << type << std::endl;
-            std::cout << "Name : " << name << std::endl;
-            if (type == "float") {
-                float temp = 1;
-                ImGui::SliderFloat(name.c_str(), &temp, 0.0, 1000.0);
-                shader->use();
-                shader->set_float(name, temp);
-            } else if (type == "int")  {
-                int temp = 1;
-                ImGui::SliderInt(name.c_str(), &temp, 0, 1000);
-                shader->use();
-                shader->set_int(name, temp);
-            } else if (type == "bool")  {
-                bool temp = 0;
-                ImGui::Checkbox(name.c_str(), &temp);
-                shader->use();
-                shader->set_bool(name, temp);
-            } else if (type == "vec2")  {
-                glm::vec2 temp(1.0);
-                ImGui::SliderFloat2(name.c_str(), &temp.x, 0.0, 1000.0);
-                shader->use();
-                shader->set_vec2(name, temp);
-            } else if (type == "vec3")  {
-                glm::vec3 temp(1.0);
-                ImGui::SliderFloat3(name.c_str(), &temp.x, 0.0, 1000.0);
-                shader->use();
-                shader->set_vec3(name, temp);
-            } else if (type == "vec4")  {
-                glm::vec4 temp(1.0);
-                ImGui::SliderFloat4(name.c_str(), &temp.x, 0.0, 1000.0);
-                shader->use();
-                shader->set_vec4(name, temp);
-            } else {
-                continue;
-            }
+            std::visit([&](auto&& v) {
+                using T = std::decay_t<decltype(v)>; // Get the type of the variant value
+                // Handle each uniform type
+                if constexpr (std::is_same_v<T, float>) {
+                    ImGui::SliderFloat(name.c_str(), &v, 0.0f, 1000.0f);
+                    shader->use();
+                    shader->set_float(name, v);
+                    shader->set_uniform(name, v);
+                } else if constexpr (std::is_same_v<T, int>) {
+                    ImGui::SliderInt(name.c_str(), &v, 0, 1000);
+                    shader->use();
+                    shader->set_int(name, v);
+                    shader->set_uniform(name, v);
+                } else if constexpr (std::is_same_v<T, bool>) {
+                    ImGui::Checkbox(name.c_str(), &v);
+                    shader->use();
+                    shader->set_bool(name, v);
+                    shader->set_uniform(name, v);
+                } else if constexpr (std::is_same_v<T, glm::vec2>) {
+                    ImGui::SliderFloat2(name.c_str(), &v.x, 0.0f, 1000.0f);
+                    shader->use();
+                    shader->set_vec2(name, v);
+                    shader->set_uniform(name, v);
+                } else if constexpr (std::is_same_v<T, glm::vec3>) {
+                    ImGui::SliderFloat3(name.c_str(), &v.x, 0.0f, 1000.0f);
+                    shader->use();
+                    shader->set_vec3(name, v);
+                    shader->set_uniform(name, v);
+                } else if constexpr (std::is_same_v<T, glm::vec4>) {
+                    ImGui::SliderFloat4(name.c_str(), &v.x, 0.0f, 1000.0f);
+                    shader->use();
+                    shader->set_vec4(name, v);
+                    shader->set_uniform(name, v);
+                } else if constexpr (std::is_same_v<T, glm::mat2>) {
+                    ImGui::SliderFloat2(name.c_str(), &v[0][0], 0.0f, 1000.0f);
+                    shader->use();
+                    shader->set_mat2(name, v);
+                    shader->set_uniform(name, v);
+                } else if constexpr (std::is_same_v<T, glm::mat3>) {
+                    ImGui::SliderFloat3(name.c_str(), &v[0][0], 0.0f, 1000.0f);
+                    shader->use();
+                    shader->set_mat3(name, v);
+                    shader->set_uniform(name, v);
+                } else if constexpr (std::is_same_v<T, glm::mat4>) {
+                    ImGui::SliderFloat4(name.c_str(), &v[0][0], 0.0f, 1000.0f);
+                    shader->use();
+                    shader->set_mat4(name, v);
+                    shader->set_uniform(name, v);
+                }
+                else {
+                    std::cerr << "Unknown uniform type: " << std::endl;
+                }
+            }, uniforms[name]);  // Access the variant by name
+            
+            
+            // std::cout << "Type : " << type << std::endl;
+            // std::cout << "Name : " << name << std::endl;
+            // if (type == "float") {
+            //     float temp = 1;
+            //     // asset.uniform_value(name)
+            //     ImGui::SliderFloat(name.c_str(), &temp, 0.0, 1000.0);
+            //     shader->use();
+            //     shader->set_float(name, temp);
+            // } else if (type == "int")  {
+            //     int temp = 1;
+            //     ImGui::SliderInt(name.c_str(), &temp, 0, 1000);
+            //     shader->use();
+            //     shader->set_int(name, temp);
+            // } else if (type == "bool")  {
+            //     bool temp = 0;
+            //     ImGui::Checkbox(name.c_str(), &temp);
+            //     shader->use();
+            //     shader->set_bool(name, temp);
+            // } else if (type == "vec2")  {
+            //     glm::vec2 temp(1.0);
+            //     ImGui::SliderFloat2(name.c_str(), &temp.x, 0.0, 1000.0);
+            //     shader->use();
+            //     shader->set_vec2(name, temp);
+            // } else if (type == "vec3")  {
+            //     glm::vec3 temp(1.0);
+            //     ImGui::SliderFloat3(name.c_str(), &temp.x, 0.0, 1000.0);
+            //     shader->use();
+            //     shader->set_vec3(name, temp);
+            // } else if (type == "vec4")  {
+            //     glm::vec4 temp(1.0);
+            //     ImGui::SliderFloat4(name.c_str(), &temp.x, 0.0, 1000.0);
+            //     shader->use();
+            //     shader->set_vec4(name, temp);
+            // } else {
+            //     continue;
+            // }
         };
     };
-
 }
 
 void Gui::set_texture() {
@@ -329,6 +384,7 @@ Context::Context(int width, int height, std::string title)
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		throw std::runtime_error("Failed to initialize GLAD");
 	}
+    glfwSwapInterval(0);
     glEnable(GL_DEBUG_OUTPUT);
     // glEnable(GL_CULL_FACE);
     // glCullFace(GL_FRONT);

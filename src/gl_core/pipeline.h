@@ -30,7 +30,6 @@ The Camera, Context, Gui, and Renderer.
 #include "gl_core/batch_renderer.h"
 #include "gl_core/shader.h"
 #include "gl_core/rigidbody.h"
-#include "gl_core/shader_parser.h"
 #include "gl_core/shape_man.h"
 #include "gl_core/texture_man.h"
 

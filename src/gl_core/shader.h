@@ -8,20 +8,19 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <variant>
 #include <vector>
 #include "glm/glm.hpp"
 #include "glad/glad.h"
 
-enum class GLSLtype {
-    INT,
-    FLOAT,
+// Define a variant for all possible uniform types
+using UniformValue = std::variant<float, unsigned int, int, bool, glm::vec2, glm::vec3, glm::vec4, glm::mat2, glm::mat3, glm::mat4>;
 
-};
-
-class Uniform {
-    public:
-        std::string name;
-        
+template <typename T>
+struct Uniform {
+    std::string name;
+    T value;
+    
 };
 
 class UniformMan {
@@ -33,17 +32,7 @@ class UniformMan {
 
 class Shader {
     public:
-        // constructor generates the shader on the fly
-        // ------------------------------------------------------------------------
         Shader(const char* vertex_path, const char* fragment_path, const char* geometry_path = nullptr);
-    private:
-        std::vector<std::string> extract_from(std::vector<const char*> file_path);
-        std::vector<unsigned int> compile_sources(std::vector<std::string> sources);
-        unsigned int compile_shader(std::string shader_type, std::string& src);
-        int checkCompileErrors(unsigned int shader, std::string type);
-        bool shader_program(std::vector<unsigned int>& compiled_shaders);
-        void copy_uniforms(std::vector<std::string> shader_sources);
-    public:
         void use();
         void set_bool   (const std::string& name, bool value) const;
         void set_int    (const std::string& name, unsigned int value);
@@ -60,12 +49,21 @@ class Shader {
         unsigned int id() const { return m_ID; }
         bool ready() const { return m_ready; }
         bool error() const { return m_error; }
-        std::unordered_map<std::string, std::string> get_uniform_names() { return m_uniform_names; }
+        std::unordered_map<std::string, UniformValue> get_uniform_names() { return m_uniforms; }
+        void set_uniform(std::string key, UniformValue value) { m_uniforms[key] = value; }
     private:
+    // Constuctor Methods, also extracts uniform names and types.
+        std::vector<std::string> extract_from(std::vector<const char*> file_path);
+        std::vector<unsigned int> compile_sources(std::vector<std::string> sources);
+        unsigned int compile_shader(std::string shader_type, std::string& src);
+        int checkCompileErrors(unsigned int shader, std::string type);
+        bool shader_program(std::vector<unsigned int>& compiled_shaders);
+        void copy_uniforms(std::vector<std::string> shader_sources);
+
         unsigned int m_ID = 1;
         bool m_ready = false;
         bool m_error = false;
-        std::unordered_map<std::string, std::string> m_uniform_names;
+        std::unordered_map<std::string, UniformValue> m_uniforms;
     
 };
 

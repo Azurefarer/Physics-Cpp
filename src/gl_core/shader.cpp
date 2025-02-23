@@ -8,9 +8,9 @@ Shader::Shader(const char* vertex_path, const char* fragment_path, const char* g
     copy_uniforms(shader_sources);
 }
 
-std::vector<std::string> Shader::extract_from(std::vector<const char*> file_path) {
+std::vector<std::string> Shader::extract_from(std::vector<const char*> file_paths) {
     std::vector<std::string> sources;
-    for (const char* path : file_path) {
+    for (const char* path : file_paths) {
         std::ifstream ShaderFile(path);
         std::stringstream ShaderStream;
         ShaderStream << ShaderFile.rdbuf();
@@ -31,6 +31,52 @@ std::vector<unsigned int> Shader::compile_sources(std::vector<std::string> sourc
         shaders[2] = compile_shader("GEOMETRY", sources[2]);
     }
     return shaders;
+}
+
+void Shader::copy_uniforms(std::vector<std::string> shader_sources) {
+    std::regex uniformRegex(R"(uniform\s+([a-zA-Z_][\w\d_]*)\s+([\w\d_]+)\s*;)");
+    std::smatch match;
+    
+    for (const auto& shader_source : shader_sources) {
+        std::string::const_iterator searchStart(shader_source.cbegin());
+        while (std::regex_search(searchStart, shader_source.cend(), match, uniformRegex)) {
+            // Convert string type to `UniformValue` and insert into the map
+            if (match[1] == "float") {
+                m_uniforms[match[2]] = 0.0f;
+            } 
+            else if (match[1] == "int") {
+                m_uniforms[match[2]] = 0;
+            } 
+            else if (match[1] == "sampler2D") {
+                m_uniforms[match[2]] = 0; // unsigned int [ This will probably cause problems]
+            } 
+            else if (match[1] == "bool") {
+                m_uniforms[match[2]] = false;
+            } 
+            else if (match[1] == "vec2") {
+                m_uniforms[match[2]] = glm::vec2(0.0f);
+            } 
+            else if (match[1] == "vec3") {
+                m_uniforms[match[2]] = glm::vec3(0.0f);
+            } 
+            else if (match[1] == "vec4") {
+                m_uniforms[match[2]] = glm::vec4(0.0f);
+            }
+            else if (match[1] == "mat2") {
+                m_uniforms[match[2]] = glm::mat2(1.0f);
+            } 
+            else if (match[1] == "mat3") {
+                m_uniforms[match[2]] = glm::mat3(1.0f);
+            } 
+            else if (match[1] == "mat4") {
+                m_uniforms[match[2]] = glm::mat4(1.0f);
+            }
+            else {
+                std::cerr << "Unknown uniform type: " << match[1] << std::endl;
+            }
+            searchStart = match.suffix().first;
+        }
+    }
 }
 
 unsigned int Shader::compile_shader(std::string shader_type, std::string& src) {
@@ -110,19 +156,6 @@ bool Shader::shader_program(std::vector<unsigned int>& compiled_shaders) {
         return true;
     }
     return false;
-}
-
-void Shader::copy_uniforms(std::vector<std::string> shader_sources) {
-    std::regex uniformRegex(R"(uniform\s+([a-zA-Z_][\w\d_]*)\s+([\w\d_]+)\s*;)");
-    std::smatch match;
-    
-    for (const auto& shader_source : shader_sources) {
-        std::string::const_iterator searchStart(shader_source.cbegin());
-        while (std::regex_search(searchStart, shader_source.cend(), match, uniformRegex)) {
-            m_uniform_names[match[2]] = match[1]; // Automatically filters duplicates
-            searchStart = match.suffix().first;
-        }
-    }
 }
 
 void Shader::use() {

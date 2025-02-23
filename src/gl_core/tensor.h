@@ -35,7 +35,39 @@
 //      The actual object won't shrink because it is invariant between coord systems
 //      The vector components will shrink while the basis vectors enlarge
 
-const float c = 300000000; ///meters per second
+const float c = 300000000; //meters per second
+
+// I think I can start with having everything being a 4 vector then make it more genralized later.
+
+// Tensor
+class Tensor {
+    public:
+        Tensor(int ru, int rl) : m_ru(ru), m_rl(rl) {}
+        
+    private:
+        std::vector<TensorCon> m_i; // Each upper index contains a set of coordinates in 4-space
+        std::vector<TensorCo> m_j; // Each lower index contains a set of coordinates in 4-space
+        int m_ru, m_rl;
+};
+
+// vector components and co-basis vectors are contravariant
+class TensorCon {
+    public:
+        float u1;
+        float u2;
+        float u3;
+        float u4;
+};
+
+// co-vector components and basis vectors are covariant
+class TensorCo {
+    public:
+        float l1;
+        float l2;
+        float l3;
+        float l4;
+};
+
 
 class CoordinateSystem {
     private:
