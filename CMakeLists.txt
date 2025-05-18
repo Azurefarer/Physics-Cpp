@@ -87,11 +87,12 @@ add_library(gl_core
   ${PROJECT_SOURCE_DIR}/src/gl_core/obj_mans.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/shader.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/shader.h
-  ${PROJECT_SOURCE_DIR}/src/gl_core/shape_man.h
-  ${PROJECT_SOURCE_DIR}/src/gl_core/shape_man.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/shapes.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/shapes.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/texture_man.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/texture_man.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/tensor.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/tensor.cpp
 )
 target_include_directories(gl_core PUBLIC
   src

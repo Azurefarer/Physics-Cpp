@@ -1,4 +1,4 @@
-#include "gl_core/shape_man.h"
+#include "gl_core/shapes.h"
 
 Shape::Shape(std::vector<Vertex> vertex_data, std::vector<unsigned int> index_data) {
     m_va_ptr.reset(new VertexArray());

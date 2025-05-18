@@ -3,11 +3,15 @@
 
 #include <map>
 #include <memory>
+#include <stdint.h>
 #include <string>
+#include <vector>
+
+#include "glad/glad.h"
 
 #include "gl_aux/cube.h"
 #include "gl_aux/quad.h"
-#include "gl_core/gpu_config.h"
+#include "gl_aux/vertex.h"
 
 class Shape {
     public:

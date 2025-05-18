@@ -2,6 +2,7 @@
 #define GL_CORE_TYPES_H_
 
 #include <functional>
+#include <memory>
 #include "glm/glm.hpp"
 // I will use the glm library for data types.
 // It is important to note that the default coordinate system this program works with is Cartesian.
@@ -38,18 +39,6 @@
 const float c = 300000000; //meters per second
 
 // I think I can start with having everything being a 4 vector then make it more genralized later.
-
-// Tensor
-class Tensor {
-    public:
-        Tensor(int ru, int rl) : m_ru(ru), m_rl(rl) {}
-        
-    private:
-        std::vector<TensorCon> m_i; // Each upper index contains a set of coordinates in 4-space
-        std::vector<TensorCo> m_j; // Each lower index contains a set of coordinates in 4-space
-        int m_ru, m_rl;
-};
-
 // vector components and co-basis vectors are contravariant
 class TensorCon {
     public:
@@ -68,20 +57,41 @@ class TensorCo {
         float l4;
 };
 
+// Tensor
+class Tensor {
+    public:
+        Tensor(int ru, int rl) : m_ru(ru), m_rl(rl) {}
+        int m_ru, m_rl;
+        std::vector<TensorCon> m_i; // Each upper index contains a set of coordinates in 4-space
+        std::vector<TensorCo> m_j; // Each lower index contains a set of coordinates in 4-space
+        
+        glm::vec4 get_vec(TensorCon);
+        glm::vec4 get_basis(TensorCo);
+        std::vector<TensorCon> get_mi() const { return m_i; }
+        std::vector<TensorCo> get_mj() const { return m_j; };
+        
+        // Want to set another Tensor variable with this one.
+        Tensor& operator=(const Tensor& other) {
+            if (this == &other) {
+                return *this; // Handle self-assignment
+            }
+            m_i = other.m_i;
+            m_j = other.m_j;
+            return *this;
+        }
+};
+
+class Metric {
+    public:
+        Metric();
+    private:
+        std::unique_ptr<Tensor> m_metric;
+};
 
 class CoordinateSystem {
     private:
         std::vector<glm::vec3> m_basis;
         glm::mat4 m_metric;
-};
-
-class Tensor {
-    public:
-        glm::mat4 m_minkowski()
-};
-
-class basis {
-    public:
 
 };
 

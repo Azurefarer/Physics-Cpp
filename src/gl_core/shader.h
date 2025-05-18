@@ -16,6 +16,42 @@
 // Define a variant for all possible uniform types
 using UniformValue = std::variant<float, unsigned int, int, bool, glm::vec2, glm::vec3, glm::vec4, glm::mat2, glm::mat3, glm::mat4>;
 
+// Try to implement like this next time
+
+// class ControlA {
+// public:
+//     void specificToA() { std::cout << "A" << std::endl; }
+// };
+
+// class ControlB {
+// public:
+//     void specificToB() { std::cout << "B" << std::endl; }
+// };
+
+// template<typename T>
+// class ControlItem{
+//     T* control;
+
+// public:
+//     ControlItem() = default;
+//     ~ControlItem() = default;
+
+//     void doStuff() {
+//         if constexpr (std::is_same_v<T, ControlA>) {
+//             control->specificToA();
+//         }
+//         if constexpr (std::is_same_v<T, ControlB>) {
+//             control->specificToB();
+//         }
+//     }
+// };
+
+// class MyClass {
+// public:
+//     void cycleThroughMap();
+//     std::map<std::string, std::variant<ControlItem<ControlA>, ControlItem<ControlB>>> controlMap;
+// };
+
 template <typename T>
 struct Uniform {
     std::string name;
