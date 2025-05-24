@@ -15,6 +15,9 @@
 // Spatial Objects can be put in a specific place in the scene and can optionally have renderable things attached
 //      e.g. 
 
+// This should be merged with teso
+
+
 class System {
     public:
         System();

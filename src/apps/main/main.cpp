@@ -11,6 +11,8 @@ int main() {
 
     while(context->is_live()) {
         glClearColor(0.35f, 0.7f, 0.9f, 1.0f);
+        glClearDepth(1.0);
+        glDepthFunc(GL_LEQUAL); // Draw if depth is <= current val
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         context->run();
         io.run();

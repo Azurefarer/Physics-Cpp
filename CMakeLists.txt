@@ -81,8 +81,6 @@ add_library(gl_core
   ${PROJECT_SOURCE_DIR}/src/gl_core/rigidbody.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/batch_renderer.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/batch_renderer.h
-  ${PROJECT_SOURCE_DIR}/src/gl_core/gpu_config.cpp
-  ${PROJECT_SOURCE_DIR}/src/gl_core/gpu_config.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/obj_mans.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/obj_mans.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/shader.cpp
