@@ -12,6 +12,7 @@
 
 #include "gl_aux/vertex.h"
 #include "gl_core/shader.h"
+#include "gl_core/shape.h"
 
 
 class RigidBody {

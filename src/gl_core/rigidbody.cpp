@@ -33,6 +33,10 @@ void RigidBody::update_view_and_perspective(glm::mat4 view, glm::mat4 projection
     m_transforms.projection = projection;
 }
 
+void RigidBody::draw() {
+    
+}
+
 // auto* RigidBody::get_uni_value(std::string uniform) {
 //     if ()
 // }
