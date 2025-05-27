@@ -5,7 +5,7 @@
 
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "gl_aux/vertex.h"
+#include "gl_core/vertex.h"
 #include "gl_core/shader.h"
 
 // obj_mans are managerts of certain types of things in the program

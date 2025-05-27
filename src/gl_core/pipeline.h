@@ -117,7 +117,7 @@ class Gui {
         scene_data get_scene_data() { return m_sdata; }
         batch_data get_batch_data() { return m_bdata; }
 
-        void set_rigidbodies(std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<RigidBody>>> assets);
+        void set_rigidbodies(const std::shared_ptr<std::vector<std::shared_ptr<RigidBody>>>& assets);
         void sleep();
         void wake_up();
         bool status_report() { return m_status; }
@@ -133,7 +133,7 @@ class Gui {
         int m_res_id = 0;
         int m_tex_id = 0;
 
-        std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<RigidBody>>> m_assets;
+        std::shared_ptr<std::vector<std::shared_ptr<RigidBody>>> m_assets;
         bool add_button_bool();
         std::vector<bool> m_rigidbody_shader_param_references;
         std::vector<bool>::iterator m_rigidbody_shader_param_references_iterator;
@@ -322,7 +322,7 @@ class Renderer {
         void set_light_uniforms();
         void set_toon_uniforms();
 
-        void rigidbody_push_back(const MVP& mvp, std::string shaderhandle, std::string shape);
+        void rigidbody_push_back(const MVP& mvp);
 
         float m_delta = 0.0f;
         float m_last_frame = 0.0f;
@@ -332,14 +332,23 @@ class Renderer {
         batch_data m_bdata;
 
         MVP m_transforms;
-        std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<RigidBody>>> m_assets;
+        std::shared_ptr<std::vector<std::shared_ptr<RigidBody>>> m_assets;
 
         std::unique_ptr<BatchRenderer> m_batch = nullptr;
         std::shared_ptr<Context> m_context = nullptr;
         std::unordered_map<std::string, std::shared_ptr<Shader>> m_shaders;
-        std::unique_ptr<ShapeMan> m_shape_man = nullptr;
         std::unique_ptr<TextureMan> m_texture_man = nullptr;
         std::unique_ptr<Gui> m_gui = nullptr;
+};
+
+class Scene {
+    public:
+        Scene();
+        void add_rigidbody(const MVP& mvp);
+    
+    private:
+        std::vector<std::shared_ptr<RigidBody>> m_assets;
+
 };
 
 #endif

@@ -2,73 +2,32 @@
 #define GL_CORE_SHADER_H_
 
 #include <array>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <regex>
 #include <sstream>
 #include <string>
 #include <unordered_map>
 #include <variant>
 #include <vector>
+
 #include "glm/glm.hpp"
 #include "glad/glad.h"
 
 // Define a variant for all possible uniform types
 using UniformValue = std::variant<float, unsigned int, int, bool, glm::vec2, glm::vec3, glm::vec4, glm::mat2, glm::mat3, glm::mat4>;
 
-// Try to implement like this next time
-
-// class ControlA {
-// public:
-//     void specificToA() { std::cout << "A" << std::endl; }
-// };
-
-// class ControlB {
-// public:
-//     void specificToB() { std::cout << "B" << std::endl; }
-// };
-
-// template<typename T>
-// class ControlItem{
-//     T* control;
-
-// public:
-//     ControlItem() = default;
-//     ~ControlItem() = default;
-
-//     void doStuff() {
-//         if constexpr (std::is_same_v<T, ControlA>) {
-//             control->specificToA();
-//         }
-//         if constexpr (std::is_same_v<T, ControlB>) {
-//             control->specificToB();
-//         }
-//     }
-// };
-
-// class MyClass {
-// public:
-//     void cycleThroughMap();
-//     std::map<std::string, std::variant<ControlItem<ControlA>, ControlItem<ControlB>>> controlMap;
-// };
-
 template <typename T>
 struct Uniform {
     std::string name;
     T value;
-    
-};
-
-class UniformMan {
-    public: 
-        UniformMan(std::unordered_map<std::string, std::string> m_uniform_names);
-
-        std::vector<std::string> m_ints;
 };
 
 class Shader {
     public:
-        Shader(const char* vertex_path, const char* fragment_path, const char* geometry_path = nullptr);
+        Shader(const std::filesystem::path& vertex_path, const std::filesystem::path& fragment_path, const std::filesystem::path& geometry_path = {});
         void use();
         void set_bool   (const std::string& name, bool value) const;
         void set_int    (const std::string& name, unsigned int value);
@@ -87,9 +46,10 @@ class Shader {
         bool error() const { return m_error; }
         std::unordered_map<std::string, UniformValue> get_uniform_names() { return m_uniforms; }
         void set_uniform(std::string key, UniformValue value) { m_uniforms[key] = value; }
+        std::string get_name() const { return m_name; }
     private:
     // Constuctor Methods, also extracts uniform names and types.
-        std::vector<std::string> extract_from(std::vector<const char*> file_path);
+        std::vector<std::string> extract_from(const std::vector<std::filesystem::path>& file_paths);
         std::vector<unsigned int> compile_sources(std::vector<std::string> sources);
         unsigned int compile_shader(std::string shader_type, std::string& src);
         int checkCompileErrors(unsigned int shader, std::string type);
@@ -97,10 +57,26 @@ class Shader {
         void copy_uniforms(std::vector<std::string> shader_sources);
 
         unsigned int m_ID = 1;
+        std::string m_name;
         bool m_ready = false;
         bool m_error = false;
         std::unordered_map<std::string, UniformValue> m_uniforms;
-    
+};
+
+class ShaderCache {
+    public: 
+        static ShaderCache& get_instance() {
+            static ShaderCache instance;
+            return instance;
+        }
+        void run(std::string shader_name);
+        std::unordered_map<std::string, std::shared_ptr<Shader>> m_shader_programs;
+
+    private:
+        ShaderCache();
+        ~ShaderCache() = default;
+        ShaderCache(const ShaderCache&) = delete;
+        ShaderCache& operator=(const ShaderCache&) = delete;
 };
 
 // Implement "core" shaders that every object gets a pass of to put it into the space

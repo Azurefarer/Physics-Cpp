@@ -9,9 +9,12 @@
 
 #include "glad/glad.h"
 
-#include "gl_aux/cube.h"
-#include "gl_aux/quad.h"
-#include "gl_aux/vertex.h"
+#include "gl_core/vertex.h"
+
+extern const std::vector<Vertex> cube_vertices;
+extern const std::vector<unsigned int> cube_indices;
+extern const std::vector<Vertex> quad_vertices;
+extern const std::vector<unsigned int> quad_indices;
 
 struct VertexBufferElement {
     unsigned int type;
@@ -30,7 +33,7 @@ struct VertexBufferElement {
 
 class IndexBuffer {
     public:
-        IndexBuffer(std::vector<unsigned int> data);
+        IndexBuffer(const std::vector<unsigned int>& data);
         ~IndexBuffer();
 
         void bind() const;
@@ -44,7 +47,7 @@ class IndexBuffer {
 
 class VertexBuffer {
     public:
-        VertexBuffer(std::vector<Vertex> data);
+        VertexBuffer(const std::vector<Vertex>& data);
         ~VertexBuffer();
 
         void bind() const;
@@ -94,28 +97,24 @@ class VertexArray {
         unsigned int m_renderer_ID = 1;
 };
 
-template <typename T>
 class Shape {
     public:
-        Shape(const T& type) {
+        Shape(int shape) {
             m_va_ptr.reset(new VertexArray());
-            m_vb_ptr.reset(new VertexBuffer(type.get_verts()));
+            m_vb_ptr.reset(new VertexBuffer(cube_vertices));
             m_layout_ptr.reset(new VertexBufferLayout());
-            m_layout_ptr.get()->push_float(3);
-            m_layout_ptr.get()->push_float(4);
-            m_layout_ptr.get()->push_float(2);
-            m_layout_ptr.get()->push_float(3);
-            m_layout_ptr.get()->push_float(1);
+            m_layout_ptr.get()->push_float(13); // 13 floats per vertex
             m_va_ptr.get()->add_buffer((*m_vb_ptr.get()), (*m_layout_ptr.get()));
-            m_ib_ptr.reset(new IndexBuffer(type.get_indices()));
-            m_element_count = std::size(type.get_indices());
+            m_ib_ptr.reset(new IndexBuffer(cube_indices));
+            m_element_count = std::size(cube_indices);
         }
-        // Shape(std::vector<Vertex> vertex_data, std::vector<unsigned int> index_data);
-        ~Shape();
-
         void bind() const { (*m_va_ptr.get()).bind(); }
         void unbind() const { (*m_va_ptr.get()).unbind(); }
-
+        void draw() {
+            bind();
+            glDrawElements(GL_TRIANGLES, m_element_count, GL_UNSIGNED_INT, (const void*)0);
+            unbind();
+        }
         unsigned int get_element_count() const { return m_element_count; }
 
     private:
@@ -125,18 +124,5 @@ class Shape {
         std::unique_ptr<IndexBuffer> m_ib_ptr;
         unsigned int m_element_count;
 };
-
-class ShapeMan {
-    public:
-        ShapeMan();
-        ~ShapeMan();
-
-        void shove_vertex_index_data(std::string key, std::vector<Vertex> vertex_data, std::vector<unsigned int> index_data);
-
-        void draw(std::string key);
-
-    private:
-        std::map<std::string, std::unique_ptr<Shape>> m_shapes;
-    };
 
 #endif

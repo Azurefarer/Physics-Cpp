@@ -133,7 +133,7 @@ void Gui::set_resolution() {
 }
 
 void Gui::show_asset_data() {
-    for (auto& [key, asset] : *m_assets) {
+    for (auto& asset : *m_assets) {
         if (ImGui::Button(asset->gui_bool ? (asset->get_name() + " | ON").c_str() : (asset->get_name() + " | OFF").c_str())) {
             asset->gui_bool = !asset->gui_bool; // Toggle the state
         }
@@ -154,7 +154,7 @@ void Gui::set_batch(std::string asset_name) {
     ImGui::Text(std::to_string(m_bdata.quad_count).c_str());
     ImGui::NewLine();
     ImGui::DragFloat3("position", &m_bdata.pos.x, 1.0f, -100.0, 100.0);
-    (*m_assets)["BATCH"]->set_model_matrix(m_bdata.pos);
+    (*m_assets)[0]->set_model_matrix(m_bdata.pos);
     ImGui::SliderFloat("width", &m_bdata.width, 0.01, 1000.0);
     ImGui::SliderFloat("length", &m_bdata.length, 0.01, 1000.0);
     ImGui::SliderFloat("width sub divisions", &m_bdata.subdivide_width, 0.01, 10.0);
@@ -183,7 +183,8 @@ void Gui::set_batch_shader() {
 }
 
 void Gui::set_shader_uniforms(RigidBody asset) {
-    for (std::shared_ptr<Shader> shader : asset.get_shaders()) {
+    for (std::string shader_name : asset.get_shaders()) {
+        std::shared_ptr<Shader>& shader = ShaderCache::get_instance().m_shader_programs[shader_name];
         auto uniforms = shader->get_uniform_names();
         for (const auto& [name, type] : uniforms) {
             std::visit([&](auto&& v) {
@@ -324,7 +325,7 @@ void Gui::set_toon() {
 
 void Gui::set_light(std::string asset_name) {
     ImGui::DragFloat3("Light Box Position", &m_sdata.light_pos.x, 1.0f, -1000.0, 1000.0);
-    (*m_assets)["CUBE"]->set_model_matrix(m_sdata.light_pos);
+    (*m_assets)[0]->set_model_matrix(m_sdata.light_pos);
     static bool show_shader_params = add_button_bool();
     if (ImGui::Button(show_shader_params ? "ON" : "OFF")) {
         show_shader_params = !show_shader_params; // Toggle the state
@@ -347,7 +348,7 @@ void Gui::end_frame() {
     ImGui::Render();
 }
 
-void Gui::set_rigidbodies(std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<RigidBody>>> assets) {
+void Gui::set_rigidbodies(const std::shared_ptr<std::vector<std::shared_ptr<RigidBody>>>& assets) {
     m_assets = assets;
 }
 
@@ -660,33 +661,21 @@ void IO::run() {
 }
 
 Renderer::Renderer(std::shared_ptr<Context> pcontext) : m_context(pcontext) {
-    m_assets = std::make_shared<std::unordered_map<std::string, std::shared_ptr<RigidBody>>>();
+    m_assets = std::make_shared<std::vector<std::shared_ptr<RigidBody>>>();
     m_batch = std::make_unique<BatchRenderer>();
-    m_shaders.insert({"phong_lighting_model", std::make_shared<Shader>(
-        "../src/shader_source/phong_lighting_model.vs",
-        "../src/shader_source/phong_lighting_model.fs")});
-    m_shaders.insert({"light_box", std::make_shared<Shader>(
-        "../src/shader_source/light_box.vs",
-        "../src/shader_source/light_box.fs")});
-    m_shaders.insert({"batch_renderer", std::make_shared<Shader>(
-        "../src/shader_source/batch_render.vs",
-        "../src/shader_source/batch_render.fs")});
-    m_shaders.insert({"post_process", std::make_shared<Shader>(
-        "../src/shader_source/post_process.vs",
-        "../src/shader_source/post_process.fs")});
-    m_shaders.insert({"directionally_challenged", std::make_shared<Shader>(
-        "../src/shader_source/directionally_challenged.vs",
-        "../src/shader_source/directionally_challenged.fs")});
-    m_shape_man = std::make_unique<ShapeMan>();
     m_texture_man = std::make_unique<TextureMan>();
     m_gui = std::make_unique<Gui>(m_context->get_window());
     set_MVP(glm::vec3(0.0), glm::vec3(1.0f));
-    rigidbody_push_back(m_transforms, "directionally_challenged", "BATCH");
-    rigidbody_push_back(m_transforms, "phong_lighting_model", "CUBE");
-    rigidbody_push_back(m_transforms, "light_box", "CUBE");
+    rigidbody_push_back(m_transforms);
+    rigidbody_push_back(m_transforms);
+    rigidbody_push_back(m_transforms);
     set_shader_uniform_texture("NULL", "texture01");
     update_gui_uniforms();
-    (*m_assets)["CUBE"]->set_model_matrix(m_sdata.light_pos);
+    (*m_assets)[0]->set_model_matrix(m_sdata.light_pos);
+}
+
+void Scene::add_rigidbody(const MVP& mvp) {
+    m_assets.push_back(std::make_shared<RigidBody>(mvp));
 }
 
 void Renderer::run() {
@@ -699,23 +688,22 @@ void Renderer::run() {
 
 void Renderer::draw() {
     MVP temp = m_context->get_MVP();
-    for (auto& [_, asset] : *m_assets) {
+    for (auto& asset : *m_assets) {
         asset->update_view_and_perspective(temp.view, temp.projection);
         asset->set_time(m_current_frame);
-        asset->run_shader();
         if (asset->get_shape() == "BATCH") {
             draw_batch();
         } else {
-            m_shape_man->draw(asset->get_shape());
+            asset->draw();
         }
     }
 }
 
-void Renderer::rigidbody_push_back(const MVP& mvp, std::string shaderhandle, std::string shape) {
+void Renderer::rigidbody_push_back(const MVP& mvp) {
     // Re-Write Key Structure
-    (*m_assets).insert({shape, std::make_shared<RigidBody>(mvp, m_shaders[shaderhandle], shape)});
+    (*m_assets).push_back(std::make_shared<RigidBody>(mvp));
     m_gui->set_rigidbodies(m_assets);
-    m_sdata.rigidbodies = (*m_assets).begin()->second->get_instance_count();
+    m_sdata.rigidbodies = (*m_assets)[0]->get_instance_count();
 }
 
 void Renderer::set_MVP(glm::vec3 model_offset, glm::vec3 scale) {

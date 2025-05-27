@@ -7,7 +7,7 @@
 
 #include "glm/gtx/string_cast.hpp"
 
-#include "gl_aux/vertex.h"
+#include "gl_core/vertex.h"
 #include "glad/glad.h"
 
 class BatchRenderer {

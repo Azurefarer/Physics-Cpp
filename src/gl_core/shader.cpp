@@ -1,16 +1,25 @@
 #include "gl_core/shader.h"
 
-Shader::Shader(const char* vertex_path, const char* fragment_path, const char* geometry_path) {
-    std::vector<const char*> file_paths{vertex_path, fragment_path, geometry_path};
+Shader::Shader(const std::filesystem::path& vertex_path, const std::filesystem::path& fragment_path, const std::filesystem::path& geometry_path) {
+    std::vector<std::filesystem::path> file_paths{vertex_path, fragment_path, geometry_path};
     std::vector<std::string> shader_sources(extract_from(file_paths));
     std::vector<unsigned int> compiled_shaders(compile_sources(shader_sources));
     m_ready = shader_program(compiled_shaders);
     copy_uniforms(shader_sources);
 }
 
-std::vector<std::string> Shader::extract_from(std::vector<const char*> file_paths) {
+std::vector<std::string> Shader::extract_from(const std::vector<std::filesystem::path>& file_paths) {
     std::vector<std::string> sources;
-    for (const char* path : file_paths) {
+    m_name = sources[0];
+    std::regex pattern(R"([^/\\]+)(?=\.[^./\\]+$)");
+    std::smatch match;
+
+    if (std::regex_search(m_name, match, pattern)) {
+        m_name = match[1];
+    } else {
+        std::cout << "No match found." << std::endl;
+    }
+    for (const std::filesystem::path& path : file_paths) {
         std::ifstream ShaderFile(path);
         std::stringstream ShaderStream;
         ShaderStream << ShaderFile.rdbuf();
@@ -222,4 +231,25 @@ void Shader::set_mat3(const std::string &name, const glm::mat3 &mat) const
 void Shader::set_mat4(const std::string &name, const glm::mat4 &mat) const
 {
     glUniformMatrix4fv(glGetUniformLocation(m_ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+
+ShaderCache::ShaderCache() {
+    std::string dir_path = "../src/shader_source";
+    for (const auto& entry : std::filesystem::directory_iterator(dir_path)) {
+        if (entry.is_regular_file()) {
+            const auto& vertex_path = entry.path();
+            if (vertex_path.extension() == ".vs") {
+                std::string name = vertex_path.stem().string();
+                auto fragment_path = vertex_path.parent_path() / (name + ".fs");
+                if (std::filesystem::exists(fragment_path) && std::filesystem::exists(vertex_path)) {
+                    m_shader_programs.insert({name, std::make_shared<Shader>(vertex_path, fragment_path)});
+                }
+            }
+        }
+    }
+}
+
+void ShaderCache::run(std::string shader_name) {
+    auto shader = m_shader_programs[shader_name];
+    shader->use();
 }
