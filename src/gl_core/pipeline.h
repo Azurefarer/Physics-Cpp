@@ -88,7 +88,7 @@ struct scene_data {
 
     float ambient_strength = 1.0;
     glm::vec4 light_color = glm::vec4{1.0};
-    glm::vec4 light_pos = glm::vec4{0.0, 25.0, 0.0, 0.0};
+    glm::vec4 light_pos = glm::vec4{0.0, 0.0, 0.0, 0.0};
 };
 
 struct batch_data {
@@ -264,7 +264,7 @@ class Camera {
         
         double m_yaw;
         double m_pitch; // for (m_yaw, m_pitch) = (0, 0) m_front, m_right, and m_up are the xyz basis vectors.
-        double m_movement_speed = 100.0;
+        double m_movement_speed = 10.0;
         double m_mouse_sensitivity = 100;
         double m_zoom = 45.0;
 

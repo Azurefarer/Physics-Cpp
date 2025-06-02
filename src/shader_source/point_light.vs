@@ -5,6 +5,7 @@ layout (location = 2) in vec2 aTexCoord;
 layout (location = 3) in vec3 aNormal;
 layout (location = 4) in float atex_index;
 
+out vec4 frag_pos;
 out vec3 UV;
 out vec2 TexCoord;
 out vec4 color;
@@ -25,4 +26,5 @@ void main()
     color = aColor;
     normal = aNormal;
     gl_Position = projection * view * model * vec4(aPos, 1.0);
+    frag_pos = model * vec4(aPos, 0.0);
 }

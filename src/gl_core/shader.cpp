@@ -236,7 +236,6 @@ ShaderCache::ShaderCache() {
                 if (std::filesystem::exists(fragment_path) && std::filesystem::exists(vertex_path)) {
                     m_shader_programs.insert({name, std::make_shared<Shader>(vertex_path, fragment_path)});
                     m_shader_programs[name]->set_name(name);
-                    std::cout << m_shader_programs[name]->get_name() << std::endl;
                 }
             }
         }

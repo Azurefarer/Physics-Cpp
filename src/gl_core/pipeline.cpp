@@ -562,7 +562,7 @@ void Context::scroll_callback(GLFWwindow* window, double xoffset, double yoffset
 
 Camera::Camera(std::shared_ptr<Context> pcontext) : 
     m_context(pcontext),
-    m_pos(glm::vec3(0.0f, 0.0f, 100.0f)),
+    m_pos(glm::vec3(0.0f, 2.0f, 15.0f)),
     m_world_up(glm::vec3(0.0f, 1.0f, 0.0f))
 {
     m_yaw = 0;
@@ -668,9 +668,7 @@ Renderer::Renderer(std::shared_ptr<Context> pcontext) : m_context(pcontext) {
     rigidbody_push_back(m_transforms);
     set_shader_uniform_texture("NULL", "texture01");
     update_gui_uniforms();
-    (*m_assets)[0]->set_model_matrix(m_sdata.light_pos);
     (*m_assets)[0]->set_shaders(std::vector({std::string("point_light")}));
-    (*m_assets)[1]->set_shaders(std::vector({std::string("point_light")}));
 }
 
 void Scene::add_rigidbody(const MVP& mvp) {
@@ -686,6 +684,18 @@ void Renderer::run() {
 
 void Renderer::draw() {
     MVP temp = m_context->get_MVP();
+///
+    float r = 10.0;
+    float f = 1.5;
+    glm::vec4 box_pos(r * sin(m_current_frame * f), -r * sin(m_current_frame * f) * cos(-m_current_frame), r * cos(m_current_frame * f), 0.0f);
+    (*m_assets)[1]->set_model_matrix(box_pos);
+    std::string  shader_name = (*m_assets)[0]->get_shaders()[0];
+    std::cout << shader_name << std::endl;
+    std::shared_ptr<Shader>& shader = ShaderCache::get_instance().m_shader_programs[shader_name];
+    shader->use();
+    shader->set_vec4("light_pos", m_sdata.light_pos);
+    m_sdata.light_pos = box_pos;
+///
     for (auto& asset : *m_assets) {
         asset->update_view_and_perspective(temp.view, temp.projection);
         asset->set_time(m_current_frame);

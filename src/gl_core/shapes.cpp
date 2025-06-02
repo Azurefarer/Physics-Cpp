@@ -44,7 +44,7 @@ const std::vector<unsigned int> cube_indices = {
     4, 13, 16,
     // -z face
     2, 8, 14,
-    8, 14, 19,
+    8, 14, 20,
     // +z face
     5, 11, 17,
     11, 17, 23,
@@ -70,9 +70,6 @@ const std::vector<unsigned int> quad_indices = {
 
 IndexBuffer::IndexBuffer(const std::vector<unsigned int>& data) {
     m_count = data.size();
-    for ( unsigned int prtdata : data ) {
-        std::cout << prtdata << std::endl;
-    }
     glGenBuffers(1, &m_renderer_ID);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_renderer_ID);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_count * sizeof(data)[0], &(data)[0], GL_STATIC_DRAW);

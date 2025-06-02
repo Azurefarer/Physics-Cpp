@@ -30,7 +30,6 @@ void RigidBody::draw() {
         auto shader = ShaderCache::get_instance().m_shader_programs[shader_name];
         shader->use();
         set_transforms(shader);
-        std::cout << shader->get_name() << std::endl;
         ShapeCache::get_instance().draw(m_shape);
     }
 }
