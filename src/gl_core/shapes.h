@@ -1,15 +1,23 @@
 #ifndef GL_CORE_SHAPE_MAN_H_
 #define GL_CORE_SHAPE_MAN_H_
 
+#include<iostream>
+
 #include <map>
 #include <memory>
 #include <stdint.h>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "glad/glad.h"
 
 #include "gl_core/vertex.h"
+
+struct shape_data {
+    std::vector<Vertex> verts;
+    std::vector<unsigned int> indices;
+};
 
 extern const std::vector<Vertex> cube_vertices;
 extern const std::vector<unsigned int> cube_indices;
@@ -41,7 +49,7 @@ class IndexBuffer {
 
         unsigned int get_count() const { return m_count; }
     private:
-        unsigned int m_renderer_ID = 1;
+        GLuint m_renderer_ID = 1;
         unsigned int m_count = 0;
 };
 
@@ -53,28 +61,17 @@ class VertexBuffer {
         void bind() const;
         void unbind() const;
     private:
-        unsigned int m_renderer_ID = 1;
+        GLuint m_renderer_ID = 1;
 };
 
 class VertexBufferLayout {
     public:
         VertexBufferLayout();
-        ~VertexBufferLayout();
+        ~VertexBufferLayout() = default;
 
-        void push_float(unsigned int count) {
-            m_elements.push_back({GL_FLOAT, count, GL_FALSE});
-            m_stride += count * VertexBufferElement::get_size_of_type(GL_FLOAT);
-        }
-
-        void push_unsigned_int(unsigned int count) {
-            m_elements.push_back({GL_UNSIGNED_INT, count, GL_FALSE});
-            m_stride += count * VertexBufferElement::get_size_of_type(GL_UNSIGNED_INT);
-        }
-
-        void push_unsigned_char(unsigned int count) {
-            m_elements.push_back({GL_UNSIGNED_BYTE, count, GL_TRUE});
-            m_stride += count * VertexBufferElement::get_size_of_type(GL_UNSIGNED_BYTE);
-        }
+        void push_float(unsigned int count);
+        void push_unsigned_int(unsigned int count);
+        void push_unsigned_char(unsigned int count);
 
         const std::vector<VertexBufferElement> get_elements() const { return m_elements; }
         unsigned int get_stride() const { return m_stride; }
@@ -94,27 +91,15 @@ class VertexArray {
         void unbind();
 
     private:
-        unsigned int m_renderer_ID = 1;
+        GLuint m_renderer_ID = 1;
 };
 
 class Shape {
     public:
-        Shape(int shape) {
-            m_va_ptr.reset(new VertexArray());
-            m_vb_ptr.reset(new VertexBuffer(cube_vertices));
-            m_layout_ptr.reset(new VertexBufferLayout());
-            m_layout_ptr.get()->push_float(13); // 13 floats per vertex
-            m_va_ptr.get()->add_buffer((*m_vb_ptr.get()), (*m_layout_ptr.get()));
-            m_ib_ptr.reset(new IndexBuffer(cube_indices));
-            m_element_count = std::size(cube_indices);
-        }
+        Shape(std::vector<Vertex> verts, std::vector<unsigned int> indices);
         void bind() const { (*m_va_ptr.get()).bind(); }
         void unbind() const { (*m_va_ptr.get()).unbind(); }
-        void draw() {
-            bind();
-            glDrawElements(GL_TRIANGLES, m_element_count, GL_UNSIGNED_INT, (const void*)0);
-            unbind();
-        }
+        void draw();
         unsigned int get_element_count() const { return m_element_count; }
 
     private:
@@ -122,7 +107,23 @@ class Shape {
         std::unique_ptr<VertexBuffer> m_vb_ptr;
         std::unique_ptr<VertexBufferLayout> m_layout_ptr;
         std::unique_ptr<IndexBuffer> m_ib_ptr;
-        unsigned int m_element_count;
+        unsigned int m_element_count = 0;
+};
+
+class ShapeCache {
+    public: 
+        static ShapeCache& get_instance() {
+            static ShapeCache instance;
+            return instance;
+        }
+        void draw(std::string shape_name);
+        std::unordered_map<std::string, std::shared_ptr<Shape>> m_shapes;
+
+    private:
+        ShapeCache();
+        ~ShapeCache() = default;
+        ShapeCache(const ShapeCache&) = delete;
+        ShapeCache& operator=(const ShapeCache&) = delete;
 };
 
 #endif

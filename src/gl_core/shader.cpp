@@ -10,15 +10,7 @@ Shader::Shader(const std::filesystem::path& vertex_path, const std::filesystem::
 
 std::vector<std::string> Shader::extract_from(const std::vector<std::filesystem::path>& file_paths) {
     std::vector<std::string> sources;
-    m_name = sources[0];
-    std::regex pattern(R"([^/\\]+)(?=\.[^./\\]+$)");
-    std::smatch match;
 
-    if (std::regex_search(m_name, match, pattern)) {
-        m_name = match[1];
-    } else {
-        std::cout << "No match found." << std::endl;
-    }
     for (const std::filesystem::path& path : file_paths) {
         std::ifstream ShaderFile(path);
         std::stringstream ShaderStream;
@@ -240,9 +232,11 @@ ShaderCache::ShaderCache() {
             const auto& vertex_path = entry.path();
             if (vertex_path.extension() == ".vs") {
                 std::string name = vertex_path.stem().string();
-                auto fragment_path = vertex_path.parent_path() / (name + ".fs");
+                auto fragment_path = (vertex_path.parent_path() / (name + ".fs")); // path has string as '//'
                 if (std::filesystem::exists(fragment_path) && std::filesystem::exists(vertex_path)) {
                     m_shader_programs.insert({name, std::make_shared<Shader>(vertex_path, fragment_path)});
+                    m_shader_programs[name]->set_name(name);
+                    std::cout << m_shader_programs[name]->get_name() << std::endl;
                 }
             }
         }

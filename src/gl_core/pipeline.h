@@ -264,7 +264,7 @@ class Camera {
         
         double m_yaw;
         double m_pitch; // for (m_yaw, m_pitch) = (0, 0) m_front, m_right, and m_up are the xyz basis vectors.
-        double m_movement_speed = 600.0;
+        double m_movement_speed = 100.0;
         double m_mouse_sensitivity = 100;
         double m_zoom = 45.0;
 

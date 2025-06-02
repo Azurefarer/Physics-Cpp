@@ -96,6 +96,7 @@ void BatchRenderer::flush() {
         glBindTexture(GL_TEXTURE_2D, m_data.texture_slots[i]);
     }
     glBindVertexArray(m_data.quad_va);
+    std::cout << m_data.index_count << std::endl;
     glDrawElements(GL_TRIANGLES, m_data.index_count, GL_UNSIGNED_INT, nullptr);
     m_data.index_count = 0;
     m_data.tex_slot_index = 1;

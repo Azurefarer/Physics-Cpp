@@ -46,6 +46,7 @@ class Shader {
         bool error() const { return m_error; }
         std::unordered_map<std::string, UniformValue> get_uniform_names() { return m_uniforms; }
         void set_uniform(std::string key, UniformValue value) { m_uniforms[key] = value; }
+        void set_name(std::string name) { m_name = name; }
         std::string get_name() const { return m_name; }
     private:
     // Constuctor Methods, also extracts uniform names and types.

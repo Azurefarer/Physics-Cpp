@@ -387,8 +387,6 @@ Context::Context(int width, int height, std::string title)
 	}
     glfwSwapInterval(0);
     glEnable(GL_DEBUG_OUTPUT);
-    // glEnable(GL_CULL_FACE);
-    // glCullFace(GL_FRONT);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
     set_GLcallbacks();
@@ -564,7 +562,7 @@ void Context::scroll_callback(GLFWwindow* window, double xoffset, double yoffset
 
 Camera::Camera(std::shared_ptr<Context> pcontext) : 
     m_context(pcontext),
-    m_pos(glm::vec3(0.0f, 0.0f, 1000.0f)),
+    m_pos(glm::vec3(0.0f, 0.0f, 100.0f)),
     m_world_up(glm::vec3(0.0f, 1.0f, 0.0f))
 {
     m_yaw = 0;
@@ -668,10 +666,11 @@ Renderer::Renderer(std::shared_ptr<Context> pcontext) : m_context(pcontext) {
     set_MVP(glm::vec3(0.0), glm::vec3(1.0f));
     rigidbody_push_back(m_transforms);
     rigidbody_push_back(m_transforms);
-    rigidbody_push_back(m_transforms);
     set_shader_uniform_texture("NULL", "texture01");
     update_gui_uniforms();
     (*m_assets)[0]->set_model_matrix(m_sdata.light_pos);
+    (*m_assets)[0]->set_shaders(std::vector({std::string("point_light")}));
+    (*m_assets)[1]->set_shaders(std::vector({std::string("point_light")}));
 }
 
 void Scene::add_rigidbody(const MVP& mvp) {
@@ -681,7 +680,6 @@ void Scene::add_rigidbody(const MVP& mvp) {
 void Renderer::run() {
     process_delta();
     draw();
-
     gui_updates();
     context_updates();
 }
@@ -700,7 +698,6 @@ void Renderer::draw() {
 }
 
 void Renderer::rigidbody_push_back(const MVP& mvp) {
-    // Re-Write Key Structure
     (*m_assets).push_back(std::make_shared<RigidBody>(mvp));
     m_gui->set_rigidbodies(m_assets);
     m_sdata.rigidbodies = (*m_assets)[0]->get_instance_count();

@@ -1,59 +1,59 @@
 #include "gl_core/shapes.h"
 
 const std::vector<Vertex> cube_vertices = {
-    {glm::vec3(-0.5, -0.5, -0.5),  glm::vec4(0.0, 0.0, 1.0, 1.0),  glm::vec2(1.0, 0.0),  glm::vec3(-1.0, 0.0, 0.0)}, //back bottom left
-    {glm::vec3(-0.5, -0.5, -0.5),  glm::vec4(0.0, 0.0, 1.0, 1.0),  glm::vec2(1.0, 0.0),  glm::vec3(0.0, -1.0, 0.0)}, //back bottom left
-    {glm::vec3(-0.5, -0.5, -0.5),  glm::vec4(0.0, 0.0, 1.0, 1.0),  glm::vec2(1.0, 0.0),  glm::vec3(0.0, 0.0, -1.0)},
-        //back bottom left
-    {glm::vec3(-0.5, -0.5, 0.5),  glm::vec4(1.0, 1.0, 1.0, 1.0),  glm::vec2(0.0, 0.0),  glm::vec3(-1.0, 0.0, 0.0)}, //front bottom left
-    {glm::vec3(-0.5, -0.5, 0.5),  glm::vec4(1.0, 1.0, 1.0, 1.0),  glm::vec2(0.0, 0.0),  glm::vec3(0.0, -1.0, 0.0)}, //front bottom left
-    {glm::vec3(-0.5, -0.5, 0.5),  glm::vec4(1.0, 1.0, 1.0, 1.0),  glm::vec2(0.0, 0.0),  glm::vec3(0.0, 0.0, 1.0)},
     //front bottom left
-    {glm::vec3(-0.5, 0.5, -0.5),  glm::vec4(0.0, 0.0, 1.0, 1.0),  glm::vec2(1.0, 1.0),  glm::vec3(-1.0, 0.0, 0.0)}, //back top left
-    {glm::vec3(-0.5, 0.5, -0.5),  glm::vec4(0.0, 0.0, 1.0, 1.0),  glm::vec2(1.0, 1.0),  glm::vec3(0.0, 1.0, 0.0)}, //back top left
-    {glm::vec3(-0.5, 0.5, -0.5),  glm::vec4(0.0, 0.0, 1.0, 1.0),  glm::vec2(1.0, 1.0),  glm::vec3(0.0, 0.0, -1.0)},
-    //back top left
-    {glm::vec3(-0.5, 0.5, 0.5),  glm::vec4(1.0, 1.0, 1.0, 1.0),  glm::vec2(0.0, 1.0),  glm::vec3(-1.0, 0.0, 0.0)}, //front top left
-    {glm::vec3(-0.5, 0.5, 0.5),  glm::vec4(1.0, 1.0, 1.0, 1.0),  glm::vec2(0.0, 1.0),  glm::vec3(0.0, 1.0, 0.0)}, //front top left
-    {glm::vec3(-0.5, 0.5, 0.5),  glm::vec4(1.0, 1.0, 1.0, 1.0),  glm::vec2(0.0, 1.0),  glm::vec3(0.0, 0.0, 1.0)},
+    {glm::vec3(-0.5, -0.5, -0.5),  glm::vec4(0.0, 0.0, 1.0, 1.0),  glm::vec2(1.0, 0.0),  glm::vec3(-1.0, 0.0, 0.0)},    // Normal -x
+    {glm::vec3(-0.5, -0.5, -0.5),  glm::vec4(0.0, 0.0, 1.0, 1.0),  glm::vec2(1.0, 0.0),  glm::vec3(0.0, -1.0, 0.0)},    // Normal -y
+    {glm::vec3(-0.5, -0.5, -0.5),  glm::vec4(0.0, 0.0, 1.0, 1.0),  glm::vec2(1.0, 0.0),  glm::vec3(0.0, 0.0, -1.0)},    // Normal -z
+    //back bottom left
+    {glm::vec3(-0.5, -0.5, 0.5),  glm::vec4(1.0, 1.0, 1.0, 1.0),  glm::vec2(0.0, 0.0),  glm::vec3(-1.0, 0.0, 0.0)},     // Normal -x
+    {glm::vec3(-0.5, -0.5, 0.5),  glm::vec4(1.0, 1.0, 1.0, 1.0),  glm::vec2(0.0, 0.0),  glm::vec3(0.0, -1.0, 0.0)},     // Normal -y
+    {glm::vec3(-0.5, -0.5, 0.5),  glm::vec4(1.0, 1.0, 1.0, 1.0),  glm::vec2(0.0, 0.0),  glm::vec3(0.0, 0.0, 1.0)},      // Normal +z
     //front top left
-    {glm::vec3(0.5, -0.5, -0.5),  glm::vec4(1.0, 0.0, 0.0, 1.0),  glm::vec2(0.0, 0.0),  glm::vec3(1.0, 0.0, 0.0)}, //back bottom right
-    {glm::vec3(0.5, -0.5, -0.5),  glm::vec4(1.0, 0.0, 0.0, 1.0),  glm::vec2(0.0, 0.0),  glm::vec3(0.0, -1.0, 0.0)}, //back bottom right
-    {glm::vec3(0.5, -0.5, -0.5),  glm::vec4(1.0, 0.0, 0.0, 1.0),  glm::vec2(0.0, 0.0),  glm::vec3(0.0, 0.0, -1.0)},
-    //back bottom right
-    {glm::vec3(0.5, -0.5, 0.5),  glm::vec4(0.0, 1.0, 0.0, 1.0),  glm::vec2(1.0, 0.0),  glm::vec3(1.0, 0.0, 0.0)}, //front bottom right
-    {glm::vec3(0.5, -0.5, 0.5),  glm::vec4(0.0, 1.0, 0.0, 1.0),  glm::vec2(1.0, 0.0),  glm::vec3(0.0, -1.0, 0.0)}, //front bottom right
-    {glm::vec3(0.5, -0.5, 0.5),  glm::vec4(0.0, 1.0, 0.0, 1.0),  glm::vec2(1.0, 0.0),  glm::vec3(0.0, 0.0, 1.0)},
+    {glm::vec3(-0.5, 0.5, -0.5),  glm::vec4(0.0, 0.0, 1.0, 1.0),  glm::vec2(1.0, 1.0),  glm::vec3(-1.0, 0.0, 0.0)},     // Normal -x
+    {glm::vec3(-0.5, 0.5, -0.5),  glm::vec4(0.0, 0.0, 1.0, 1.0),  glm::vec2(1.0, 1.0),  glm::vec3(0.0, 1.0, 0.0)},      // Normal +y
+    {glm::vec3(-0.5, 0.5, -0.5),  glm::vec4(0.0, 0.0, 1.0, 1.0),  glm::vec2(1.0, 1.0),  glm::vec3(0.0, 0.0, -1.0)},     // Normal -z
+    //back top left
+    {glm::vec3(-0.5, 0.5, 0.5),  glm::vec4(1.0, 1.0, 1.0, 1.0),  glm::vec2(0.0, 1.0),  glm::vec3(-1.0, 0.0, 0.0)},      // Normal -x
+    {glm::vec3(-0.5, 0.5, 0.5),  glm::vec4(1.0, 1.0, 1.0, 1.0),  glm::vec2(0.0, 1.0),  glm::vec3(0.0, 1.0, 0.0)},       // Normal +y
+    {glm::vec3(-0.5, 0.5, 0.5),  glm::vec4(1.0, 1.0, 1.0, 1.0),  glm::vec2(0.0, 1.0),  glm::vec3(0.0, 0.0, 1.0)},       // Normal +z
     //front bottom right
-    {glm::vec3(0.5, 0.5, -0.5),  glm::vec4(1.0, 0.0, 0.0, 1.0),  glm::vec2(0.0, 1.0),  glm::vec3(1.0, 0.0, 0.0)}, //back top right
-    {glm::vec3(0.5, 0.5, -0.5),  glm::vec4(1.0, 0.0, 0.0, 1.0),  glm::vec2(0.0, 1.0),  glm::vec3(0.0, 1.0, 0.0)}, //back top right
-    {glm::vec3(0.5, 0.5, -0.5),  glm::vec4(1.0, 0.0, 0.0, 1.0),  glm::vec2(0.0, 1.0),  glm::vec3(0.0, 0.0, -1.0)},
-    //back top right
-    {glm::vec3(0.5, 0.5, 0.5),  glm::vec4(0.0, 1.0, 0.0, 1.0),  glm::vec2(1.0, 1.0),  glm::vec3(1.0, 0.0, 0.0)}, //front top right
-    {glm::vec3(0.5, 0.5, 0.5),  glm::vec4(0.0, 1.0, 0.0, 1.0),  glm::vec2(1.0, 1.0),  glm::vec3(0.0, 1.0, 0.0)}, //front top right
-    {glm::vec3(0.5, 0.5, 0.5),  glm::vec4(0.0, 1.0, 0.0, 1.0),  glm::vec2(1.0, 1.0),  glm::vec3(0.0, 0.0, 1.0)}
+    {glm::vec3(0.5, -0.5, -0.5),  glm::vec4(1.0, 0.0, 0.0, 1.0),  glm::vec2(0.0, 0.0),  glm::vec3(1.0, 0.0, 0.0)},      // Normal +x
+    {glm::vec3(0.5, -0.5, -0.5),  glm::vec4(1.0, 0.0, 0.0, 1.0),  glm::vec2(0.0, 0.0),  glm::vec3(0.0, -1.0, 0.0)},     // Normal -y
+    {glm::vec3(0.5, -0.5, -0.5),  glm::vec4(1.0, 0.0, 0.0, 1.0),  glm::vec2(0.0, 0.0),  glm::vec3(0.0, 0.0, -1.0)},     // Normal -z
+    //back bottom right
+    {glm::vec3(0.5, -0.5, 0.5),  glm::vec4(0.0, 1.0, 0.0, 1.0),  glm::vec2(1.0, 0.0),  glm::vec3(1.0, 0.0, 0.0)},       // Normal +x
+    {glm::vec3(0.5, -0.5, 0.5),  glm::vec4(0.0, 1.0, 0.0, 1.0),  glm::vec2(1.0, 0.0),  glm::vec3(0.0, -1.0, 0.0)},      // Normal -y
+    {glm::vec3(0.5, -0.5, 0.5),  glm::vec4(0.0, 1.0, 0.0, 1.0),  glm::vec2(1.0, 0.0),  glm::vec3(0.0, 0.0, 1.0)},       // Normal +z
     //front top right
+    {glm::vec3(0.5, 0.5, -0.5),  glm::vec4(1.0, 0.0, 0.0, 1.0),  glm::vec2(0.0, 1.0),  glm::vec3(1.0, 0.0, 0.0)},       // Normal +x
+    {glm::vec3(0.5, 0.5, -0.5),  glm::vec4(1.0, 0.0, 0.0, 1.0),  glm::vec2(0.0, 1.0),  glm::vec3(0.0, 1.0, 0.0)},       // Normal +y
+    {glm::vec3(0.5, 0.5, -0.5),  glm::vec4(1.0, 0.0, 0.0, 1.0),  glm::vec2(0.0, 1.0),  glm::vec3(0.0, 0.0, -1.0)},      // Normal -z
+    //back top right
+    {glm::vec3(0.5, 0.5, 0.5),  glm::vec4(0.0, 1.0, 0.0, 1.0),  glm::vec2(1.0, 1.0),  glm::vec3(1.0, 0.0, 0.0)},        // Normal +x
+    {glm::vec3(0.5, 0.5, 0.5),  glm::vec4(0.0, 1.0, 0.0, 1.0),  glm::vec2(1.0, 1.0),  glm::vec3(0.0, 1.0, 0.0)},        // Normal +y
+    {glm::vec3(0.5, 0.5, 0.5),  glm::vec4(0.0, 1.0, 0.0, 1.0),  glm::vec2(1.0, 1.0),  glm::vec3(0.0, 0.0, 1.0)}         // Normal +z
 };
 
 const std::vector<unsigned int> cube_indices = {
-    // left face
+    // -x face
     0, 3, 6,
-    3, 6, 12,
-    // right face
-    15, 12, 21,
-    12, 21, 18,
-    // front face
-    5, 17, 11,
-    17, 11, 23,
-    // back face
-    14, 2, 20,
-    2, 20, 8,
-    // bottom face
-    13, 16, 1,
-    16, 1, 4,
-    // top face
-    19, 22, 7,
-    22, 7, 10
+    3, 6, 9,
+    // -y face
+    1, 4, 13,
+    4, 13, 16,
+    // -z face
+    2, 8, 14,
+    8, 14, 19,
+    // +z face
+    5, 11, 17,
+    11, 17, 23,
+    // +y face
+    7, 10, 19,
+    10, 19, 22,
+    // +x face
+    12, 15, 18,
+    15, 18, 21
 };
 
 const std::vector<Vertex> quad_vertices = {
@@ -70,6 +70,9 @@ const std::vector<unsigned int> quad_indices = {
 
 IndexBuffer::IndexBuffer(const std::vector<unsigned int>& data) {
     m_count = data.size();
+    for ( unsigned int prtdata : data ) {
+        std::cout << prtdata << std::endl;
+    }
     glGenBuffers(1, &m_renderer_ID);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_renderer_ID);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_count * sizeof(data)[0], &(data)[0], GL_STATIC_DRAW);
@@ -105,9 +108,28 @@ void VertexBuffer::unbind() const {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-VertexBufferLayout::VertexBufferLayout() {}
+VertexBufferLayout::VertexBufferLayout() {
+    push_float(3); // vec3 pos
+    push_float(4); // vec4 color
+    push_float(2); // vec2 uv
+    push_float(3); // vec3 normal
+    push_float(1); // float tex_index
+}
 
-VertexBufferLayout::~VertexBufferLayout() {}
+void VertexBufferLayout::push_float(unsigned int count) {
+    m_elements.push_back({GL_FLOAT, count, GL_FALSE});
+    m_stride += count * VertexBufferElement::get_size_of_type(GL_FLOAT);
+}
+
+void VertexBufferLayout::push_unsigned_int(unsigned int count) {
+    m_elements.push_back({GL_UNSIGNED_INT, count, GL_FALSE});
+    m_stride += count * VertexBufferElement::get_size_of_type(GL_UNSIGNED_INT);
+}
+
+void VertexBufferLayout::push_unsigned_char(unsigned int count) {
+    m_elements.push_back({GL_UNSIGNED_BYTE, count, GL_TRUE});
+    m_stride += count * VertexBufferElement::get_size_of_type(GL_UNSIGNED_BYTE);
+}
 
 VertexArray::VertexArray() {
     glGenVertexArrays(1, &m_renderer_ID);
@@ -125,7 +147,7 @@ void VertexArray::add_buffer(const VertexBuffer& vb, const VertexBufferLayout& l
     uintptr_t offset = 0;
     for (unsigned int i=0; i<elements.size(); i++) {
         const auto& element = elements[i];
-        glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.get_stride(), (const void*)offset);
+        glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.get_stride(),  reinterpret_cast<void*>(offset));
         glEnableVertexAttribArray(i);
         offset += element.count * VertexBufferElement::get_size_of_type(element.type);
     }
@@ -139,16 +161,26 @@ void VertexArray::unbind() {
     glBindVertexArray(0);
 }
 
-// Shape::Shape(std::vector<Vertex> vertex_data, std::vector<unsigned int> index_data) {
-//     m_va_ptr.reset(new VertexArray());
-//     m_vb_ptr.reset(new VertexBuffer(vertex_data));
-//     m_layout_ptr.reset(new VertexBufferLayout());
-//     m_layout_ptr.get()->push_float(3);
-//     m_layout_ptr.get()->push_float(4);
-//     m_layout_ptr.get()->push_float(2);
-//     m_layout_ptr.get()->push_float(3);
-//     m_layout_ptr.get()->push_float(1);
-//     m_va_ptr.get()->add_buffer((*m_vb_ptr.get()), (*m_layout_ptr.get()));
-//     m_ib_ptr.reset(new IndexBuffer(index_data));
-//     m_element_count = std::size(index_data);
-// }
+Shape::Shape(std::vector<Vertex> verts, std::vector<unsigned int> indices) {
+    m_va_ptr.reset(new VertexArray());
+    m_vb_ptr.reset(new VertexBuffer(verts));
+    m_layout_ptr.reset(new VertexBufferLayout());
+    m_va_ptr.get()->add_buffer((*m_vb_ptr.get()), (*m_layout_ptr.get()));
+    m_ib_ptr.reset(new IndexBuffer(indices));
+    m_element_count = m_ib_ptr->get_count();
+}
+
+void Shape::draw() {
+    bind();
+    glDrawElements(GL_TRIANGLES, m_element_count, GL_UNSIGNED_INT, (const void*)0);
+    unbind();
+}
+
+ShapeCache::ShapeCache() {
+    m_shapes.insert({"cube", std::make_shared<Shape>(cube_vertices, cube_indices)});
+    m_shapes.insert({"quad", std::make_shared<Shape>(quad_vertices, quad_indices)});
+}
+
+void ShapeCache::draw(std::string shape_name) {
+    m_shapes[shape_name]->draw();
+}

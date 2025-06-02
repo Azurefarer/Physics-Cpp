@@ -5,9 +5,8 @@
 
 // TODO: Add a sphere
 
-// I think these things need to be stored on the Heap.  I'm generating a boat load of 'em
-// So this might become a bottleneck if I keep it like this where each vertex ius stored on the stack
-// Make the position the GR space-time 4vector
+
+// { vec3 pos, vec4 color, vec2 uv, vec3 normal, float tex_index }
 struct Vertex {
     glm::vec3 position;
     glm::vec4 color;

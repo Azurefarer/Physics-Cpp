@@ -27,6 +27,7 @@ class RigidBody {
         void set_time(float time) { m_time = time; }
         int get_instance_count() const { return instance_count; }
         std::string get_name() { return m_name; }
+        void set_shaders(const std::vector<std::string>& shaders);
         void set_shape(std::string shape) { m_shape = shape; } //
         std::string get_shape() { return m_shape; }
         std::vector<std::string> get_shaders() { return m_shaders; }
@@ -41,7 +42,7 @@ class RigidBody {
         glm::mat4 m_model = glm::mat4(1.0f);
         glm::mat3 m_normal = glm::mat3(1.0f);
         float m_time;
-        std::string m_shape;
+        std::string m_shape = "cube";
 };
 
 #endif

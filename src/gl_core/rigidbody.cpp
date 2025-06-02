@@ -11,6 +11,12 @@ RigidBody::RigidBody(MVP mvp) {
     m_name = "cube" + std::to_string(++instance_count);
 };
 
+void RigidBody::set_shaders(const std::vector<std::string>& shaders) {
+    m_shaders.clear();
+    m_shaders = shaders;
+}
+
+
 void RigidBody::set_transforms(const std::shared_ptr<Shader>& shader) {
     shader->set_mat4("model", m_transforms.model);
     shader->set_mat4("view", m_transforms.view);
@@ -22,7 +28,10 @@ void RigidBody::set_transforms(const std::shared_ptr<Shader>& shader) {
 void RigidBody::draw() {
     for (auto& shader_name : m_shaders) {
         auto shader = ShaderCache::get_instance().m_shader_programs[shader_name];
+        shader->use();
         set_transforms(shader);
+        std::cout << shader->get_name() << std::endl;
+        ShapeCache::get_instance().draw(m_shape);
     }
 }
 
@@ -37,8 +46,6 @@ void RigidBody::update_view_and_perspective(glm::mat4 view, glm::mat4 projection
     m_transforms.view = view;
     m_transforms.projection = projection;
 }
-
-
 
 // auto* RigidBody::get_uni_value(std::string uniform) {
 //     if ()
