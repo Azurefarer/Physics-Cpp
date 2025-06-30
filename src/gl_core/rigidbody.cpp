@@ -2,22 +2,19 @@
 
 int RigidBody::instance_count = 0;
 
-RigidBody::RigidBody(MVP mvp) {
+RigidBody::RigidBody(MVP mvp) : m_shader(ShaderCache::get_instance().m_shader_programs["default"]) {
     m_transforms.model = mvp.model;
     m_transforms.view = mvp.view;
     m_transforms.projection = mvp.projection;
-    m_shaders.push_back("default");
     m_shape = "cube";
     m_name = "cube" + std::to_string(++instance_count);
 };
 
-void RigidBody::set_shaders(const std::vector<std::string>& shaders) {
-    m_shaders.clear();
-    m_shaders = shaders;
+void RigidBody::set_shader(const std::shared_ptr<Shader>& shader) {
+    m_shader = shader;
 }
 
-
-void RigidBody::set_transforms(const std::shared_ptr<Shader>& shader) {
+void RigidBody::set_uniforms(const std::shared_ptr<Shader>& shader) {
     shader->set_mat4("model", m_transforms.model);
     shader->set_mat4("view", m_transforms.view);
     shader->set_mat4("projection", m_transforms.projection);
@@ -26,12 +23,9 @@ void RigidBody::set_transforms(const std::shared_ptr<Shader>& shader) {
 }
 
 void RigidBody::draw() {
-    for (auto& shader_name : m_shaders) {
-        auto shader = ShaderCache::get_instance().m_shader_programs[shader_name];
-        shader->use();
-        set_transforms(shader);
+        m_shader->use();
+        set_uniforms(m_shader);
         ShapeCache::get_instance().draw(m_shape);
-    }
 }
 
 void RigidBody::set_model_matrix(glm::vec3 model_offset_from_world, glm::vec3 scale) {

@@ -17,6 +17,21 @@
 
 // This should be merged with teso
 
+class GameObject {
+    public:
+        GameObject() = default;
+        ~GameObject() = default;
+    private:
+        int ID;
+    
+};
+
+
+
+
+
+
+
 
 class System {
     public:

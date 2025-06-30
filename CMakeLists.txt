@@ -81,12 +81,20 @@ add_library(gl_core
   ${PROJECT_SOURCE_DIR}/src/gl_core/rigidbody.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/batch_renderer.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/batch_renderer.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/camera.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/camera.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/context.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/context.h
+  # ${PROJECT_SOURCE_DIR}/src/gl_core/gui.cpp
+  # ${PROJECT_SOURCE_DIR}/src/gl_core/gui.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/obj_mans.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/obj_mans.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/scene.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/scene.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/shader.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/shader.h
-  ${PROJECT_SOURCE_DIR}/src/gl_core/shapes.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/shapes.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/shapes.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/texture_man.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/texture_man.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/tensor.h

@@ -1,7 +1,10 @@
-#include "gl_core/pipeline.h"
 #include <memory>
 #include <string>
 #include <utility>
+
+#include "gl_core/context.h"
+#include "gl_core/camera.h"
+#include "gl_core/pipeline.h"
 
 int main() {
     auto context = std::make_shared<Context>(1920, 1080, std::string("OpenGL Application"));

@@ -182,9 +182,8 @@ void Gui::set_batch_shader() {
     ImGui::SliderFloat("spec_coeff", &m_sdata.spec_coeff, 0.0, 10.0);
 }
 
-void Gui::set_shader_uniforms(RigidBody asset) {
-    for (std::string shader_name : asset.get_shaders()) {
-        std::shared_ptr<Shader>& shader = ShaderCache::get_instance().m_shader_programs[shader_name];
+void Gui::set_shader_uniforms(RigidBody& asset) {
+        const std::shared_ptr<Shader>& shader = asset.get_shader();
         auto uniforms = shader->get_uniform_names();
         for (const auto& [name, type] : uniforms) {
             std::visit([&](auto&& v) {
@@ -278,9 +277,8 @@ void Gui::set_shader_uniforms(RigidBody asset) {
             // } else {
             //     continue;
             // }
-        };
     };
-}
+};
 
 void Gui::set_texture() {
     ImGui::Text("Set Different Textures Here :D");
@@ -365,292 +363,7 @@ void Gui::wake_up() {
     m_rigidbody_shader_param_references_iterator = m_rigidbody_shader_param_references.begin();
 }
 
-Context::Context(int width, int height, std::string title) 
-    : m_width(width), m_height(height), m_cursor_pos_x(width/2), m_cursor_pos_y(height/2) {
-    
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-    m_window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
-	if (m_window == NULL) { 
-		glfwTerminate();
-        throw std::runtime_error("Failed to create GLFW window");
-	}
-    glfwMakeContextCurrent(m_window);
-    glfwSetWindowPos(m_window, 0, 10); // Make this flush with OS taskbar or fullscreen it.
-    set_GLFWcallbacks();
-
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		throw std::runtime_error("Failed to initialize GLAD");
-	}
-    glfwSwapInterval(0);
-    glEnable(GL_DEBUG_OUTPUT);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    glEnable(GL_DEPTH_TEST);
-    set_GLcallbacks();
-    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-}
-
-Context::~Context() {
-    glfwTerminate();
-}
-
-void Context::run() {
-    glfwPollEvents();
-
-    m_current_frame = glfwGetTime();
-    m_delta = m_current_frame - m_last_frame;
-    m_last_frame = m_current_frame;
-}
-
-void Context::set_MVP(glm::mat4 view, double zoom) {
-    // m_mvp.model = glm::mat4(1.0f);
-    m_mvp.view = view;
-
-    glm::mat4 projection(1.0f);
-    projection = glm::perspective(glm::radians(static_cast<float>(zoom)), get_aspect_ratio(), 0.1f, 4000.0f);
-    m_mvp.projection = projection;
-}
-
-void Context::set_resolution(int width, int height) {
-    glfwSetWindowSize(m_window, width, height);
-}
-
-void Context::swap_buffers() {
-    glfwSwapBuffers(m_window);
-}
-
-void Context::set_GLcallbacks() {
-    static auto message_callback_static = [this](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
-        Context::message_callback(source, type, id, severity, length, message, userParam);
-    };
-    glDebugMessageCallback(
-        [](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
-            message_callback_static(source, type, id, severity, length, message, userParam);},
-        0
-    );
-}
-
-void Context::message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) { 
-    if (type == GL_DEBUG_TYPE_OTHER) {
-            return;
-    }
-    fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-        ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ), type, severity, message
-    );
-};
-
-void Context::set_GLFWcallbacks() {   
-    static auto viewport_callback_static = [this](GLFWwindow* window, int width, int height) {
-        Context::viewport_size_callback(window, width, height);
-    };
-    glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
-        viewport_callback_static(window, width, height);
-        }
-    );
-
-    static auto key_callback_static = [this](GLFWwindow* window, int key, int scancode, int action, int mods) {
-        Context::keyboard_callback(window, key, scancode, action, mods);
-    };
-    glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-        key_callback_static(window, key, scancode, action, mods);
-        }
-    );
-
-    static auto cursor_pos_callback_static = [this](GLFWwindow* window, double xposIn, double yposIn) {
-        Context::cursor_pos_callback(window, xposIn, yposIn);
-    };
-    glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xposIn, double yposIn) {
-        cursor_pos_callback_static(window, xposIn, yposIn);
-        }
-    );
-
-    static auto cursor_entered_callback_static = [this](GLFWwindow* window, int entered) {
-        Context::cursor_entered_callback(window, entered);
-    };
-    glfwSetCursorEnterCallback(m_window, [](GLFWwindow* window, int entered) {
-        cursor_entered_callback_static(window, entered);
-        }
-    );
-
-    static auto scroll_callback_static = [this](GLFWwindow* window, double xoffset, double yoffset) {
-        Context::scroll_callback(window, xoffset, yoffset);
-    };
-    glfwSetScrollCallback(m_window, [](GLFWwindow* window, double xoffset, double yoffset) {
-        scroll_callback_static(window, xoffset, yoffset);
-        }
-    );
-}
-
-void Context::viewport_size_callback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
-    m_aspect_ratio = static_cast<float>(m_width)/static_cast<float>(m_height);
-    m_width = width;
-    m_height = height;
-}
-
-void Context::keyboard_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if ( action == GLFW_REPEAT ) {
-        return;
-    }
-    if ( action == GLFW_PRESS ) {
-        if ( key == GLFW_KEY_ESCAPE ) {
-            glfwSetWindowShouldClose(window, true);
-        }
-        if ( key == GLFW_KEY_TAB ) {
-            if ( m_gui_focus == false ) {
-                (*m_keys).Ltab_key = key;
-                glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-                set_gui_focus(true);
-            } else {
-                (*m_keys).Ltab_key = -1;
-                glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-                set_gui_focus(false); 
-            }
-        }
-        if ( key == GLFW_KEY_W ) {
-            (*m_keys).W_key = key;
-        }
-        if ( key == GLFW_KEY_A ) {
-            (*m_keys).A_key = key;
-        }
-        if ( key == GLFW_KEY_S ) {
-            (*m_keys).S_key = key;
-        }
-        if ( key == GLFW_KEY_D ) {
-            (*m_keys).D_key = key;
-        }
-    }
-    if ( action == GLFW_RELEASE ) {
-        if ( key == GLFW_KEY_W ) {
-            (*m_keys).W_key = -1;
-        }
-        if ( key == GLFW_KEY_A ) {
-            (*m_keys).A_key = -1;
-        }
-        if ( key == GLFW_KEY_S ) {
-            (*m_keys).S_key = -1;
-        }
-        if ( key == GLFW_KEY_D ) {
-            (*m_keys).D_key = -1;
-        }
-    }
-}
-
-void Context::cursor_pos_callback(GLFWwindow* window, double xposIn, double yposIn) {
-    m_arc_x += xposIn - m_cursor_pos_x;
-    m_arc_y += m_cursor_pos_y - yposIn;
-    m_cursor_pos_x = xposIn;
-    m_cursor_pos_y = yposIn;
-    m_cursor_pos_ratio = {m_cursor_pos_x/m_width, m_cursor_pos_y/m_height};
-
-    set_cursor_activity(true);
-}
-
-void Context::cursor_entered_callback(GLFWwindow* window, int entered) {
-    glfwSetCursorPos(m_window, m_cursor_pos_x, m_cursor_pos_y);
-}
-
-void Context::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-    m_scroll_x_offset = xoffset;
-    m_scroll_y_offset = yoffset;
-    
-    m_scroll_activity = true;
-}
-
-Camera::Camera(std::shared_ptr<Context> pcontext) : 
-    m_context(pcontext),
-    m_pos(glm::vec3(0.0f, 2.0f, 15.0f)),
-    m_world_up(glm::vec3(0.0f, 1.0f, 0.0f))
-{
-    m_yaw = 0;
-    m_pitch = 0.0;
-    update_camera_vectors();
-    set_view();
-    m_context->set_MVP(m_view, m_zoom);
-}
-
-void Camera::run() {
-    set_control(!m_context->get_gui_focus());
-    int *iter = &(m_context->get_keys_pressed()->W_key); // Memory Address Starts at the beginning of the keys struct.
-    for ( int i=0; i*4<sizeof(keys); i++ ) { 
-        int key = *(iter);
-        process_keyboard(key, m_context->get_delta_time());
-        iter++;
-    }
-    if ( m_context->get_cursor_activity() ) {
-        process_mouse_movement(m_context->get_arc_x(), m_context->get_arc_y());
-        m_context->set_cursor_activity(false);
-        m_context->set_arc_x(0);
-        m_context->set_arc_y(0);
-    } else {}
-    if ( m_context->get_scroll_activity() ) {
-        process_mouse_scroll(m_context->get_scroll_y());
-        m_context->set_scroll_activity(false);
-    } else {}
-    set_view();
-    m_context->set_MVP(m_view, m_zoom);
-}
-
-void Camera::set_view() {
-    glm::vec3 target = m_pos + m_front;
-    m_view = glm::lookAt(m_pos, target, m_up); 
-}
-
-void Camera::set_control(bool activity) {
-    m_active = activity;
-}
-
-void Camera::process_keyboard(int key, float delta_time) {
-    if (m_active) {
-        // std::cout << key << std::endl;
-        float velocity = m_movement_speed * delta_time;
-        if (key == GLFW_KEY_W) 
-            m_pos += m_front * velocity; 
-        if (key == GLFW_KEY_A)
-            m_pos -= m_right * velocity;
-        if (key == GLFW_KEY_S)
-            m_pos -= m_front * velocity;
-        if (key == GLFW_KEY_D)
-            m_pos += m_right * velocity;
-            // std::cout << glm::to_string(m_right) << std::endl;
-    } else { return; }
-}
-
-void Camera::process_mouse_movement(double x_offset, double y_offset, GLboolean constrain_pitch) {
-    if (m_active) { 
-        x_offset /= m_mouse_sensitivity; // This acts as the radius of
-        y_offset /= m_mouse_sensitivity; // the circle the camera looks within.
-        m_yaw += x_offset; // negative because z-axis is flipped
-        m_pitch += y_offset;
-        if (m_pitch >= std::numbers::pi / 2)
-            m_pitch = std::numbers::pi / 2;
-        if (m_pitch <= -std::numbers::pi / 2)
-            m_pitch = -std::numbers::pi / 2;
-        Camera::update_camera_vectors(); 
-    } else { 
-        return; 
-    }
-}
-
-void Camera::update_camera_vectors() {
-    m_front.x = sin(m_yaw) *    cos(m_pitch);
-    m_front.y =                 sin(m_pitch);
-    m_front.z = -cos(m_yaw) *   cos(m_pitch);
-    m_right =   glm::normalize(glm::cross(m_front, m_world_up)); // Have to normalize otherwise looking down restricts left and right movement
-    m_up =      glm::cross(m_right, m_front);
-}
-
-void Camera::process_mouse_scroll(double y_offset) {
-    if (!m_active) { return; }
-    else {
-        m_zoom -= y_offset; // Scroll down will zoom out, that is, increase the fovy
-    }
-}
-
-IO::IO(std::shared_ptr<Context> pcontext) : m_context(pcontext) {}
+IO::IO(const std::shared_ptr<Context>& pcontext) : m_context(pcontext) {}
 
 IO::~IO() {}
 
@@ -658,7 +371,7 @@ void IO::run() {
     
 }
 
-Renderer::Renderer(std::shared_ptr<Context> pcontext) : m_context(pcontext) {
+Renderer::Renderer(const std::shared_ptr<Context>& pcontext) : m_context(pcontext) {
     m_assets = std::make_shared<std::vector<std::shared_ptr<RigidBody>>>();
     m_batch = std::make_unique<BatchRenderer>();
     m_texture_man = std::make_unique<TextureMan>();
@@ -668,7 +381,8 @@ Renderer::Renderer(std::shared_ptr<Context> pcontext) : m_context(pcontext) {
     rigidbody_push_back(m_transforms);
     set_shader_uniform_texture("NULL", "texture01");
     update_gui_uniforms();
-    (*m_assets)[0]->set_shaders(std::vector({std::string("point_light")}));
+    std::shared_ptr<Shader> shader_ref = ShaderCache::get_instance().m_shader_programs["point_light"];
+    (*m_assets)[0]->set_shader(shader_ref);
 }
 
 void Scene::add_rigidbody(const MVP& mvp) {
@@ -689,11 +403,10 @@ void Renderer::draw() {
     float f = 1.5;
     glm::vec4 box_pos(r * sin(m_current_frame * f), -r * sin(m_current_frame * f) * cos(-m_current_frame), r * cos(m_current_frame * f), 0.0f);
     (*m_assets)[1]->set_model_matrix(box_pos);
-    std::string  shader_name = (*m_assets)[0]->get_shaders()[0];
-    std::cout << shader_name << std::endl;
-    std::shared_ptr<Shader>& shader = ShaderCache::get_instance().m_shader_programs[shader_name];
-    shader->use();
-    shader->set_vec4("light_pos", m_sdata.light_pos);
+    std::shared_ptr<Shader> shader_ref = (*m_assets)[0]->get_shader();
+    std::cout << shader_ref->get_name() << std::endl;
+    shader_ref->use();
+    shader_ref->set_vec4("light_pos", m_sdata.light_pos);
     m_sdata.light_pos = box_pos;
 ///
     for (auto& asset : *m_assets) {
@@ -724,10 +437,6 @@ void Renderer::set_MVP(glm::vec3 model_offset, glm::vec3 scale) {
 void Renderer::update_gui_uniforms() {
     m_sdata = m_gui->get_scene_data();
     m_bdata = m_gui->get_batch_data();
-    // set_light_uniforms();
-    // set_phong_uniforms();
-    // set_batch_uniforms();
-    // set_toon_uniforms();
 }
 
 void Renderer::draw_batch() {
@@ -745,8 +454,6 @@ void Renderer::set_batch_config_params() {
     m_batch->set_config_param_subdivide_width(m_bdata.subdivide_width);
     m_batch->set_config_param_subdivide_length(m_bdata.subdivide_length);
 }
-
-// Gotta have a shader uniform manager
 
 void Renderer::process_delta() {
     m_current_frame = glfwGetTime();
@@ -827,8 +534,6 @@ void Renderer::set_light_uniforms() {
     set_shader_uniform_vec4("light_color", m_sdata.light_color);
     set_shader_uniform_vec4("light_pos", m_sdata.light_pos);
 }
-
-// void Renderer::add_object() {}
 
 void Renderer::updates_for_gui() {    
     m_gui->set_scene_data(m_sdata);

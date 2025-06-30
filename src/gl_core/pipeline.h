@@ -28,6 +28,8 @@ The Camera, Context, Gui, and Renderer.
 #include "GLFW/glfw3.h"
 
 #include "gl_core/batch_renderer.h"
+#include "gl_core/context.h"
+#include "gl_core/camera.h"
 #include "gl_core/shader.h"
 #include "gl_core/rigidbody.h"
 #include "gl_core/shapes.h"
@@ -40,15 +42,6 @@ enum CameraMovement {
     LEFT = GLFW_KEY_A,
     BACKWARD = GLFW_KEY_S,
     RIGHT = GLFW_KEY_D
-};
-
-struct keys {
-    int W_key = -1;
-    int A_key = -1;
-    int S_key = -1;
-    int D_key = -1;
-    int Ltab_key = -1;
-    int esc_key = -1;
 };
 
 struct scene_data {
@@ -143,7 +136,7 @@ class Gui {
         void show_diagnostics();
         void set_resolution();
         void show_asset_data();
-        void set_shader_uniforms(RigidBody asset);
+        void set_shader_uniforms(RigidBody& asset);
         void set_batch(std::string asset_name);
         void set_batch_shader();
         void reset_texture_options();
@@ -154,135 +147,9 @@ class Gui {
         void end_frame();
 };
 
-class Context {
-    public:
-        Context(int width, int height, std::string title);
-        ~Context();
-
-        void run();
-
-        bool is_live() { return !glfwWindowShouldClose(m_window); }
-        bool get_gui_focus() { return m_gui_focus; }
-        void set_gui_focus(bool focus) { m_gui_focus = focus; }
-
-        GLFWwindow *get_window() { return m_window; }
-        float get_delta_time() { return m_delta; }
-
-        void set_MVP(glm::mat4 view, double zoom);
-        MVP get_MVP() const { return m_mvp; }
-
-        float get_aspect_ratio() { return m_aspect_ratio; }
-        double get_scroll_x() { return m_scroll_x_offset; }
-        double get_scroll_y() { return m_scroll_y_offset; }
-        double get_arc_x() { return m_arc_x; }
-        double get_arc_y() { return m_arc_y; }
-        void set_arc_x(double x) { m_arc_x = x; }
-        void set_arc_y(double y) { m_arc_y = y; }
-
-        bool get_cursor_activity() { return m_cursor_activity; }
-        void set_cursor_activity(bool activity) { m_cursor_activity = activity; };
-        
-        bool get_scroll_activity() { return m_scroll_activity; }
-        void set_scroll_activity(bool activity) { m_scroll_activity = activity; };
-        
-        bool get_keyboard_activity() { return m_keyboard_activity; } // may remove
-        void set_keyboard_activity(bool activity) { m_keyboard_activity = activity; }; // may remove
-
-        void set_resolution(int width, int height);
-
-        void swap_buffers();
-
-        keys *get_keys_pressed() { return m_keys.get(); }
-
-        std::vector<double> get_cursor_pos_ratio() const { return m_cursor_pos_ratio; }
-
-    private:
-        GLFWwindow* m_window;
-        float m_delta;
-        float m_current_frame;
-        float m_last_frame;
-
-        int m_width;
-        int m_height;
-        float m_aspect_ratio = static_cast<float>(m_width)/static_cast<float>(m_height);
-
-        bool m_gui_focus = false;
-        
-        bool m_cursor_activity = false;
-        bool m_scroll_activity = false;
-        bool m_keyboard_activity = false; // may remove
-
-        double m_arc_x = 0.0f;
-        double m_arc_y = 0.0f;
-        double m_cursor_pos_x;
-        double m_cursor_pos_y;
-        std::vector<double> m_cursor_pos_ratio{0.5, 0.5};
-        
-        double m_scroll_x_offset = 0.0f;
-        double m_scroll_y_offset = 0.0f;
-
-        std::shared_ptr<keys> m_keys = std::make_unique<keys>();
-
-        MVP m_mvp;
-
-        void set_GLcallbacks();
-        void APIENTRY message_callback(GLenum source,
-                 GLenum type,
-                 GLuint id,
-                 GLenum severity,
-                 GLsizei length,
-                 const GLchar* message,
-                 const void* userParam);
-        void set_GLFWcallbacks();
-        void viewport_size_callback(GLFWwindow* window, int width, int height);
-        void keyboard_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-        void cursor_pos_callback(GLFWwindow* window, double xposIn, double yposIn);
-        void cursor_entered_callback(GLFWwindow* window, int entered);
-        void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-};
-
-class Camera {
-    public:
-        Camera(std::shared_ptr<Context> pcontext);
-        void point_at(glm::vec3 front);
-        void run();
-
-        void set_control(bool activity);
-
-        void process_keyboard(int key, float delta_time);
-        void process_mouse_movement(double x_offset, double y_offset, GLboolean constrain_pitch = true);
-        void process_mouse_scroll(double y_offset);
-
-        float get_pos() const { return m_pos.x; }
-        float get_zoom() const { return m_zoom; }
-
-        glm::mat4 get_view() const { return m_view; }
-    
-    private:
-        std::shared_ptr<Context> m_context;
-        bool m_active = true;
-        
-        double m_yaw;
-        double m_pitch; // for (m_yaw, m_pitch) = (0, 0) m_front, m_right, and m_up are the xyz basis vectors.
-        double m_movement_speed = 10.0;
-        double m_mouse_sensitivity = 100;
-        double m_zoom = 45.0;
-
-        glm::mat4 m_view;
-        void set_view();
-
-        glm::vec3 m_pos;
-        glm::vec3 m_front;
-        glm::vec3 m_up;
-        glm::vec3 m_world_up;
-        glm::vec3 m_right;
-
-        void update_camera_vectors();
-};
-
 class IO {
     public:
-        IO(std::shared_ptr<Context> pcontext);
+        IO(const std::shared_ptr<Context>& pcontext);
         ~IO();
 
         void run();
@@ -293,7 +160,7 @@ class IO {
 
 class Renderer {
     public:
-        Renderer(std::shared_ptr<Context> pcontext);
+        Renderer(const std::shared_ptr<Context>& pcontext);
         ~Renderer() = default;
 
         void run();
@@ -339,16 +206,6 @@ class Renderer {
         std::unordered_map<std::string, std::shared_ptr<Shader>> m_shaders;
         std::unique_ptr<TextureMan> m_texture_man = nullptr;
         std::unique_ptr<Gui> m_gui = nullptr;
-};
-
-class Scene {
-    public:
-        Scene();
-        void add_rigidbody(const MVP& mvp);
-    
-    private:
-        std::vector<std::shared_ptr<RigidBody>> m_assets;
-
 };
 
 #endif
