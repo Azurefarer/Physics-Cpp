@@ -1,7 +1,10 @@
 #include "gl_core/shader.h"
 
-Shader::Shader(const std::filesystem::path& vertex_path, const std::filesystem::path& fragment_path, const std::filesystem::path& geometry_path) {
-    std::vector<std::filesystem::path> file_paths{vertex_path, fragment_path, geometry_path};
+Shader::Shader(const std::filesystem::path& vertex_path,
+               const std::filesystem::path& fragment_path,
+               const std::filesystem::path& geometry_path,
+               const std::filesystem::path& compute_path) {
+    std::vector<std::filesystem::path> file_paths{vertex_path, fragment_path, geometry_path, compute_path};
     std::vector<std::string> shader_sources(extract_from(file_paths));
     std::vector<unsigned int> compiled_shaders(compile_sources(shader_sources));
     m_ready = shader_program(compiled_shaders);
@@ -12,6 +15,10 @@ std::vector<std::string> Shader::extract_from(const std::vector<std::filesystem:
     std::vector<std::string> sources;
 
     for (const std::filesystem::path& path : file_paths) {
+        if (path.empty()) {
+            sources.emplace_back("");
+            continue;
+        }
         std::ifstream ShaderFile(path);
         std::stringstream ShaderStream;
         ShaderStream << ShaderFile.rdbuf();
@@ -22,15 +29,21 @@ std::vector<std::string> Shader::extract_from(const std::vector<std::filesystem:
     return sources;
 }
 
-std::vector<unsigned int> Shader::compile_sources(std::vector<std::string> sources) {
-    std::vector<unsigned int> shaders {
-        compile_shader("VERTEX", sources[0]),
-        compile_shader("FRAGMENT", sources[1]),
-        0
-    };
-    if (sources[2] != "") {
+std::vector<unsigned int> Shader::compile_sources(const std::vector<std::string>& sources) {
+    std::vector<unsigned int> shaders {0, 0, 0, 0};
+    if (!sources[0].empty()) {
+        shaders[0] = compile_shader("VERTEX", sources[0]);
+    }
+    if (!sources[1].empty()) {
+        shaders[1] = compile_shader("FRAGMENT", sources[1]);
+    }
+    if (!sources[2].empty()) {
         shaders[2] = compile_shader("GEOMETRY", sources[2]);
     }
+    if (!sources[3].empty()) {
+        shaders[3] = compile_shader("COMPUTE", sources[3]);
+    }
+
     return shaders;
 }
 
@@ -80,7 +93,7 @@ void Shader::copy_uniforms(std::vector<std::string> shader_sources) {
     }
 }
 
-unsigned int Shader::compile_shader(std::string shader_type, std::string& src) {
+unsigned int Shader::compile_shader(std::string shader_type, const std::string& src) {
     GLuint shader = 0;
     int success = 0;
     const char* csrc = src.c_str();
@@ -101,7 +114,14 @@ unsigned int Shader::compile_shader(std::string shader_type, std::string& src) {
         glShaderSource(shader, 1, &csrc, NULL);
         glCompileShader(shader);
         success = checkCompileErrors(shader, "GEOMETRY");
-    } else {
+    }
+    else if (shader_type == "COMPUTE") {
+        shader = glCreateShader(GL_COMPUTE_SHADER);
+        glShaderSource(shader, 1, &csrc, NULL);
+        glCompileShader(shader);
+        success = checkCompileErrors(shader, "COMPUTE");
+    }
+    else {
         std::cout << "ERROR: unhandled shader type, " << shader_type << std::endl;
     }
     if (!success) {
@@ -140,19 +160,23 @@ int Shader::checkCompileErrors(unsigned int shader, std::string type)
 
 bool Shader::shader_program(std::vector<unsigned int>& compiled_shaders) {
     m_ID = glCreateProgram();
-    glAttachShader(m_ID, compiled_shaders[0]);
-    glAttachShader(m_ID, compiled_shaders[1]);
-    if (!compiled_shaders[2] == 0) {
-        glAttachShader(m_ID, compiled_shaders[2]);
+        if (compiled_shaders[3] != 0) {
+        glAttachShader(m_ID, compiled_shaders[3]);
+    } else {
+        if (compiled_shaders[0] != 0) glAttachShader(m_ID, compiled_shaders[0]);
+        if (compiled_shaders[1] != 0) glAttachShader(m_ID, compiled_shaders[1]);
+        if (compiled_shaders[2] != 0) glAttachShader(m_ID, compiled_shaders[2]);
     }
     glLinkProgram(m_ID);
     if (!checkCompileErrors(m_ID, "PROGRAM")) {
         std::cout << "program failed to link" << std::endl;
     } else {
-        glDeleteShader(compiled_shaders[0]);
-        glDeleteShader(compiled_shaders[1]);
-        if (!compiled_shaders[2] == 0) {
-            glDeleteShader(compiled_shaders[2]);
+        if (compiled_shaders[3] != 0) {
+            glDeleteShader(compiled_shaders[3]);
+        } else {
+            if (compiled_shaders[0] != 0) glDeleteShader(compiled_shaders[0]);
+            if (compiled_shaders[1] != 0) glDeleteShader(compiled_shaders[1]);
+            if (compiled_shaders[2] != 0) glDeleteShader(compiled_shaders[2]);
         }
         return true;
     }
@@ -227,17 +251,38 @@ void Shader::set_mat4(const std::string &name, const glm::mat4 &mat) const
 
 ShaderCache::ShaderCache() {
     std::string dir_path = "../src/shader_source";
+    
+    struct ShaderPaths {
+        std::filesystem::path vertex;
+        std::filesystem::path fragment;
+        std::filesystem::path geometry;
+        std::filesystem::path compute;
+    };
+
+    std::unordered_map<std::string, ShaderPaths> groups;
+
     for (const auto& entry : std::filesystem::directory_iterator(dir_path)) {
-        if (entry.is_regular_file()) {
-            const auto& vertex_path = entry.path();
-            if (vertex_path.extension() == ".vs") {
-                std::string name = vertex_path.stem().string();
-                auto fragment_path = (vertex_path.parent_path() / (name + ".fs")); // path has string as '//'
-                if (std::filesystem::exists(fragment_path) && std::filesystem::exists(vertex_path)) {
-                    m_shader_programs.insert({name, std::make_shared<Shader>(vertex_path, fragment_path)});
-                    m_shader_programs[name]->set_name(name);
-                }
-            }
+        if (!entry.is_regular_file()) continue;
+        auto path = entry.path();
+        std::string name = path.stem().string();
+        auto ext = path.extension();
+
+        ShaderPaths& p = groups[name];
+        if (ext == ".vs")       p.vertex   = path;
+        else if (ext == ".fs")  p.fragment = path;
+        else if (ext == ".gs")  p.geometry = path;
+        else if (ext == ".cs")  p.compute  = path;
+    }
+
+    for (const auto& [name, p] : groups) {
+        if (!p.compute.empty()) {
+            auto shader = std::make_shared<Shader>(std::filesystem::path{}, std::filesystem::path{}, std::filesystem::path{}, p.compute);
+            shader->set_name(name);
+            m_shader_programs.insert({name, shader});
+        } else if (!p.vertex.empty() && !p.fragment.empty()) {
+            auto shader = std::make_shared<Shader>(p.vertex, p.fragment, p.geometry);
+            shader->set_name(name);
+            m_shader_programs.insert({name, shader});
         }
     }
 }

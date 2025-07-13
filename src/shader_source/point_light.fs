@@ -15,7 +15,6 @@ vec4 ambient() {
     vec4 result;
     float ambient_strength = 0.25;
     result = color * ambient_strength;
-
     return result;
 }
 

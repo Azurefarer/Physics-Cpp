@@ -23,6 +23,9 @@
 #include "gl_core/shapes.h"
 #include "gl_core/texture_man.h"
 
+// Gui should talk directly to the engine for any info it wants
+// Could be from any of the components of the Engine.
+
 class Gui {
     public:
         Gui(GLFWwindow *context);

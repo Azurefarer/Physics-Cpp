@@ -9,7 +9,7 @@ Camera::Camera(const std::shared_ptr<Context>& pcontext) :
     m_pitch = 0.0;
     update_camera_vectors();
     set_view();
-    m_context->set_MVP(m_view, m_zoom);
+    set_MVP(m_view, m_zoom);
 }
 
 void Camera::run() {
@@ -31,7 +31,7 @@ void Camera::run() {
         m_context->set_scroll_activity(false);
     } else {}
     set_view();
-    m_context->set_MVP(m_view, m_zoom);
+    set_MVP(m_view, m_zoom);
 }
 
 void Camera::set_view() {

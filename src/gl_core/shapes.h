@@ -94,6 +94,36 @@ class VertexArray {
         GLuint m_renderer_ID = 1;
 };
 
+// # Shader Storage Buffer Objects (SSBO)
+
+// Shader Storage Buffer Objects allow shaders to read and write large blocks of memory. Unlike uniform buffers, SSBOs can be much larger and support random write access from compute or rendering shaders.
+
+// ## GLSL Declaration
+// ```glsl
+// layout(std430, binding = 0) buffer ParticleData {
+//     vec4 position[];
+// };
+// ```
+// This buffer can be bound in your application and updated by a compute shader.
+
+// ## Typical Usage
+// 1. Create a buffer with `glGenBuffers` and `glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, buffer)`.
+// 2. Fill or map the buffer with initial data.
+// 3. Dispatch a compute shader or draw call that accesses the buffer.
+// 4. Optionally read back or use the results in later rendering passes.
+
+// SSBOs are ideal for physics data such as positions, velocities, and collision results because the GPU can modify them directly.
+
+class Ssbo {
+    public:
+        Ssbo() = default;
+        ~Ssbo() = default;
+
+        void add_data(const glm::vec4& data);
+    private:
+        GLuint m_renderer_ID = 1;
+};
+
 class Shape {
     public:
         Shape(std::vector<Vertex> verts, std::vector<unsigned int> indices);

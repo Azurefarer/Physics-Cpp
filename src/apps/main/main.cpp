@@ -3,25 +3,18 @@
 #include <utility>
 
 #include "gl_core/context.h"
-#include "gl_core/camera.h"
+#include "gl_core/engine.h"
+#include "gl_core/scene.h"
 #include "gl_core/pipeline.h"
 
 int main() {
-    auto context = std::make_shared<Context>(1920, 1080, std::string("OpenGL Application"));
-    IO io(context);
-    Camera camera(context);
-    Renderer renderer(context);
-
-    while(context->is_live()) {
+    Engine engine;
+    while(engine.context_active()) {
         glClearColor(0.35f, 0.7f, 0.9f, 1.0f);
         glClearDepth(1.0);
         glDepthFunc(GL_LEQUAL); // Draw if depth is <= current val
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        context->run();
-        io.run();
-        camera.run();
-        renderer.run();
-        context->swap_buffers();
+        engine.run();
     }
     return 0;
 }
@@ -32,7 +25,7 @@ int main() {
 // Prompt GPT with this
 
 // Turn everything into a batch render.  NVM
-// Put the shape man and batch renderer into the same sort of implementation
+// Put the Shyapes and batch renderer into the same sort of implementation
 // So that I can include subdivisions on assets.
 // I do not need an entire batch (10,000 vertices of memory) to render a cube with 26
 // The logic for generating vertices for a subdivided cube may be cumbersome.

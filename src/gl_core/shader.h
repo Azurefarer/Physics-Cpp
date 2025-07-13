@@ -27,7 +27,11 @@ struct Uniform {
 
 class Shader {
     public:
-        Shader(const std::filesystem::path& vertex_path, const std::filesystem::path& fragment_path, const std::filesystem::path& geometry_path = {});
+        Shader(const std::filesystem::path& vertex_path = {},
+               const std::filesystem::path& fragment_path = {},
+               const std::filesystem::path& geometry_path = {},
+               const std::filesystem::path& compute_path = {}
+        );
         void use();
         void set_bool   (const std::string& name, bool value) const;
         void set_int    (const std::string& name, unsigned int value);
@@ -51,8 +55,8 @@ class Shader {
     private:
     // Constuctor Methods, also extracts uniform names and types.
         std::vector<std::string> extract_from(const std::vector<std::filesystem::path>& file_paths);
-        std::vector<unsigned int> compile_sources(std::vector<std::string> sources);
-        unsigned int compile_shader(std::string shader_type, std::string& src);
+        std::vector<unsigned int> compile_sources(const std::vector<std::string>& sources);
+        unsigned int compile_shader(std::string shader_type, const std::string& src);
         int checkCompileErrors(unsigned int shader, std::string type);
         bool shader_program(std::vector<unsigned int>& compiled_shaders);
         void copy_uniforms(std::vector<std::string> shader_sources);

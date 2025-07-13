@@ -2,7 +2,7 @@
 
 int RigidBody::instance_count = 0;
 
-RigidBody::RigidBody(MVP mvp) : m_shader(ShaderCache::get_instance().m_shader_programs["default"]) {
+RigidBody::RigidBody(const MVP& mvp) : m_shader(ShaderCache::get_instance().m_shader_programs["default"]) {
     m_transforms.model = mvp.model;
     m_transforms.view = mvp.view;
     m_transforms.projection = mvp.projection;
@@ -39,10 +39,5 @@ void RigidBody::update_view_and_perspective(glm::mat4 view, glm::mat4 projection
     m_transforms.view = view;
     m_transforms.projection = projection;
 }
-
-// auto* RigidBody::get_uni_value(std::string uniform) {
-//     if ()
-// }
-
 
 // TODO: look at Godot's implementation

@@ -1,6 +1,6 @@
 #include "gl_core/context.h"
 
-Context::Context(int width, int height, std::string title) 
+Context::Context(int width, int height, std::string title, const std::shared_ptr<Services>& pservices) 
     : m_width(width), m_height(height), m_cursor_pos_x(width/2), m_cursor_pos_y(height/2) {
     
     glfwInit();
@@ -26,6 +26,8 @@ Context::Context(int width, int height, std::string title)
     glEnable(GL_DEPTH_TEST);
     set_GLcallbacks();
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    
 }
 
 Context::~Context() {

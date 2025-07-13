@@ -17,7 +17,7 @@
 
 class RigidBody {
     public:
-        RigidBody(MVP mvp);
+        RigidBody(const MVP& mvp);
         ~RigidBody() { --instance_count; };
 
         void set_uniforms(const std::shared_ptr<Shader>& shader);
@@ -37,7 +37,7 @@ class RigidBody {
         static int instance_count;
         std::string m_name;
         MVP m_transforms;
-        std::shared_ptr<Shader>& m_shader;
+        std::shared_ptr<Shader> m_shader;
         std::unordered_map<std::string, std::variant<int, bool, float, glm::vec2, glm::vec3, glm::vec4>> uni_values;
         glm::mat4 m_model = glm::mat4(1.0f);
         glm::mat3 m_normal = glm::mat3(1.0f);
