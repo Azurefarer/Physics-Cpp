@@ -14,7 +14,7 @@
 
 class Camera {
     public:
-        Camera(const std::shared_ptr<Context>& pcontext);
+        Camera(const std::shared_ptr<Services>& pservices);
         void point_at(glm::vec3 front);
         void run();
 
@@ -28,9 +28,10 @@ class Camera {
         float get_zoom() const { return m_zoom; }
 
         glm::mat4 get_view() const { return m_view; }
+        glm::mat4 get_projection() const { return m_projection; }
     
     private:
-        std::shared_ptr<Context> m_context;
+        std::shared_ptr<Services> m_services;
         bool m_active = true;
         
         double m_yaw;
@@ -40,7 +41,8 @@ class Camera {
         double m_zoom = 45.0;
 
         glm::mat4 m_view;
-        void set_view();
+        glm::mat4 m_projection;
+        void set_view_projection_transforms();
 
         glm::vec3 m_pos;
         glm::vec3 m_front;

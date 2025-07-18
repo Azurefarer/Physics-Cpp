@@ -53,6 +53,7 @@ class Context {
         keys *get_keys_pressed() { return m_keys.get(); }
         std::vector<double> get_cursor_pos_ratio() const { return m_cursor_pos_ratio; }
     private:
+        std::shared_ptr<Services> m_services;
         GLFWwindow* m_window;
         float m_delta;
         float m_current_frame;

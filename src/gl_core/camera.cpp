@@ -1,15 +1,14 @@
 #include "gl_core/camera.h"
 
-Camera::Camera(const std::shared_ptr<Context>& pcontext) : 
-    m_context(pcontext),
+Camera::Camera(const std::shared_ptr<Services>& pservices) : 
+    m_services(pservices),
     m_pos(glm::vec3(0.0f, 2.0f, 15.0f)),
     m_world_up(glm::vec3(0.0f, 1.0f, 0.0f))
 {
     m_yaw = 0;
     m_pitch = 0.0;
     update_camera_vectors();
-    set_view();
-    set_MVP(m_view, m_zoom);
+    set_view_projection_transforms();
 }
 
 void Camera::run() {
@@ -30,13 +29,17 @@ void Camera::run() {
         process_mouse_scroll(m_context->get_scroll_y());
         m_context->set_scroll_activity(false);
     } else {}
-    set_view();
-    set_MVP(m_view, m_zoom);
+    set_view_projection_transforms();
 }
 
-void Camera::set_view() {
+void Camera::set_view_projection_transforms() {
     glm::vec3 target = m_pos + m_front;
-    m_view = glm::lookAt(m_pos, target, m_up); 
+    m_view = glm::lookAt(m_pos, target, m_up);
+    m_projection = glm::perspective(glm::radians(m_zoom), m_services->get_aspect_ratio(), 1.0, 100.0);
+    MVP temp;
+    temp.view = m_view;
+    temp.projection = m_projection;
+    m_services->set_mvp(temp);
 }
 
 void Camera::set_control(bool activity) {

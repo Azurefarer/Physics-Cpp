@@ -11,7 +11,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "gl_core/shader.h"
-#include "gl_core/shapes.h"
+#include "gl_core/mesh.h"
 #include "gl_core/vertex.h"
 
 
@@ -19,6 +19,8 @@ class RigidBody {
     public:
         RigidBody(const MVP& mvp);
         ~RigidBody() { --instance_count; };
+
+        Mesh &get_mesh() const { return m_mesh; }
 
         void set_uniforms(const std::shared_ptr<Shader>& shader);
         void draw();
@@ -35,6 +37,8 @@ class RigidBody {
         bool gui_bool = false;
     private:
         static int instance_count;
+        Mesh m_mesh;
+        Material m_material;
         std::string m_name;
         MVP m_transforms;
         std::shared_ptr<Shader> m_shader;
@@ -43,6 +47,26 @@ class RigidBody {
         glm::mat3 m_normal = glm::mat3(1.0f);
         float m_time;
         std::string m_shape = "cube";
+};
+
+class Material {
+    public:
+        Material(std::shared_ptr<Shader> &shader) : m_shader(shader) {};
+
+        void bind() const;
+
+        void setFloat(const std::string& name, float value) { m_floats[name] = value; }
+        void setVec4(const std::string& name, const glm::vec4& value) { m_vec4s[name] = value; }
+        void setInt(const std::string& name, int value) { m_ints[name] = value; }
+        void setMat4(const std::string& name, const glm::mat4& value) { m_mat4s[name] = value; }
+
+    private:
+        std::shared_ptr<Shader> m_shader;
+        std::unordered_map<std::string, float> m_floats;
+        std::unordered_map<std::string, glm::vec4> m_vec4s;
+        std::unordered_map<std::string, int> m_ints;
+        std::unordered_map<std::string, glm::mat4> m_mat4s;
+
 };
 
 #endif

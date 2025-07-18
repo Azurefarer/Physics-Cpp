@@ -4,7 +4,6 @@ Renderer::Renderer(const std::shared_ptr<Services>& pservices) : m_services(pser
     m_assets = std::make_shared<std::vector<std::shared_ptr<RigidBody>>>();
     m_batch = std::make_unique<BatchRenderer>();
     m_texture_man = std::make_unique<TextureMan>();
-    m_gui = std::make_unique<Gui>(m_context->get_window());
     set_MVP(glm::vec3(0.0), glm::vec3(1.0f));
     rigidbody_push_back(m_transforms);
     rigidbody_push_back(m_transforms);
@@ -22,19 +21,19 @@ void Renderer::run() {
     context_updates();
 }
 
+void Renderer::render(const Scene& scene) {
+    const auto& bodies = scene.get_rigid_bodies();
+
+    for (const auto& body : bodies) {
+        shader.setMat4("u_Model", body->m_transform);
+        body->m_mesh->bind();
+        glDrawElements(GL_TRIANGLES, body->m_mesh->getIndexCount(), GL_UNSIGNED_INT, 0);
+    }
+}
+
 void Renderer::draw() {
     MVP temp = m_context->get_MVP();
-///
-    float r = 10.0;
-    float f = 1.5;
-    glm::vec4 box_pos(r * sin(m_current_frame * f), -r * sin(m_current_frame * f) * cos(-m_current_frame), r * cos(m_current_frame * f), 0.0f);
-    (*m_assets)[1]->set_model_matrix(box_pos);
-    std::shared_ptr<Shader> shader_ref = (*m_assets)[0]->get_shader();
-    std::cout << shader_ref->get_name() << std::endl;
-    shader_ref->use();
-    shader_ref->set_vec4("light_pos", m_sdata.light_pos);
-    m_sdata.light_pos = box_pos;
-///
+
     for (auto& asset : *m_assets) {
         asset->update_view_and_perspective(temp.view, temp.projection);
         asset->set_time(m_current_frame);

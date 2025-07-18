@@ -1,7 +1,12 @@
 #include "gl_core/context.h"
 
 Context::Context(int width, int height, std::string title, const std::shared_ptr<Services>& pservices) 
-    : m_width(width), m_height(height), m_cursor_pos_x(width/2), m_cursor_pos_y(height/2) {
+    : m_width(width),
+    m_height(height),
+    m_cursor_pos_x(width/2),
+    m_cursor_pos_y(height/2),
+    m_services(pservices)
+    {
     
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -25,9 +30,7 @@ Context::Context(int width, int height, std::string title, const std::shared_ptr
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
     set_GLcallbacks();
-    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-    
+    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
 }
 
 Context::~Context() {
@@ -114,7 +117,9 @@ void Context::set_GLFWcallbacks() {
 
 void Context::viewport_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
-    m_aspect_ratio = static_cast<float>(m_width)/static_cast<float>(m_height);
+    m_services->set_aspect_ratio(static_cast<float>(width)/static_cast<float>(height));
+    m_aspect_ratio = static_cast<float>(width)/static_cast<float>(height);
+
     m_width = width;
     m_height = height;
 }

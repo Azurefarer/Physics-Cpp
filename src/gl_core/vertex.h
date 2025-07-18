@@ -25,6 +25,7 @@ struct MVP {
     glm::mat4 model;
     glm::mat4 view;
     glm::mat4 projection;
+    MVP() : model(glm::mat4(1.0)), view(glm::mat4(1.0)), projection(glm::mat4(1.0)) {}
 }; // Make it so each obj in the scene only knows about a model matrix
    // the View and PRojection Matricies should be accessed from elsewhere.
    // 

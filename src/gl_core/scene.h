@@ -14,10 +14,11 @@ class Scene {
     public:
         Scene(const std::shared_ptr<Services>& pservices);
         void add_rigidbody();
+        void get_rigidbodies();
         void run();
-        void serve_camera_();
     
     private:
+        std::shared_ptr<Services> m_services;
         MVP m_transforms;
         std::unique_ptr<Camera> m_camera;
         std::vector<std::shared_ptr<RigidBody>> m_assets;

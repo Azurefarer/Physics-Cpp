@@ -1,5 +1,5 @@
-#ifndef GL_CORE_SHAPE_MAN_H_
-#define GL_CORE_SHAPE_MAN_H_
+#ifndef GL_CORE_MESH_H_
+#define GL_CORE_MESH_H_
 
 #include<iostream>
 
@@ -14,10 +14,12 @@
 
 #include "gl_core/vertex.h"
 
-struct shape_data {
+struct MeshData {
     std::vector<Vertex> verts;
     std::vector<unsigned int> indices;
 };
+
+MeshData generate_sphere(float r, int rows, int columns);
 
 extern const std::vector<Vertex> cube_vertices;
 extern const std::vector<unsigned int> cube_indices;
@@ -124,9 +126,9 @@ class Ssbo {
         GLuint m_renderer_ID = 1;
 };
 
-class Shape {
+class Mesh {
     public:
-        Shape(std::vector<Vertex> verts, std::vector<unsigned int> indices);
+        Mesh(std::vector<Vertex> verts, std::vector<unsigned int> indices);
         void bind() const { (*m_va_ptr.get()).bind(); }
         void unbind() const { (*m_va_ptr.get()).unbind(); }
         void draw();
@@ -142,18 +144,13 @@ class Shape {
 
 class ShapeCache {
     public: 
-        static ShapeCache& get_instance() {
-            static ShapeCache instance;
-            return instance;
-        }
-        void draw(std::string shape_name);
-        std::unordered_map<std::string, std::shared_ptr<Shape>> m_shapes;
-
-    private:
         ShapeCache();
         ~ShapeCache() = default;
-        ShapeCache(const ShapeCache&) = delete;
-        ShapeCache& operator=(const ShapeCache&) = delete;
+        void draw(std::string shape_name);
+        std::unordered_map<std::string, std::shared_ptr<Mesh>> m_shapes;
+
+    private:
+        
 };
 
 #endif

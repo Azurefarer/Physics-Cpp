@@ -20,7 +20,7 @@
 #include "gl_core/batch_renderer.h"
 #include "gl_core/shader.h"
 #include "gl_core/rigidbody.h"
-#include "gl_core/shapes.h"
+#include "gl_core/mesh.h"
 #include "gl_core/texture_man.h"
 
 // Gui should talk directly to the engine for any info it wants

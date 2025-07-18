@@ -1,4 +1,35 @@
-#include "gl_core/shapes.h"
+#include "gl_core/mesh.h"
+
+MeshData generate_sphere(float r, int rows, int columns) {
+    MeshData temp;
+    for (int i=0; i<=rows; ++i) {
+        for (int j=0; j<=columns; ++j) {
+            float theta = i / static_cast<float>(rows) * 3.141; //glm::pi<float>();
+            float phi = j / static_cast<float>(columns) * 2 * 3.141; //glm::two_pi<float>();
+
+            Vertex vert;
+            vert.position[0] = r * sin(theta) * cos(phi);
+            vert.position[1] = r * sin(theta) * sin(phi);
+            vert.position[2] = r * cos(theta);
+            temp.verts.push_back(vert);
+
+            if (i < rows && j < columns) { // don't want to generate extra indicies
+                int i0 = i * (columns + 1) + j;
+                int i1 = i0 + 1;
+                int i2 = i0 + (columns + 1);
+                int i3 = i2 + 1;
+                temp.indices.push_back(i0);
+                temp.indices.push_back(i2);
+                temp.indices.push_back(i1);
+
+                temp.indices.push_back(i1);
+                temp.indices.push_back(i2);
+                temp.indices.push_back(i3);
+            }
+        }
+    }
+    return temp;
+}
 
 const std::vector<Vertex> cube_vertices = {
     //front bottom left
@@ -158,7 +189,7 @@ void VertexArray::unbind() {
     glBindVertexArray(0);
 }
 
-Shape::Shape(std::vector<Vertex> verts, std::vector<unsigned int> indices) {
+Mesh::Mesh(std::vector<Vertex> verts, std::vector<unsigned int> indices) {
     m_va_ptr.reset(new VertexArray());
     m_vb_ptr.reset(new VertexBuffer(verts));
     m_layout_ptr.reset(new VertexBufferLayout());
@@ -167,15 +198,17 @@ Shape::Shape(std::vector<Vertex> verts, std::vector<unsigned int> indices) {
     m_element_count = m_ib_ptr->get_count();
 }
 
-void Shape::draw() {
+// void Mesh::update_verts
+
+void Mesh::draw() {
     bind();
     glDrawElements(GL_TRIANGLES, m_element_count, GL_UNSIGNED_INT, (const void*)0);
     unbind();
 }
 
 ShapeCache::ShapeCache() {
-    m_shapes.insert({"cube", std::make_shared<Shape>(cube_vertices, cube_indices)});
-    m_shapes.insert({"quad", std::make_shared<Shape>(quad_vertices, quad_indices)});
+    m_shapes.insert({"cube", std::make_shared<Mesh>(cube_vertices, cube_indices)});
+    m_shapes.insert({"quad", std::make_shared<Mesh>(quad_vertices, quad_indices)});
 }
 
 void ShapeCache::draw(std::string shape_name) {

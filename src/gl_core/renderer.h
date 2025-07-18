@@ -25,7 +25,7 @@
 #include "gl_core/shader.h"
 #include "gl_core/services.h"
 #include "gl_core/rigidbody.h"
-#include "gl_core/shapes.h"
+#include "gl_core/mesh.h"
 #include "gl_core/texture_man.h"
 
 class Renderer {
@@ -45,6 +45,7 @@ class Renderer {
         void gui_updates();
         void context_updates();
 
+        // get these gui fcts out of here
         void set_shader_uniform_texture(std::string tex_name, std::string uniform);
         void set_shader_uniform_float(std::string uniform, float value);
         void set_shader_uniform_int(std::string uniform, int value);

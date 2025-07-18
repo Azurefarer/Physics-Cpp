@@ -89,6 +89,10 @@ add_library(gl_core
   ${PROJECT_SOURCE_DIR}/src/gl_core/engine.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/gui.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/gui.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/mesh.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/mesh.h
+  ${PROJECT_SOURCE_DIR}/src/gl_core/physics_object.cpp
+  ${PROJECT_SOURCE_DIR}/src/gl_core/physics_object.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/renderer.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/renderer.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/scene.cpp
@@ -97,8 +101,6 @@ add_library(gl_core
   ${PROJECT_SOURCE_DIR}/src/gl_core/services.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/shader.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/shader.h
-  ${PROJECT_SOURCE_DIR}/src/gl_core/shapes.cpp
-  ${PROJECT_SOURCE_DIR}/src/gl_core/shapes.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/texture_man.cpp
   ${PROJECT_SOURCE_DIR}/src/gl_core/texture_man.h
   ${PROJECT_SOURCE_DIR}/src/gl_core/tensor.h
