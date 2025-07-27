@@ -2,10 +2,7 @@
 #include <string>
 #include <utility>
 
-#include "gl_core/context.h"
-#include "gl_core/engine.h"
-#include "gl_core/scene.h"
-#include "gl_core/pipeline.h"
+#include "core/engine.h"
 
 int main() {
     Engine engine;

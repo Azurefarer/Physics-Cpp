@@ -17,11 +17,10 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/string_cast.hpp"
 
-#include "gl_core/batch_renderer.h"
-#include "gl_core/shader.h"
-#include "gl_core/rigidbody.h"
-#include "gl_core/mesh.h"
-#include "gl_core/texture_man.h"
+#include "asset/shader.h"
+#include "physics/rigidbody.h"
+#include "asset/mesh.h"
+#include "asset/texture.h"
 
 // Gui should talk directly to the engine for any info it wants
 // Could be from any of the components of the Engine.
