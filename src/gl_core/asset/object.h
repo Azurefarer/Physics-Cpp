@@ -1,5 +1,7 @@
-#ifndef CORE_OBJECT_H_
-#define CORE_OBJECT_H_
+#ifndef ASSET_OBJECT_H_
+#define ASSET_OBJECT_H_
+
+#define GLM_ENABLE_EXPERIMENTAL
 
 #include <memory>
 
@@ -40,6 +42,20 @@ class Image {
         unsigned int m_element_count;
 };
 
+class RigidBody : public Image {
+    public:
+        RigidBody(const std::shared_ptr<Mesh>& mesh, const std::shared_ptr<Material>& material);
+        ~RigidBody() = default;
+
+        bool gui_bool = false;
+
+    private:
+        std::shared_ptr<Material> m_material;
+        std::shared_ptr<Mesh> m_mesh;
+        glm::mat4 m_model = glm::mat4(1.0f);
+        glm::mat3 m_normal = glm::mat3(1.0f);
+};
+
 class Object {
     public:
         Object();
@@ -49,4 +65,4 @@ class Object {
         int m_id;
 };
 
-#endif // CORE_OBJECT_H_
+#endif // ASSET_OBJECT_H_

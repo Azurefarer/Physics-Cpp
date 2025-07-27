@@ -14,28 +14,24 @@
 #include "GLFW/glfw3.h"
 
 #include "core/services.h"
+#include "core/types.h"
 #include "core/vertex.h"
-
-struct keys {
-    int W_key = -1;
-    int A_key = -1;
-    int S_key = -1;
-    int D_key = -1;
-    int space = -1;
-    int Ltab_key = -1;
-    int esc_key = -1;
-};
 
 class Input {
     public:
         Input(const std::shared_ptr<Services>& pservices);
         ~Input() = default;
-        
+
+        keys get_keys_pressed() { return m_keys; }
+
+        bool free_cursor = false;
+
     private:
         std::shared_ptr<Services> m_services;
         GLFWwindow* m_window;
         keys m_keys;
 
+        void set_GLFWcallbacks();
         // Static glfw bounce fcts
         static void viewport_size_callback(GLFWwindow* window, int width, int height);
         static void keyboard_callback(GLFWwindow* window, int key, int scancode, int action, int mods);

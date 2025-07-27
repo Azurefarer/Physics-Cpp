@@ -5,10 +5,10 @@
 
 #include <array>
 
+#include "glad/glad.h"
 #include "glm/gtx/string_cast.hpp"
 
 #include "core/vertex.h"
-#include "glad/glad.h"
 
 class BatchRenderer {
     public:

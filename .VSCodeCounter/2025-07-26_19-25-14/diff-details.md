@@ -1,19 +1,17 @@
-# Details
+# Diff Details
 
-Date : 2025-07-18 15:18:07
+Date : 2025-07-26 19:25:14
 
-Directory c:\\Users\\benji\\WorkSpace\\Cpp\\physics_simulation
+Directory c:\\Users\\benji\\WorkSpace\\Cpp\\physics_simulation\\src
 
-Total : 658 files,  169123 codes, 44877 comments, 28763 blanks, all 242763 lines
+Total : 691 files,  166729 codes, 44694 comments, 28275 blanks, all 239698 lines
 
-[Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
+[Summary](results.md) / [Details](details.md) / [Diff Summary](diff.md) / Diff Details
 
 ## Files
 | filename | language | code | comment | blank | total |
 | :--- | :--- | ---: | ---: | ---: | ---: |
-| [CMakeLists.txt](/CMakeLists.txt) | CMake | 116 | 0 | 14 | 130 |
-| [imgui.ini](/imgui.ini) | Ini | 12 | 0 | 5 | 17 |
-| [src/apps/main/main.cpp](/src/apps/main/main.cpp) | C++ | 18 | 11 | 6 | 35 |
+| [src/apps/main/main.cpp](/src/apps/main/main.cpp) | C++ | 15 | 11 | 6 | 32 |
 | [src/external\_libs/KHR/KHR.cpp](/src/external_libs/KHR/KHR.cpp) | C++ | 0 | 0 | 1 | 1 |
 | [src/external\_libs/KHR/khrplatform.h](/src/external_libs/KHR/khrplatform.h) | C++ | 117 | 165 | 30 | 312 |
 | [src/external\_libs/glad/glad.c](/src/external_libs/glad/glad.c) | C | 1,474 | 25 | 47 | 1,546 |
@@ -610,50 +608,85 @@ Total : 658 files,  169123 codes, 44877 comments, 28763 blanks, all 242763 lines
 | [src/external\_libs/imgui\_src/misc/single\_file/imgui\_single\_file.h](/src/external_libs/imgui_src/misc/single_file/imgui_single_file.h) | C++ | 17 | 8 | 5 | 30 |
 | [src/external\_libs/stb\_image/stb\_image.cpp](/src/external_libs/stb_image/stb_image.cpp) | C++ | 2 | 0 | 0 | 2 |
 | [src/external\_libs/stb\_image/stb\_image.h](/src/external_libs/stb_image/stb_image.h) | C++ | 5,842 | 1,285 | 861 | 7,988 |
-| [src/gl\_core/CMakeLists.txt](/src/gl_core/CMakeLists.txt) | CMake | 3 | 0 | 2 | 5 |
-| [src/gl\_core/assets/CMakeLists.txt](/src/gl_core/assets/CMakeLists.txt) | CMake | 15 | 0 | 3 | 18 |
-| [src/gl\_core/assets/cache/CMakeLists.txt](/src/gl_core/assets/cache/CMakeLists.txt) | CMake | 14 | 0 | 2 | 16 |
-| [src/gl\_core/assets/cache/cache.h](/src/gl_core/assets/cache/cache.h) | C++ | 12 | 0 | 4 | 16 |
-| [src/gl\_core/assets/cache/material\_cache.cpp](/src/gl_core/assets/cache/material_cache.cpp) | C++ | 10 | 0 | 3 | 13 |
-| [src/gl\_core/assets/cache/material\_cache.h](/src/gl_core/assets/cache/material_cache.h) | C++ | 14 | 0 | 5 | 19 |
-| [src/gl\_core/assets/cache/mesh\_cache.cpp](/src/gl_core/assets/cache/mesh_cache.cpp) | C++ | 10 | 0 | 3 | 13 |
-| [src/gl\_core/assets/cache/mesh\_cache.h](/src/gl_core/assets/cache/mesh_cache.h) | C++ | 14 | 0 | 5 | 19 |
-| [src/gl\_core/assets/cache/shader\_cache.cpp](/src/gl_core/assets/cache/shader_cache.cpp) | C++ | 38 | 0 | 8 | 46 |
-| [src/gl\_core/assets/cache/shader\_cache.h](/src/gl_core/assets/cache/shader_cache.h) | C++ | 16 | 0 | 4 | 20 |
-| [src/gl\_core/assets/material.cpp](/src/gl_core/assets/material.cpp) | C++ | 0 | 0 | 1 | 1 |
-| [src/gl\_core/assets/material.h](/src/gl_core/assets/material.h) | C++ | 19 | 1 | 9 | 29 |
-| [src/gl\_core/assets/mesh.cpp](/src/gl_core/assets/mesh.cpp) | C++ | 171 | 15 | 31 | 217 |
-| [src/gl\_core/assets/mesh.h](/src/gl_core/assets/mesh.h) | C++ | 107 | 15 | 35 | 157 |
-| [src/gl\_core/assets/shader.cpp](/src/gl_core/assets/shader.cpp) | C++ | 225 | 5 | 24 | 254 |
-| [src/gl\_core/assets/shader.h](/src/gl_core/assets/shader.h) | C++ | 62 | 6 | 9 | 77 |
-| [src/gl\_core/batch\_renderer.cpp](/src/gl_core/batch_renderer.cpp) | C++ | 118 | 1 | 32 | 151 |
-| [src/gl\_core/batch\_renderer.h](/src/gl_core/batch_renderer.h) | C++ | 52 | 0 | 23 | 75 |
-| [src/gl\_core/camera.cpp](/src/gl_core/camera.cpp) | C++ | 84 | 0 | 9 | 93 |
-| [src/gl\_core/camera.h](/src/gl_core/camera.h) | C++ | 41 | 0 | 15 | 56 |
-| [src/gl\_core/context.cpp](/src/gl_core/context.cpp) | C++ | 167 | 37 | 30 | 234 |
-| [src/gl\_core/context.h](/src/gl_core/context.h) | C++ | 90 | 2 | 14 | 106 |
-| [src/gl\_core/core/CMakeLists.txt](/src/gl_core/core/CMakeLists.txt) | CMake | 7 | 0 | 2 | 9 |
-| [src/gl\_core/core/vertex.h](/src/gl_core/core/vertex.h) | C++ | 23 | 4 | 6 | 33 |
-| [src/gl\_core/engine.cpp](/src/gl_core/engine.cpp) | C++ | 13 | 0 | 3 | 16 |
-| [src/gl\_core/engine.h](/src/gl_core/engine.h) | C++ | 23 | 3 | 11 | 37 |
-| [src/gl\_core/gui.cpp](/src/gl_core/gui.cpp) | C++ | 258 | 55 | 25 | 338 |
-| [src/gl\_core/gui.h](/src/gl_core/gui.h) | C++ | 55 | 2 | 15 | 72 |
-| [src/gl\_core/physics\_object.cpp](/src/gl_core/physics_object.cpp) | C++ | 1 | 0 | 0 | 1 |
-| [src/gl\_core/physics\_object.h](/src/gl_core/physics_object.h) | C++ | 17 | 0 | 8 | 25 |
-| [src/gl\_core/pipeline.cpp](/src/gl_core/pipeline.cpp) | C++ | 22 | 5 | 7 | 34 |
-| [src/gl\_core/pipeline.h](/src/gl_core/pipeline.h) | C++ | 69 | 11 | 22 | 102 |
-| [src/gl\_core/renderer.cpp](/src/gl_core/renderer.cpp) | C++ | 158 | 2 | 26 | 186 |
-| [src/gl\_core/renderer.h](/src/gl_core/renderer.h) | C++ | 64 | 1 | 17 | 82 |
-| [src/gl\_core/rigidbody.cpp](/src/gl_core/rigidbody.cpp) | C++ | 30 | 2 | 8 | 40 |
-| [src/gl\_core/rigidbody.h](/src/gl_core/rigidbody.h) | C++ | 41 | 0 | 10 | 51 |
-| [src/gl\_core/scene.cpp](/src/gl_core/scene.cpp) | C++ | 13 | 0 | 6 | 19 |
-| [src/gl\_core/scene.h](/src/gl_core/scene.h) | C++ | 22 | 0 | 6 | 28 |
-| [src/gl\_core/services.cpp](/src/gl_core/services.cpp) | C++ | 5 | 0 | 1 | 6 |
-| [src/gl\_core/services.h](/src/gl_core/services.h) | C++ | 22 | 0 | 8 | 30 |
-| [src/gl\_core/tensor.cpp](/src/gl_core/tensor.cpp) | C++ | 9 | 4 | 4 | 17 |
-| [src/gl\_core/tensor.h](/src/gl_core/tensor.h) | C++ | 99 | 39 | 28 | 166 |
-| [src/gl\_core/texture\_man.cpp](/src/gl_core/texture_man.cpp) | C++ | 71 | 0 | 16 | 87 |
-| [src/gl\_core/texture\_man.h](/src/gl_core/texture_man.h) | C++ | 35 | 1 | 10 | 46 |
+| [src/gl\_core/CMakeLists.txt](/src/gl_core/CMakeLists.txt) | CMake | -36 | 0 | 0 | -36 |
+| [src/gl\_core/asset/CMakeLists.txt](/src/gl_core/asset/CMakeLists.txt) | CMake | 15 | 0 | 2 | 17 |
+| [src/gl\_core/asset/material.cpp](/src/gl_core/asset/material.cpp) | C++ | 49 | 12 | 15 | 76 |
+| [src/gl\_core/asset/material.h](/src/gl_core/asset/material.h) | C++ | 27 | 1 | 8 | 36 |
+| [src/gl\_core/asset/mesh.cpp](/src/gl_core/asset/mesh.cpp) | C++ | 164 | 15 | 29 | 208 |
+| [src/gl\_core/asset/mesh.h](/src/gl_core/asset/mesh.h) | C++ | 91 | 23 | 32 | 146 |
+| [src/gl\_core/asset/shader.cpp](/src/gl_core/asset/shader.cpp) | C++ | 176 | 4 | 12 | 192 |
+| [src/gl\_core/asset/shader.h](/src/gl_core/asset/shader.h) | C++ | 50 | 6 | 10 | 66 |
+| [src/gl\_core/asset/texture.cpp](/src/gl_core/asset/texture.cpp) | C++ | 71 | 0 | 16 | 87 |
+| [src/gl\_core/asset/texture.h](/src/gl_core/asset/texture.h) | C++ | 35 | 1 | 10 | 46 |
+| [src/gl\_core/assets/CMakeLists.txt](/src/gl_core/assets/CMakeLists.txt) | CMake | -15 | 0 | -3 | -18 |
+| [src/gl\_core/assets/cache/CMakeLists.txt](/src/gl_core/assets/cache/CMakeLists.txt) | CMake | -14 | 0 | -2 | -16 |
+| [src/gl\_core/assets/cache/cache.h](/src/gl_core/assets/cache/cache.h) | C++ | -12 | 0 | -4 | -16 |
+| [src/gl\_core/assets/cache/material\_cache.cpp](/src/gl_core/assets/cache/material_cache.cpp) | C++ | -10 | 0 | -3 | -13 |
+| [src/gl\_core/assets/cache/material\_cache.h](/src/gl_core/assets/cache/material_cache.h) | C++ | -14 | 0 | -5 | -19 |
+| [src/gl\_core/assets/cache/mesh\_cache.cpp](/src/gl_core/assets/cache/mesh_cache.cpp) | C++ | -10 | 0 | -3 | -13 |
+| [src/gl\_core/assets/cache/mesh\_cache.h](/src/gl_core/assets/cache/mesh_cache.h) | C++ | -14 | 0 | -5 | -19 |
+| [src/gl\_core/assets/cache/shader\_cache.cpp](/src/gl_core/assets/cache/shader_cache.cpp) | C++ | -38 | 0 | -8 | -46 |
+| [src/gl\_core/assets/cache/shader\_cache.h](/src/gl_core/assets/cache/shader_cache.h) | C++ | -16 | 0 | -4 | -20 |
+| [src/gl\_core/assets/material.cpp](/src/gl_core/assets/material.cpp) | C++ | 0 | 0 | -1 | -1 |
+| [src/gl\_core/assets/material.h](/src/gl_core/assets/material.h) | C++ | -19 | -1 | -9 | -29 |
+| [src/gl\_core/assets/mesh.cpp](/src/gl_core/assets/mesh.cpp) | C++ | -171 | -15 | -31 | -217 |
+| [src/gl\_core/assets/mesh.h](/src/gl_core/assets/mesh.h) | C++ | -107 | -15 | -35 | -157 |
+| [src/gl\_core/assets/shader.cpp](/src/gl_core/assets/shader.cpp) | C++ | -225 | -5 | -24 | -254 |
+| [src/gl\_core/assets/shader.h](/src/gl_core/assets/shader.h) | C++ | -62 | -6 | -9 | -77 |
+| [src/gl\_core/batch\_renderer.cpp](/src/gl_core/batch_renderer.cpp) | C++ | -118 | -1 | -32 | -151 |
+| [src/gl\_core/batch\_renderer.h](/src/gl_core/batch_renderer.h) | C++ | -52 | 0 | -23 | -75 |
+| [src/gl\_core/cache/CMakeLists.txt](/src/gl_core/cache/CMakeLists.txt) | CMake | 10 | 0 | 2 | 12 |
+| [src/gl\_core/cache/material\_cache.cpp](/src/gl_core/cache/material_cache.cpp) | C++ | 19 | 0 | 5 | 24 |
+| [src/gl\_core/cache/material\_cache.h](/src/gl_core/cache/material_cache.h) | C++ | 19 | 0 | 5 | 24 |
+| [src/gl\_core/cache/mesh\_cache.cpp](/src/gl_core/cache/mesh_cache.cpp) | C++ | 15 | 0 | 4 | 19 |
+| [src/gl\_core/cache/mesh\_cache.h](/src/gl_core/cache/mesh_cache.h) | C++ | 16 | 0 | 5 | 21 |
+| [src/gl\_core/cache/shader\_cache.cpp](/src/gl_core/cache/shader_cache.cpp) | C++ | 38 | 0 | 8 | 46 |
+| [src/gl\_core/cache/shader\_cache.h](/src/gl_core/cache/shader_cache.h) | C++ | 17 | 0 | 5 | 22 |
+| [src/gl\_core/camera.cpp](/src/gl_core/camera.cpp) | C++ | -84 | 0 | -9 | -93 |
+| [src/gl\_core/camera.h](/src/gl_core/camera.h) | C++ | -41 | 0 | -15 | -56 |
+| [src/gl\_core/core/CMakeLists.txt](/src/gl_core/core/CMakeLists.txt) | CMake | 13 | 0 | 0 | 13 |
+| [src/gl\_core/core/context.cpp](/src/gl_core/core/context.cpp) | C++ | 1 | -37 | -5 | -41 |
+| [src/gl\_core/core/context.h](/src/gl_core/core/context.h) | C++ | -8 | 0 | -1 | -9 |
+| [src/gl\_core/core/engine.cpp](/src/gl_core/core/engine.cpp) | C++ | -1 | 1 | 0 | 0 |
+| [src/gl\_core/core/engine.h](/src/gl_core/core/engine.h) | C++ | -1 | 1 | 0 | 0 |
+| [src/gl\_core/core/input.cpp](/src/gl_core/core/input.cpp) | C++ | 106 | 0 | 15 | 121 |
+| [src/gl\_core/core/input.h](/src/gl_core/core/input.h) | C++ | 43 | 2 | 10 | 55 |
+| [src/gl\_core/core/object.cpp](/src/gl_core/core/object.cpp) | C++ | 17 | 0 | 4 | 21 |
+| [src/gl\_core/core/object.h](/src/gl_core/core/object.h) | C++ | 35 | 5 | 12 | 52 |
+| [src/gl\_core/core/services.cpp](/src/gl_core/core/services.cpp) | C++ | 1 | 0 | 0 | 1 |
+| [src/gl\_core/core/services.h](/src/gl_core/core/services.h) | C++ | 22 | 6 | 9 | 37 |
+| [src/gl\_core/core/types.h](/src/gl_core/core/types.h) | C++ | 20 | 10 | 9 | 39 |
+| [src/gl\_core/gui.h](/src/gl_core/gui.h) | C++ | -1 | 0 | 0 | -1 |
+| [src/gl\_core/misc/CMakeLists.txt](/src/gl_core/misc/CMakeLists.txt) | CMake | 16 | 0 | 2 | 18 |
+| [src/gl\_core/misc/batch\_renderer.cpp](/src/gl_core/misc/batch_renderer.cpp) | C++ | 118 | 15 | 36 | 169 |
+| [src/gl\_core/misc/batch\_renderer.h](/src/gl_core/misc/batch_renderer.h) | C++ | 52 | 0 | 23 | 75 |
+| [src/gl\_core/misc/physics\_object.cpp](/src/gl_core/misc/physics_object.cpp) | C++ | 1 | 0 | 0 | 1 |
+| [src/gl\_core/misc/physics\_object.h](/src/gl_core/misc/physics_object.h) | C++ | 17 | 0 | 8 | 25 |
+| [src/gl\_core/misc/tensor.cpp](/src/gl_core/misc/tensor.cpp) | C++ | 9 | 4 | 4 | 17 |
+| [src/gl\_core/misc/tensor.h](/src/gl_core/misc/tensor.h) | C++ | 99 | 39 | 28 | 166 |
+| [src/gl\_core/physics/CMakeLists.txt](/src/gl_core/physics/CMakeLists.txt) | CMake | 13 | 0 | 2 | 15 |
+| [src/gl\_core/physics/rigidbody.cpp](/src/gl_core/physics/rigidbody.cpp) | C++ | 4 | 1 | 5 | 10 |
+| [src/gl\_core/physics/rigidbody.h](/src/gl_core/physics/rigidbody.h) | C++ | 23 | 0 | 9 | 32 |
+| [src/gl\_core/physics\_object.cpp](/src/gl_core/physics_object.cpp) | C++ | -1 | 0 | 0 | -1 |
+| [src/gl\_core/physics\_object.h](/src/gl_core/physics_object.h) | C++ | -17 | 0 | -8 | -25 |
+| [src/gl\_core/rigidbody.cpp](/src/gl_core/rigidbody.cpp) | C++ | -30 | -2 | -8 | -40 |
+| [src/gl\_core/rigidbody.h](/src/gl_core/rigidbody.h) | C++ | -41 | 0 | -10 | -51 |
+| [src/gl\_core/scene.cpp](/src/gl_core/scene.cpp) | C++ | -13 | 0 | -6 | -19 |
+| [src/gl\_core/scene.h](/src/gl_core/scene.h) | C++ | -22 | 0 | -6 | -28 |
+| [src/gl\_core/scene/CMakeLists.txt](/src/gl_core/scene/CMakeLists.txt) | CMake | 19 | 0 | 2 | 21 |
+| [src/gl\_core/scene/camera.cpp](/src/gl_core/scene/camera.cpp) | C++ | 72 | 1 | 10 | 83 |
+| [src/gl\_core/scene/camera.h](/src/gl_core/scene/camera.h) | C++ | 40 | 0 | 15 | 55 |
+| [src/gl\_core/scene/observer.cpp](/src/gl_core/scene/observer.cpp) | C++ | 31 | 2 | 7 | 40 |
+| [src/gl\_core/scene/observer.h](/src/gl_core/scene/observer.h) | C++ | 19 | 0 | 8 | 27 |
+| [src/gl\_core/scene/scene.cpp](/src/gl_core/scene/scene.cpp) | C++ | 23 | 5 | 5 | 33 |
+| [src/gl\_core/scene/scene.h](/src/gl_core/scene/scene.h) | C++ | 23 | 2 | 6 | 31 |
+| [src/gl\_core/servers/CMakeLists.txt](/src/gl_core/servers/CMakeLists.txt) | CMake | 4 | 0 | 0 | 4 |
+| [src/gl\_core/servers/renderer.cpp](/src/gl_core/servers/renderer.cpp) | C++ | -137 | -2 | -21 | -160 |
+| [src/gl\_core/servers/renderer.h](/src/gl_core/servers/renderer.h) | C++ | -33 | 0 | -8 | -41 |
+| [src/gl\_core/tensor.cpp](/src/gl_core/tensor.cpp) | C++ | -9 | -4 | -4 | -17 |
+| [src/gl\_core/tensor.h](/src/gl_core/tensor.h) | C++ | -99 | -39 | -28 | -166 |
+| [src/gl\_core/texture\_man.cpp](/src/gl_core/texture_man.cpp) | C++ | -71 | 0 | -16 | -87 |
+| [src/gl\_core/texture\_man.h](/src/gl_core/texture_man.h) | C++ | -35 | -1 | -10 | -46 |
 | [src/shader\_source/batch\_render.fs](/src/shader_source/batch_render.fs) | GLSL | 61 | 2 | 13 | 76 |
 | [src/shader\_source/batch\_render.vs](/src/shader_source/batch_render.vs) | GLSL | 124 | 11 | 20 | 155 |
 | [src/shader\_source/default.fs](/src/shader_source/default.fs) | GLSL | 6 | 0 | 2 | 8 |
@@ -670,4 +703,4 @@ Total : 658 files,  169123 codes, 44877 comments, 28763 blanks, all 242763 lines
 | [src/shader\_source/post\_process.fs](/src/shader_source/post_process.fs) | GLSL | 23 | 0 | 5 | 28 |
 | [src/shader\_source/post\_process.vs](/src/shader_source/post_process.vs) | GLSL | 19 | 0 | 3 | 22 |
 
-[Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
+[Summary](results.md) / [Details](details.md) / [Diff Summary](diff.md) / Diff Details

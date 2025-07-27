@@ -3,19 +3,20 @@
 Scene::Scene(const std::shared_ptr<Services>& pservices) :
     m_services(pservices)
 {
-    m_camera = std::make_unique<Camera>();
+    m_camera = std::make_shared<Camera>(pservices);
     add_rb();
 }
 
 void Scene::run() {
-    m_camera->run();
     // Update Loop
     for (auto& [id, rb] : m_images ) {
         /*
-            PhysicsServer(rb)   -  Does some work on the rb
-            GameUpdate(rb)      -  Game Logic
+        PhysicsServer(rb)   -  Does some work on the rb
+        GameUpdate(rb)      -  Game Logic
         */
     }
+    m_observer->run();
+    m_camera->run(m_observer->get_orientation());
 }
 
 int Scene::add_rb(const std::shared_ptr<Mesh>& mesh, const std::shared_ptr<Material>& material) {

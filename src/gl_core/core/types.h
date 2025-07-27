@@ -1,6 +1,16 @@
 #ifndef CORE_TYPES_H_
 #define CORE_TYPES_H_
 
+struct keys {
+    int W_key = -1;
+    int A_key = -1;
+    int S_key = -1;
+    int D_key = -1;
+    int space = -1;
+    int Ltab_key = -1;
+    int esc_key = -1;
+};
+
 struct position { // relativistic 4 position
     float ct, x, y, z;
 };

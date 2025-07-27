@@ -1,6 +1,8 @@
 #ifndef GL_CORE_RENDERER_H_
 #define GL_CORE_RENDERER_H_
 
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include <cmath>
 #include <iostream>
 #include <numbers>
@@ -18,6 +20,7 @@
 #include "asset/mesh.h"
 #include "asset/shader.h"
 #include "core/services.h"
+#include "asset/object.h"
 #include "scene/scene.h"
 // #include "gl_core/texture_man.h"
 

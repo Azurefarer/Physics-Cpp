@@ -1,6 +1,8 @@
 #ifndef ASSET_SHADER_H_
 #define ASSET_SHADER_H_
 
+#define GLFW_INCLUDE_NONE
+
 #include <array>
 #include <filesystem>
 #include <fstream>
@@ -13,8 +15,8 @@
 #include <variant>
 #include <vector>
 
-#include "glm/glm.hpp"
 #include "glad/glad.h"
+#include "glm/glm.hpp"
 
 // Define a variant for all possible uniform types
 using UniformValue = std::variant<float, unsigned int, int, bool, glm::vec2, glm::vec3, glm::vec4, glm::mat2, glm::mat3, glm::mat4>;

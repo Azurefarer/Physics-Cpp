@@ -1,15 +1,17 @@
 #ifndef SCENE_SCENE_H_
 #define SCENE_SCENE_H_
 
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include <iostream>
 #include <memory>
 #include <vector>
 
-#include "core/object.h"
+#include "asset/object.h"
 #include "core/services.h"
 #include "core/vertex.h"
 #include "scene/camera.h"
-#include "physics/rigidbody.h"
+#include "scene/observer.h"
 
 class Scene {
     // friend class Renderer;   Can do this to share view and projection data from camera
@@ -22,7 +24,8 @@ class Scene {
     private:
         int m_render_ids = 0;
         std::shared_ptr<Services> m_services;
-        std::unique_ptr<Camera> m_camera;
+        std::shared_ptr<Camera> m_camera;
+        std::shared_ptr<Observer> m_observer;
         std::unordered_map<int, std::shared_ptr<Image>> m_images;
         // std::unordered_map<int, std::shared_ptr<Object>> m_objects;
 };

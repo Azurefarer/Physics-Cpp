@@ -13,7 +13,7 @@ target_include_directories(scene PUBLIC
     ${PROJECT_SOURCE_DIR}/src/gl_core
     ${PROJECT_SOURCE_DIR}/src/external_libs
 )
-target_link_libraries(scene PUBLIC asset_cache)
+target_link_libraries(scene PUBLIC cache)
 target_link_libraries(scene PUBLIC physics)
 target_link_libraries(scene PUBLIC glfw)
 target_link_libraries(scene PUBLIC glad)

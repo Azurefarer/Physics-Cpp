@@ -12,44 +12,39 @@
 
 #include "core/context.h"
 
+enum CameraMovement {
+    FORWARD = GLFW_KEY_W,
+    LEFT = GLFW_KEY_A,
+    BACKWARD = GLFW_KEY_S,
+    RIGHT = GLFW_KEY_D
+};
+
 class Camera {
     public:
         Camera(const std::shared_ptr<Services>& pservices);
-        void point_at(glm::vec3 front);
-        void run();
+        void run(const glm::quat& orientation);
 
-        void set_control(bool activity);
-
-        void process_keyboard(int key, float delta_time);
-        void process_mouse_movement(double x_offset, double y_offset, GLboolean constrain_pitch = true);
-        void process_mouse_scroll(double y_offset);
-
+        void update_orientation(const glm::quat& orientation);
+        
         float get_pos() const { return m_pos.x; }
         float get_zoom() const { return m_zoom; }
-
+        
         glm::mat4 get_view() const { return m_view; }
         glm::mat4 get_projection() const { return m_projection; }
-    
+        
     private:
         std::shared_ptr<Services> m_services;
-        bool m_active = true;
-        
-        double m_yaw;
-        double m_pitch; // for (m_yaw, m_pitch) = (0, 0) m_front, m_right, and m_up are the xyz basis vectors.
-        double m_movement_speed = 10.0;
         double m_zoom = 45.0;
-
         glm::mat4 m_view;
         glm::mat4 m_projection;
-        void set_view_projection_transforms();
-
         glm::vec3 m_pos;
         glm::vec3 m_front;
         glm::vec3 m_up;
         glm::vec3 m_world_up;
         glm::vec3 m_right;
-
-        void update_camera_vectors(const glm::quat& orientation);
+        
+        void process_mouse_scroll(double y_offset);
+        void set_view_projection_transforms();
 };
 
 #endif

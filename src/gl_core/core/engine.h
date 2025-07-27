@@ -2,6 +2,7 @@
 #define GL_CORE_ENGINE_H_
 
 #define GLM_ENABLE_EXPERIMENTAL
+#define GLFW_INCLUDE_NONE
 
 #include <memory>
 #include <vector>

@@ -1,8 +1,8 @@
 # src/gl_core/physics/CMakeLists.txt
 
 add_library(physics
-    ${PROJECT_SOURCE_DIR}/src/gl_core/physics/rigidbody.cpp
-    ${PROJECT_SOURCE_DIR}/src/gl_core/physics/rigidbody.h
+    ${PROJECT_SOURCE_DIR}/src/gl_core/physics/physic.cpp
+    ${PROJECT_SOURCE_DIR}/src/gl_core/physics/physic.h
 )
 target_include_directories(physics PUBLIC 
     ${PROJECT_SOURCE_DIR}/src/gl_core/

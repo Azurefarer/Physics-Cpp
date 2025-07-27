@@ -1,4 +1,4 @@
-#include "core/object.h"
+#include "asset/object.h"
 
 Image::Image(const std::shared_ptr<Mesh>& mesh, const std::shared_ptr<Material>& material) 
     : m_mesh(mesh),
@@ -18,3 +18,8 @@ void Image::set_model_position(const glm::vec3& model_offset_from_world) {
     m_model = glm::mat4(1.0f);
     m_model = glm::translate(m_model, model_offset_from_world);
 }
+
+RigidBody::RigidBody(const std::shared_ptr<Mesh>& mesh, const std::shared_ptr<Material>& material) 
+    : Image(mesh, material)
+{};
+

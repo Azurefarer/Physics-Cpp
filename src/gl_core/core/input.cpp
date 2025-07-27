@@ -1,5 +1,10 @@
 #include "core/input.h"
 
+Input::Input(const std::shared_ptr<Services>& pservices) : m_services(pservices) {
+    m_window = m_services->get_window();
+    glfwSetWindowUserPointer(m_window, this); // glfw expects a void *, so instead we set it to expect context *
+}
+
 void Input::set_GLFWcallbacks() {
     glfwSetFramebufferSizeCallback(m_window, viewport_size_callback);
     glfwSetKeyCallback(m_window, keyboard_callback);
@@ -53,15 +58,14 @@ void Input::on_key(int key, int scancode, int action, int mods) {
             glfwSetWindowShouldClose(m_window, true);
         }
         if ( key == GLFW_KEY_TAB ) {
-            static bool gaming = true;
-            if ( gaming ) {
+            if ( !free_cursor ) {
                 (m_keys).Ltab_key = key;
                 glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-                gaming = true;
+                free_cursor = true;
             } else {
                 (m_keys).Ltab_key = -1;
                 glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-                gaming = false;
+                free_cursor = false;
             }
         }
         if ( key == GLFW_KEY_W ) {
@@ -91,25 +95,27 @@ void Input::on_key(int key, int scancode, int action, int mods) {
             (m_keys).D_key = -1;
         }
     }
+    m_services->set_keys(m_keys);
 }
 
 void Input::on_cursor_pos(double xposIn, double yposIn) {
-    m_arc_x += xposIn - m_cursor_pos_x;
-    m_arc_y += m_cursor_pos_y - yposIn;
-    m_cursor_pos_x = xposIn;
-    m_cursor_pos_y = yposIn;
-    m_cursor_pos_ratio = {m_cursor_pos_x/m_width, m_cursor_pos_y/m_height};
-
-    set_cursor_activity(true);
+    if (free_cursor) {
+        m_services->set_cursor_diff_x(0);
+        m_services->set_cursor_diff_y(0);
+    } else {
+        m_services->set_cursor_diff_x(xposIn - m_services->get_cursor_pos_x());
+        m_services->set_cursor_diff_y(m_services->get_cursor_pos_y() - yposIn);
+    }
+    m_services->set_cursor_pos_x(xposIn);
+    m_services->set_cursor_pos_y(yposIn);
+    // There will be multiple calls to this per frame, as is the mouse movement will feel chunky
 }
 
 void Input::on_cursor_enter(int entered) {
-    glfwSetCursorPos(m_window, m_cursor_pos_x, m_cursor_pos_y);
+    glfwSetCursorPos(m_window, m_services->get_cursor_pos_x(), m_services->get_cursor_pos_y());
 }
 
 void Input::on_scroll(double xoffset, double yoffset) {
-    m_scroll_x_offset = xoffset;
-    m_scroll_y_offset = yoffset;
-    
-    m_scroll_activity = true;
+    m_services->set_scroll_offset_x(xoffset);
+    m_services->set_scroll_offset_y(yoffset);
 }

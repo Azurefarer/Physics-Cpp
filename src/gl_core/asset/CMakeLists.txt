@@ -3,6 +3,7 @@
 add_library(asset
     ${PROJECT_SOURCE_DIR}/src/gl_core/asset/material.cpp
     ${PROJECT_SOURCE_DIR}/src/gl_core/asset/mesh.cpp
+    ${PROJECT_SOURCE_DIR}/src/gl_core/asset/object.cpp
     ${PROJECT_SOURCE_DIR}/src/gl_core/asset/shader.cpp
     # ${PROJECT_SOURCE_DIR}/src/gl_core/cache/asset/texture.cpp
 )

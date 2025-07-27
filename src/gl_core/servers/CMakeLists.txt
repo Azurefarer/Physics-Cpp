@@ -11,3 +11,6 @@ target_include_directories(servers PUBLIC
 target_link_libraries(servers PUBLIC glad)
 target_link_libraries(servers PUBLIC glfw)
 target_link_libraries(servers PUBLIC glm::glm)
+target_link_libraries(servers PUBLIC asset)
+target_link_libraries(servers PUBLIC cache)
+target_link_libraries(servers PUBLIC )
