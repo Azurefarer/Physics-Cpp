@@ -5,6 +5,7 @@ Camera::Camera(const std::shared_ptr<Services>& pservices) :
     m_pos(glm::vec3(0.0f, 2.0f, 15.0f)),
     m_world_up(glm::vec3(0.0f, 1.0f, 0.0f))
 {
+    
     update_orientation(glm::quat(0.0, 0.0, 0.0, 0.0));
     set_view_projection_transforms();
 }

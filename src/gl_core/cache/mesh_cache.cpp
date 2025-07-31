@@ -4,6 +4,7 @@ MeshCache::MeshCache() {
     m_meshes["default"] = std::make_shared<Mesh>(quad_vertices, quad_indices);
     m_meshes["quad"] = std::make_shared<Mesh>(quad_vertices, quad_indices);
     m_meshes["cube"] = std::make_shared<Mesh>(cube_vertices, cube_indices);
+
 }
 
 void MeshCache::add(const std::string& name, std::shared_ptr<Mesh> mesh) {

@@ -13,7 +13,7 @@
 
 class Context {
     public:
-        Context(int width, int height, std::string title);
+        Context(int width, int height, std::string title, const std::shared_ptr<Services>& pservices);
         ~Context();
         void run();
 
@@ -25,7 +25,7 @@ class Context {
         void set_resolution(int width, int height);
 
         void swap_buffers();
-        void set_services(const std::shared_ptr<Services>& pservices) { m_services = pservices; }
+        void set_services(const std::shared_ptr<Services>& pservices);
     private:
         std::shared_ptr<Services> m_services;
         GLFWwindow* m_window;

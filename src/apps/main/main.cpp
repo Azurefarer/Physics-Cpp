@@ -1,10 +1,14 @@
+#include <iostream>
 #include <memory>
 #include <string>
 #include <utility>
+#define GLFW_INCLUDE_NONE
+
+#include "GLFW/glfw3.h"
 
 #include "core/engine.h"
 
-int main() {
+int main() { 
     Engine engine;
     while(engine.context_active()) {
         glClearColor(0.35f, 0.7f, 0.9f, 1.0f);

@@ -19,7 +19,7 @@
 
 class Input {
     public:
-        Input(const std::shared_ptr<Services>& pservices);
+        Input(GLFWwindow* window, const std::shared_ptr<Services>& pservices);
         ~Input() = default;
 
         keys get_keys_pressed() { return m_keys; }

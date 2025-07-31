@@ -8,8 +8,9 @@
 #include <vector>
 
 #include "core/context.h"
-#include "scene/scene.h"
+#include "core/input.h"
 #include "core/services.h"
+#include "scene/scene.h"
 #include "servers/renderer.h"
 
 // The Engine is what organizes all the components in the system
@@ -25,13 +26,14 @@ class Engine {
         bool context_active() const { return m_context->is_live(); }
 
     private:
+        void setup();
         std::shared_ptr<Services> m_services;
         std::unique_ptr<Context> m_context;
+        std::unique_ptr<Input> m_input;
         // std::unique_ptr<Gui> m_gui; // should take out as another higher-order entity like engine.
         std::unique_ptr<Renderer> m_renderer;
         std::unique_ptr<Scene> m_scene;
+
 };
-
-
 
 #endif

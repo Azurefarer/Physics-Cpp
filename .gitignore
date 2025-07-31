@@ -5,3 +5,6 @@ build/
 /helloworld_build
 /Object_Graphic.ase
 src/external_libs/glfw/
+/.idea
+/cmake-build-debug
+/cmake-build-release

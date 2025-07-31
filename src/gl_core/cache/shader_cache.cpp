@@ -8,22 +8,22 @@ ShaderCache::ShaderCache() {
         std::filesystem::path geometry;
         std::filesystem::path compute;
     };
-
+    
     std::unordered_map<std::string, ShaderPaths> groups;
-
+    
     for (const auto& entry : std::filesystem::directory_iterator(SHADER_DIR)) { // using cmake functionality to define a macro for my glsl src code.
         if (!entry.is_regular_file()) continue;
         auto path = entry.path();
         std::string name = path.stem().string();
         auto ext = path.extension();
-
+        
         ShaderPaths& p = groups[name];
         if (ext == ".vs")       p.vertex   = path;
         else if (ext == ".fs")  p.fragment = path;
         else if (ext == ".gs")  p.geometry = path;
         else if (ext == ".cs")  p.compute  = path;
     }
-
+    
     for (const auto& [name, p] : groups) {
         if (!p.compute.empty()) {
             auto shader = std::make_shared<Shader>(std::filesystem::path{}, std::filesystem::path{}, std::filesystem::path{}, p.compute);

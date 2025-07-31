@@ -19,9 +19,8 @@ class Services {
     Services();
     ~Services() = default;
     
-    GLFWwindow* get_window() { return m_window; }
-    void set_window(GLFWwindow* window) { m_window = window; }
-    
+    void config_cache();
+
     float   get_width() const { return m_width; }
     void    set_width(float width) { m_width = width; }
     float   get_height() const { return m_height; }
@@ -77,7 +76,6 @@ class Services {
         glm::mat4 m_view;
         glm::mat4 m_projection;
     // Context data
-        GLFWwindow* m_window;
         double m_aspect_ratio;
         float m_time;
         float m_delta;

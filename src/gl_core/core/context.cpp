@@ -1,6 +1,6 @@
 #include "core/context.h"
 
-Context::Context(int width, int height, std::string title) {
+Context::Context(int width, int height, std::string title, const std::shared_ptr<Services>& pservices) : m_services(pservices) {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -8,14 +8,14 @@ Context::Context(int width, int height, std::string title) {
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
     m_window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
 	if (m_window == NULL) { 
-		glfwTerminate();
+        glfwTerminate();
         throw std::runtime_error("Failed to create GLFW window");
 	}
     glfwMakeContextCurrent(m_window);
-    glfwSetWindowPos(m_window, 0, 10); // Make this flush with OS taskbar or fullscreen it.
-
+    glfwSetWindowPos(m_window, 10, 10); // Make this flush with OS taskbar or fullscreen it.
+    
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		throw std::runtime_error("Failed to initialize GLAD");
+        throw std::runtime_error("Failed to initialize GLAD");
 	}
     glfwSwapInterval(0);
     glEnable(GL_DEBUG_OUTPUT);
@@ -23,8 +23,8 @@ Context::Context(int width, int height, std::string title) {
     glEnable(GL_DEPTH_TEST);
     set_GLcallbacks();
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-    m_services->set_window(m_window);
+    m_services->set_width(width);
+    m_services->set_height(height);
 }
 
 Context::~Context() {
@@ -68,3 +68,8 @@ void Context::message_callback(GLenum source, GLenum type, GLuint id, GLenum sev
         ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ), type, severity, message
     );
 };
+
+void Context::set_services(const std::shared_ptr<Services>& pservices) {
+//          std::cout << "hii" << std::endl;
+// m_services = std::make_shared<Services>(pservices); 
+}

@@ -1,7 +1,6 @@
 #include "core/input.h"
 
-Input::Input(const std::shared_ptr<Services>& pservices) : m_services(pservices) {
-    m_window = m_services->get_window();
+Input::Input(GLFWwindow* window, const std::shared_ptr<Services>& pservices) : m_window(window), m_services(pservices) {
     glfwSetWindowUserPointer(m_window, this); // glfw expects a void *, so instead we set it to expect context *
 }
 

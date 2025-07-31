@@ -22,6 +22,7 @@ void Scene::run() {
 int Scene::add_rb(const std::shared_ptr<Mesh>& mesh, const std::shared_ptr<Material>& material) {
     m_render_ids++;
     if (mesh && material) {
+        std::cout << "hi" << std::endl;
         m_images[m_render_ids] = std::make_shared<RigidBody>(mesh, material);
     } else {
         const std::shared_ptr<Mesh>& dmesh = m_services->get_mesh_cache()->get("default");
