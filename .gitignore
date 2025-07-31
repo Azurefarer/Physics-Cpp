@@ -1,5 +1,6 @@
 build/
 /.vscode
+/.VSCodeCounter
 /opencv
 .DS_Store
 /helloworld_build
