@@ -1,13 +1,24 @@
 #include "core/context.h"
 
+namespace {
+// TODO: need a global strategy for managing version dependent features
+#ifdef __APPLE__
+static const int openglMajorVersion = 4;
+static const int openglMinorVersion = 1;
+#else
+static const int openglMajorVersion = 4;
+static const int openglMinorVersion = 3;
+#endif
+static constexpr int openglVersion = openglMajorVersion * 100 + openglMinorVersion * 10;
+}  // anonymous namespace
+
 Context::Context(int width, int height, std::string title) :
 m_width(width),
 m_height(height),
 m_title(title) {
     glfwInit();
-    // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);  // 4 fails with macos
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openglMajorVersion);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, openglMinorVersion);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
     m_window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
@@ -21,11 +32,17 @@ m_title(title) {
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         throw std::runtime_error("Failed to initialize GLAD");
 	}
+
+    GLint majorVersion, minorVersion;
+    glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
+    glGetIntegerv(GL_MINOR_VERSION, &minorVersion);
+    std::cout << "OpenGL Version: " << majorVersion << "." << minorVersion << std::endl;
+
     glfwSwapInterval(0);
     glEnable(GL_DEBUG_OUTPUT);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
-//    set_GLcallbacks();
+    set_GLcallbacks();
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
@@ -61,11 +78,16 @@ void Context::set_GLcallbacks() {
     static auto message_callback_static = [this](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
         Context::message_callback(source, type, id, severity, length, message, userParam);
     };
-    glDebugMessageCallback(
-        [](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
-            message_callback_static(source, type, id, severity, length, message, userParam);},
-        0
-    );
+    if (openglVersion >= 430) {
+        // glDebugMessageCallback requires opengl 4.3 or the GL_KHR_debug extension
+        glDebugMessageCallback(
+                [](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message,
+                   const void *userParam) {
+                    message_callback_static(source, type, id, severity, length, message, userParam);
+                },
+                0
+        );
+    }
 }
 
 void Context::message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) { 
