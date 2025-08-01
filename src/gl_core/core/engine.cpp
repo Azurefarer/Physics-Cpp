@@ -12,11 +12,16 @@ void Engine::run() {
 }
 
 void Engine::setup() {
-    m_services = std::make_shared<Services>();
-    m_context = std::make_unique<Context>(1920, 1080, std::string("OpenGL Application"), m_services);
+    m_context = std::make_shared<Context>(1920, 1080, std::string("OpenGL Application"));
+    m_services = std::make_shared<Services>(m_context);
+
     m_input = std::make_unique<Input>(m_context->get_window(), m_services);
     m_renderer = std::make_unique<Renderer>(m_services);
     m_scene = std::make_unique<Scene>(m_services);
-    m_context->set_services(m_services);
+
     m_services->config_cache();
+
+    auto dmesh = m_services->get_mesh_cache()->get("default");
+    auto dmaterial = m_services->get_material_cache()->get("default");
+    m_scene->add_rb(dmesh, dmaterial);
 }

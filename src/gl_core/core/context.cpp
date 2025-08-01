@@ -1,13 +1,17 @@
 #include "core/context.h"
 
-Context::Context(int width, int height, std::string title, const std::shared_ptr<Services>& pservices) : m_services(pservices) {
+Context::Context(int width, int height, std::string title) :
+m_width(width),
+m_height(height),
+m_title(title) {
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);  // 4 fails with macos
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
     m_window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
-	if (m_window == NULL) { 
+	if (m_window == NULL) {
         glfwTerminate();
         throw std::runtime_error("Failed to create GLFW window");
 	}
@@ -21,10 +25,8 @@ Context::Context(int width, int height, std::string title, const std::shared_ptr
     glEnable(GL_DEBUG_OUTPUT);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
-    set_GLcallbacks();
+//    set_GLcallbacks();
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    m_services->set_width(width);
-    m_services->set_height(height);
 }
 
 Context::~Context() {
@@ -37,8 +39,14 @@ void Context::run() {
     m_current_frame = glfwGetTime();
     m_delta = m_current_frame - m_last_frame;
     m_last_frame = m_current_frame;
-    m_services->set_time(m_current_frame);
-    m_services->set_delta(m_delta);
+}
+
+double Context::get_aspect_ratio() const {
+    if ((m_width <= 0) || (m_height <= 0)) {
+        // TODO: need a runtime error strategy - return std::optional, std::expected, throw, other?
+        throw std::runtime_error(m_title + ": error - bad window size");
+    }
+    return static_cast<double>(m_width)/static_cast<double>(m_height);
 }
 
 void Context::set_resolution(int width, int height) {
@@ -68,8 +76,3 @@ void Context::message_callback(GLenum source, GLenum type, GLuint id, GLenum sev
         ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ), type, severity, message
     );
 };
-
-void Context::set_services(const std::shared_ptr<Services>& pservices) {
-//          std::cout << "hii" << std::endl;
-// m_services = std::make_shared<Services>(pservices); 
-}

@@ -1,6 +1,8 @@
 #include "core/services.h"
 
-Services::Services() {};
+Services::Services(std::shared_ptr<Context> context) :
+m_context(context) {
+}
 
 void Services::config_cache() {
     m_mesh_cache = std::make_shared<MeshCache>();

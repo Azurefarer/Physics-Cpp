@@ -28,7 +28,7 @@ class Engine {
     private:
         void setup();
         std::shared_ptr<Services> m_services;
-        std::unique_ptr<Context> m_context;
+        std::shared_ptr<Context> m_context;
         std::unique_ptr<Input> m_input;
         // std::unique_ptr<Gui> m_gui; // should take out as another higher-order entity like engine.
         std::unique_ptr<Renderer> m_renderer;

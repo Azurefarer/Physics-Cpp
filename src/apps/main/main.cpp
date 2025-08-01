@@ -1,23 +1,34 @@
+#include <cstdlib>
 #include <iostream>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <utility>
-#define GLFW_INCLUDE_NONE
-
-#include "GLFW/glfw3.h"
+//#define GLFW_INCLUDE_NONE
+//
+//#include "GLFW/glfw3.h"
 
 #include "core/engine.h"
 
-int main() { 
-    Engine engine;
-    while(engine.context_active()) {
-        glClearColor(0.35f, 0.7f, 0.9f, 1.0f);
-        glClearDepth(1.0);
-        glDepthFunc(GL_LEQUAL); // Draw if depth is <= current val
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        engine.run();
+int main() {
+    bool success = true;
+    try {
+        Engine engine;
+        while (engine.context_active()) {
+            glClearColor(0.35f, 0.7f, 0.9f, 1.0f);
+            glClearDepth(1.0);
+            glDepthFunc(GL_LEQUAL); // Draw if depth is <= current val
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            engine.run();
+        }
+    } catch (std::exception& e) {
+        success = false;
+        std::cerr << "main: error - " << e.what() << std::endl;
+    } catch (...) {
+        success = false;
+        std::cerr << "main: unknown exception" << std::endl;
     }
-    return 0;
+    return (success ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 
 // Make a framebuffer shader for advanced post processing like
