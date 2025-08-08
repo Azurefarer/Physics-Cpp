@@ -1,13 +1,28 @@
 #include "core/context.h"
 
-Context::Context(int width, int height, std::string title, const std::shared_ptr<Services>& pservices) : m_services(pservices) {
+namespace {
+// TODO: need a global strategy for managing version dependent features
+#ifdef __APPLE__
+static const int openglMajorVersion = 4;
+static const int openglMinorVersion = 1;
+#else
+static const int openglMajorVersion = 4;
+static const int openglMinorVersion = 3;
+#endif
+static constexpr int openglVersion = openglMajorVersion * 100 + openglMinorVersion * 10;
+}  // anonymous namespace
+
+Context::Context(int width, int height, std::string title) :
+m_width(width),
+m_height(height),
+m_title(title) {
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openglMajorVersion);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, openglMinorVersion);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
     m_window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
-	if (m_window == NULL) { 
+	if (m_window == NULL) {
         glfwTerminate();
         throw std::runtime_error("Failed to create GLFW window");
 	}
@@ -17,14 +32,18 @@ Context::Context(int width, int height, std::string title, const std::shared_ptr
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         throw std::runtime_error("Failed to initialize GLAD");
 	}
+
+    GLint majorVersion, minorVersion;
+    glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
+    glGetIntegerv(GL_MINOR_VERSION, &minorVersion);
+    std::cout << "OpenGL Version: " << majorVersion << "." << minorVersion << std::endl;
+
     glfwSwapInterval(0);
     glEnable(GL_DEBUG_OUTPUT);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
     set_GLcallbacks();
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    m_services->set_width(width);
-    m_services->set_height(height);
 }
 
 Context::~Context() {
@@ -37,8 +56,14 @@ void Context::run() {
     m_current_frame = glfwGetTime();
     m_delta = m_current_frame - m_last_frame;
     m_last_frame = m_current_frame;
-    m_services->set_time(m_current_frame);
-    m_services->set_delta(m_delta);
+}
+
+double Context::get_aspect_ratio() const {
+    if ((m_width <= 0) || (m_height <= 0)) {
+        // TODO: need a runtime error strategy - return std::optional, std::expected, throw, other?
+        throw std::runtime_error(m_title + ": error - bad window size");
+    }
+    return static_cast<double>(m_width)/static_cast<double>(m_height);
 }
 
 void Context::set_resolution(int width, int height) {
@@ -53,11 +78,16 @@ void Context::set_GLcallbacks() {
     static auto message_callback_static = [this](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
         Context::message_callback(source, type, id, severity, length, message, userParam);
     };
-    glDebugMessageCallback(
-        [](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
-            message_callback_static(source, type, id, severity, length, message, userParam);},
-        0
-    );
+    if (openglVersion >= 430) {
+        // glDebugMessageCallback requires opengl 4.3 or the GL_KHR_debug extension
+        glDebugMessageCallback(
+                [](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message,
+                   const void *userParam) {
+                    message_callback_static(source, type, id, severity, length, message, userParam);
+                },
+                0
+        );
+    }
 }
 
 void Context::message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) { 
@@ -68,8 +98,3 @@ void Context::message_callback(GLenum source, GLenum type, GLuint id, GLenum sev
         ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ), type, severity, message
     );
 };
-
-void Context::set_services(const std::shared_ptr<Services>& pservices) {
-//          std::cout << "hii" << std::endl;
-// m_services = std::make_shared<Services>(pservices); 
-}

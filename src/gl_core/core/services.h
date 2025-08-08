@@ -12,27 +12,25 @@
 #include "cache/material_cache.h"
 #include "cache/mesh_cache.h"
 #include "cache/shader_cache.h"
+#include "core/context.h"
 #include "core/types.h"
 
 class Services {
     public:
-    Services();
+    explicit Services(std::shared_ptr<Context> context);
     ~Services() = default;
     
     void config_cache();
 
-    float   get_width() const { return m_width; }
-    void    set_width(float width) { m_width = width; }
-    float   get_height() const { return m_height; }
-    void    set_height(float height) { m_height = height; }
-    double   get_aspect_ratio() const { return m_width/m_height; }
+    void    set_width(int width) { m_context->set_width(width); }
+    void    set_height(int height) { m_context->set_height(height); }
+    int     get_width() const { return m_context->get_width(); }
+    int     get_height() const { return m_context->get_height(); }
+    double   get_aspect_ratio() const { return m_context->get_aspect_ratio(); }
     
-    float get_time() const { return m_time; }
-    void set_time(float time) { m_time = time; }
-    
-    float get_delta() const { return m_delta; }
-    void set_delta(float delta) { m_delta = delta; }
-    
+    float get_time() const { return m_context->get_time(); }
+    float get_delta() const { return m_context->get_delta_time(); }
+
     double get_mouse_sensitivity() const { return m_mouse_sensitivity; }
     void set_mouse_sensitivity(double mouse_sensitivity) { m_mouse_sensitivity = mouse_sensitivity; }
     
@@ -76,11 +74,7 @@ class Services {
         glm::mat4 m_view;
         glm::mat4 m_projection;
     // Context data
-        double m_aspect_ratio;
-        float m_time;
-        float m_delta;
-        float m_width;
-        float m_height;
+        std::shared_ptr<Context> m_context;
         bool m_free_cursor;
     // Input data
         keys m_keys;

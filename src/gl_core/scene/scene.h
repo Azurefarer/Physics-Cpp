@@ -17,7 +17,7 @@ class Scene {
     // friend class Renderer;   Can do this to share view and projection data from camera
     public:
         Scene(const std::shared_ptr<Services>& pservices);
-        int add_rb(const std::shared_ptr<Mesh>& mesh = nullptr, const std::shared_ptr<Material>& material = nullptr);
+        int add_rb(const std::shared_ptr<Mesh>& mesh, const std::shared_ptr<Material>& material);
         const std::unordered_map<int, std::shared_ptr<Image>>& get_images() const { return m_images; }
         void run();
 

@@ -4,7 +4,7 @@ Scene::Scene(const std::shared_ptr<Services>& pservices) :
     m_services(pservices)
 {
     m_camera = std::make_shared<Camera>(pservices);
-    add_rb();
+    m_observer = std::make_shared<Observer>(pservices);
 }
 
 void Scene::run() {
@@ -20,15 +20,11 @@ void Scene::run() {
 }
 
 int Scene::add_rb(const std::shared_ptr<Mesh>& mesh, const std::shared_ptr<Material>& material) {
-    m_render_ids++;
     if (mesh && material) {
-        std::cout << "hi" << std::endl;
-        m_images[m_render_ids] = std::make_shared<RigidBody>(mesh, material);
-    } else {
-        const std::shared_ptr<Mesh>& dmesh = m_services->get_mesh_cache()->get("default");
-        const std::shared_ptr<Material>& dmaterial = m_services->get_material_cache()->get("default");
+        m_render_ids++;
+        std::cout << "hi " << m_render_ids << std::endl;
 
-        m_images[m_render_ids] = std::make_shared<RigidBody>(dmesh, dmaterial);
+        m_images[m_render_ids] = std::make_shared<RigidBody>(mesh, material);
     }
     return m_render_ids;
 }

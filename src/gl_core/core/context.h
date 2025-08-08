@@ -8,26 +8,33 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
-#include "core/services.h"
-#include "core/vertex.h"
-
 class Context {
     public:
-        Context(int width, int height, std::string title, const std::shared_ptr<Services>& pservices);
+        Context(int width, int height, std::string title);
         ~Context();
         void run();
 
         bool is_live() const { return !glfwWindowShouldClose(m_window); }
 
         GLFWwindow* get_window() const { return m_window; }
+
+        void set_width(int width) { m_width = width; }
+        void set_height(int height) { m_height = height; }
+        int get_width() const { return m_width; }
+        int get_height() const { return m_height; }
+        double get_aspect_ratio() const;
+        float get_time() const { return m_current_frame; }
         float get_delta_time() { return m_delta; }
 
         void set_resolution(int width, int height);
 
         void swap_buffers();
-        void set_services(const std::shared_ptr<Services>& pservices);
+
     private:
-        std::shared_ptr<Services> m_services;
+        int m_width;
+        int m_height;
+        std::string m_title;
+
         GLFWwindow* m_window;
         float m_delta;
         float m_current_frame;
