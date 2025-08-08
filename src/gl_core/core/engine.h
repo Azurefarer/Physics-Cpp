@@ -33,7 +33,6 @@ class Engine {
         // std::unique_ptr<Gui> m_gui; // should take out as another higher-order entity like engine.
         std::unique_ptr<Renderer> m_renderer;
         std::unique_ptr<Scene> m_scene;
-
 };
 
 #endif
